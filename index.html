@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ==================== SEO Optimization ==================== -->
+    <title>Soroush Zendedel | سروش زنده‌دل</title>
+    <meta name="description" content="سروش زنده‌دل؛ تکنیکال آرتیست، برنامه‌نویس و جستجوگر. پروژه‌های خلاقانه، ابزارها و نوشته‌ها. | Soroush Zendedel's Personal Portfolio: Technical Artist, Programmer & Meaning Seeker.">
+    <meta name="keywords" content="سروش زنده دل, تکنیکال آرتیست, برنامه نویس, پورتفولیو, Soroush Zendedel, Technical Artist, Programmer, Portfolio, Web Developer, Game Developer">
+    <meta name="author" content="Soroush Zendedel">
+    <meta name="robots" content="index, follow">
+    <!-- آدرس اصلی سایت خود را در تگ canonical زیر جایگزین کنید در صورت نیاز -->
+    <link rel="canonical" href="https://soroush-zendedel.github.io/">
+
+    <!-- Open Graph / Facebook / LinkedIn / Telegram (Social Previews) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soroush-zendedel.github.io/">
+    <meta property="og:title" content="Soroush Zendedel | سروش زنده‌دل">
+    <meta property="og:description" content="سروش زنده‌دل؛ تکنیکال آرتیست، برنامه‌نویس و جستجوگر. | Technical Artist, Programmer & Meaning Seeker.">
+    <!-- عکس زیر برای پیش‌نمایش لینک‌ها استفاده می‌شود -->
+    <meta property="og:image" content="https://soroush-zendedel.github.io/img/me.jpg">
+
+    <!-- Twitter / X -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://soroush-zendedel.github.io/">
+    <meta property="twitter:title" content="Soroush Zendedel | سروش زنده‌دل">
+    <meta property="twitter:description" content="سروش زنده‌دل؛ تکنیکال آرتیست، برنامه‌نویس و جستجوگر. | Technical Artist, Programmer & Meaning Seeker.">
+    <meta property="twitter:image" content="https://soroush-zendedel.github.io/img/me.jpg">
+
+    <!-- Schema.org JSON-LD (For Google Rich Results) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Soroush Zendedel",
+      "alternateName": "سروش زنده‌دل",
+      "url": "https://soroush-zendedel.github.io/",
+      "image": "https://soroush-zendedel.github.io/img/me.jpg",
+      "jobTitle": "Technical Artist & Programmer",
+      "description": "Technical Artist, Programmer & Meaning Seeker",
+      "sameAs": [
+        "https://github.com/soroush-zendedel"
+      ]
+    }
+    </script>
+    <!-- ========================================================== -->
+
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Vazirmatn for Persian, Lora for English -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ink: '#1a1a1a',      // Darker, richer black
+                        paper: '#e8e6e1',    // Slightly warmer paper background
+                        canvas: '#fdfcfb',   // Pure paper for the central card
+                        crimson: '#b91c1c',  // Artistic red
+                        crimsonHover: '#991b1b'
+                    },
+                    fontFamily: {
+                        fa: ['Vazirmatn', 'sans-serif'],
+                        en: ['Lora', 'serif'],
+                    },
+                    boxShadow: {
+                        'artistic': '0 20px 40px -10px rgba(0,0,0,0.1), 0 0 20px rgba(185,28,28,0.03)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: theme('colors.paper');
+            color: theme('colors.ink');
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+            transition: all 0.4s ease;
+        }
+
+        /* The central document/canvas wrapper */
+        .document-wrapper {
+            background-color: theme('colors.canvas');
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.01' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        /* Avatar styling - Artistic frame without touching the face */
+        .avatar-frame {
+            position: relative;
+            display: inline-block;
+            padding: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, theme('colors.crimson') 0%, transparent 50%, theme('colors.ink') 100%);
+        }
+        .avatar-frame::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border: 1px dashed theme('colors.crimson');
+            border-radius: 50%;
+            animation: spin 30s linear infinite;
+        }
+        .art-avatar {
+            filter: grayscale(100%) contrast(115%) brightness(95%);
+            transition: all 0.5s ease;
+        }
+        .avatar-container:hover .art-avatar {
+            filter: grayscale(20%) contrast(105%);
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Highlight markers */
+        .brush-highlight {
+            display: inline;
+            background-image: linear-gradient(transparent 65%, rgba(185, 28, 28, 0.15) 65%, rgba(185, 28, 28, 0.15) 95%, transparent 95%);
+            -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+            padding: 0 2px;
+        }
+
+        /* Ornate Frame for Sabte Ahval */
+        .ornate-frame {
+            position: relative;
+            border: 1px solid rgba(26, 26, 26, 0.1);
+        }
+        .ornate-frame::before, .ornate-frame::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid theme('colors.crimson');
+            transition: all 0.3s ease;
+        }
+        .ornate-frame::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .ornate-frame::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+        
+        .ornate-frame-inner::before, .ornate-frame-inner::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid theme('colors.crimson');
+            transition: all 0.3s ease;
+        }
+        .ornate-frame-inner::before { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .ornate-frame-inner::after { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+
+        .group-sabte:hover .ornate-frame::before { top: -6px; left: -6px; }
+        .group-sabte:hover .ornate-frame::after { bottom: -6px; right: -6px; }
+        .group-sabte:hover .ornate-frame-inner::before { top: -6px; right: -6px; }
+        .group-sabte:hover .ornate-frame-inner::after { bottom: -6px; left: -6px; }
+
+        /* Multilingual logic */
+        html[lang="en"] .lang-fa { display: none !important; }
+        html[lang="en"] .lang-en { display: block; }
+        html[lang="en"] span.lang-en, html[lang="en"] p.lang-en, html[lang="en"] h1.lang-en, html[lang="en"] h2.lang-en { display: inline-block; }
+        
+        html[lang="fa"] .lang-en { display: none !important; }
+        html[lang="fa"] .lang-fa { display: block; }
+        html[lang="fa"] span.lang-fa, html[lang="fa"] p.lang-fa, html[lang="fa"] h1.lang-fa, html[lang="fa"] h2.lang-fa { display: inline-block; }
+
+        /* Dynamic Alignment based on Document Language */
+        html[lang="fa"] .dynamic-align { text-align: right; }
+        html[lang="en"] .dynamic-align { text-align: left; }
+        
+        /* Typography tweaks */
+        .quote-mark { 
+            font-family: 'Lora', serif; 
+            font-size: 4rem; 
+            color: theme('colors.crimson'); 
+            opacity: 0.15; 
+            line-height: 1; 
+            user-select: none;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+
+<body class="font-fa antialiased min-h-screen selection:bg-crimson selection:text-white p-4 md:p-8 lg:p-12">
+
+    <!-- Top Navigation outside the document wrapper -->
+    <nav class="w-full max-w-5xl mx-auto flex justify-end mb-4">
+        <button id="langToggle" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson transition-all flex items-center gap-2" onclick="toggleLanguage()">
+            <i class="fa-solid fa-globe text-crimson/70"></i>
+            <span class="lang-fa">EN</span>
+            <span class="lang-en font-fa">فا</span>
+        </button>
+    </nav>
+
+    <!-- Main Central Document Wrapper -->
+    <main class="document-wrapper max-w-5xl mx-auto rounded-lg shadow-artistic border border-ink/5 overflow-hidden relative">
+        
+        <!-- Decorative subtle top border -->
+        <div class="h-1.5 w-full bg-gradient-to-r from-transparent via-crimson to-transparent opacity-80"></div>
+
+        <div class="px-6 py-12 md:px-16 md:py-20">
+            
+            <header class="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-16 border-b border-ink/10 pb-12">
+                
+                <!-- Avatar Column -->
+                <div class="flex-shrink-0 avatar-container group">
+                    <div class="avatar-frame">
+                        <img src="./img/me.jpg" alt="Soroush Zendedel | سروش زنده‌دل" onerror="this.src='https://placehold.co/240x240/1a1a1a/e8e6e1?text=Soroush'" class="art-avatar w-48 h-48 md:w-56 md:h-56 object-cover rounded-full border-4 border-canvas z-10 relative shadow-inner">
+                    </div>
+                    <div class="mt-6 text-center">
+                        <div class="flex items-center justify-center gap-5 text-ink/40">
+                            <div class="w-8 h-px bg-ink/20"></div>
+                            <a href="https://github.com/soroush-zendedel" target="_blank" class="hover:text-crimson transition-colors text-xl" title="GitHub Profile">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                            <a href="mailto:soroush_zendedel@Live.com" class="hover:text-crimson transition-colors text-xl" title="Contact via Email">
+                                <i class="fa-regular fa-envelope"></i>
+                            </a>
+                            <div class="w-8 h-px bg-ink/20"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio Column -->
+                <div class="flex-1 text-center md:text-start pt-2">
+                    
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-ink mb-2 tracking-tight">
+                        <span class="lang-fa">سروش زنده‌دل</span>
+                        <span class="lang-en font-en">Soroush Zendedel</span>
+                    </h1>
+                    
+                    <h2 class="text-lg text-crimson font-medium mb-8 tracking-wide">
+                        <span class="lang-fa">تکنیکال آرتیست، برنامه‌نویس و جستجوگر</span>
+                        <span class="lang-en font-en italic">Technical Artist, Programmer & Meaning Seeker</span>
+                    </h2>
+
+                    <!-- Statement -->
+                    <div class="relative pt-4 mt-2 md:pt-6 md:mt-4">
+                        <!-- Quote mark styling improved and correctly anchored -->
+                        <span class="quote-mark absolute top-0 -right-2 md:-right-6 lang-fa">"</span>
+                        <span class="quote-mark absolute top-0 -left-2 md:-left-6 lang-en">"</span>
+                        
+                        <div class="text-base md:text-lg leading-relaxed text-ink/80 text-justify md:text-start font-light space-y-4 relative z-10">
+                            <!-- Persian Bio -->
+                            <div class="lang-fa space-y-4">
+                                <p><strong class="font-bold text-ink">من؟ منم مثل همه بنده‌ی خدا.</strong></p>
+                                <p>بین دنیای فکر و احساس قدم می‌زنم. از تکنولوژی و هنر یاد می‌گیرم، سعی می‌کنم هر روز دست به یک کار کوچیک جدید بزنم، اشتباه کنم، یاد بگیرم و قدم‌به‌قدم جلو برم. ایراد زیاد دارم، ولی تلاش می‌کنم مسیرم رو آگاهانه‌تر و صادقانه‌تر طی کنم، به امید اینکه ارتباط‌هام واقعی‌تر باشن و حضورم برای آدم‌هایی که باهاشون در ارتباطم، مفید یا دلگرم‌کننده باشه.</p>
+                                <p>گاهی هم فقط نگاه می‌کنم و با خودم می‌گم: 
+                                    <br>
+                                    <em class="brush-highlight">
+                                        "ادامه دادنم شاید فعلا فایده‌ای نداشته باشه، ولی ضرری هم نداره!"
+                                    </em>
+                                    <br>
+                                    و همین برای برداشتن قدم بعدی کافیه.</p>
+                            </div>
+                            
+                            <!-- English Bio -->
+                            <div class="lang-en font-en space-y-4">
+                                <p><strong class="font-bold text-ink">Me? I'm just an ordinary creation.</strong></p>
+                                <p>I walk the line between thought and emotion. Learning from technology and art, I try to take a small new step every day, make mistakes, learn, and move forward. I have many flaws, but I strive to walk my path more consciously and honestly, hoping my connections become more real and my presence comforting to those around me.</p>
+                                <p>Sometimes I just look and tell myself: <em class="brush-highlight">"Continuing might not have a clear benefit right now, but it does no harm either!"</em> ... and that is enough to take the next step.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </header>
+
+            <section class="py-12 border-b border-ink/10">
+                <div class="max-w-3xl mx-auto text-center">
+                    <i class="fa-solid fa-feather-pointed text-crimson/20 text-3xl mb-6"></i>
+                    
+                    <div class="text-lg md:text-xl leading-loose font-medium text-ink/90">
+                        <div class="lang-fa space-y-2">
+                            <p>شاید کمی خالی، شاید کمی پر، درست مثل دل..</p>
+                            <p>برنامه‌نویسی که با موسیقی نفس می‌کشه.</p>
+                            <p>دانش‌آموخته‌ی مهندسی فناوری اطلاعات.</p>
+                            <p>بین کد و کلمات، به دنبال معنا و بهتر کردن زندگیِ هر روزم.</p>
+                            <p>عاشق گفتگو درباره هنر، موسیقی، و دنیای دیجیتال.</p>
+                            <p class="text-crimson mt-6 text-sm font-bold tracking-wider">و باور دارم دنیای بهتر ساخته میشه، با خلاقیت، آگاهی، و فقط یک قدم رو به جلو در هر روز (و یا شب).</p>
+                        </div>
+                        
+                        <div class="lang-en font-en space-y-2 italic">
+                            <p>Perhaps a bit empty, perhaps a bit full, just like a heart..</p>
+                            <p>A programmer who breathes with music.</p>
+                            <p>IT Engineering graduate.</p>
+                            <p>Between codes and words, searching for meaning to better my everyday life.</p>
+                            <p>Passionate about art, music, and the digital world.</p>
+                            <p class="text-crimson mt-6 text-sm font-bold tracking-widest uppercase not-italic">And I believe a better world is built with creativity, awareness, and just one step forward every day.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-16">
+                <div class="flex items-center justify-center gap-6 mb-12">
+                    <div class="h-px bg-ink/10 flex-1 max-w-[100px]"></div>
+                    <h3 class="text-2xl md:text-3xl font-extrabold tracking-widest uppercase">
+                        <span class="lang-fa">مخلفات</span>
+                        <span class="lang-en font-en">Creations</span>
+                    </h3>
+                    <div class="h-px bg-ink/10 flex-1 max-w-[100px]"></div>
+                </div>
+
+                <!-- Compact Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Tara -->
+                    <a href="https://soroush-zendedel.github.io/tara/" target="_blank" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                        <img src="./img/tara.jpg" alt="Tara - Music Theory Application" onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=T'" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">
+                        <div class="flex-1 px-5">
+                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa flex items-center gap-2">تارا <span class="text-sm font-en text-ink/50 font-normal">| Tara</span></span>
+                                <span class="lang-en font-en">Tara</span>
+                            </h4>
+                            <p class="text-xs md:text-sm text-ink/60 font-en italic tracking-wide dynamic-align" dir="ltr">Visualize. Analyze. Master Music Theory.</p>
+                        </div>
+                    </a>
+
+                    <!-- Shenobin -->
+                    <a href="https://soroush-zendedel.github.io/shenobin/" target="_blank" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                        <img src="./img/shenobin.jpg" alt="Shenobin - Audio Capture Tool" onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=S'" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">
+                        <div class="flex-1 px-5">
+                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa flex items-center gap-2">شنوبین <span class="text-sm font-en text-ink/50 font-normal">| Shenobin</span></span>
+                                <span class="lang-en font-en">Shenobin</span>
+                            </h4>
+                            <p class="text-xs md:text-sm text-ink/60 font-en italic tracking-wide dynamic-align" dir="ltr">Listen. Capture. Deliver.</p>
+                        </div>
+                    </a>
+
+                    <!-- Khater -->
+                    <a href="https://soroush-zendedel.github.io/khater/" target="_blank" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                        <img src="./img/khater.jpg" alt="Khater - Font Design Tool" onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=K'" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">
+                        <div class="flex-1 px-5">
+                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa flex items-center gap-2">خطِر <span class="text-sm font-en text-ink/50 font-normal">| Khater</span></span>
+                                <span class="lang-en font-en">Khater</span>
+                            </h4>
+                            <p class="text-xs md:text-sm text-ink/60 font-en italic tracking-wide dynamic-align" dir="ltr">Practice, Design and Create Fonts.</p>
+                        </div>
+                    </a>
+
+                    <!-- Notella -->
+                    <a href="https://github.com/soroush-zendedel/notella" target="_blank" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                        <img src="./img/notella.jpg" alt="Notella - Note Taking App" onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=N'" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">
+                        <div class="flex-1 px-5">
+                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa flex items-center gap-2">نوتلا <span class="text-sm font-en text-ink/50 font-normal">| Notella</span></span>
+                                <span class="lang-en font-en">Notella</span>
+                            </h4>
+                            <p class="text-xs md:text-sm text-ink/60 font-en italic tracking-wide dynamic-align" dir="ltr">Write. Enjoy. Remember.</p>
+                        </div>
+                    </a>
+
+                    <!-- Silk Road -->
+                    <a href="https://soroush-zendedel.github.io/silk-road/" target="_blank" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                        <img src="./img/silkroad.jpg" alt="Silk Road Project" onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=SR'" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">
+                        <div class="flex-1 px-5">
+                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa flex items-center gap-2">جاده ابریشم <span class="text-sm font-en text-ink/50 font-normal">| Silk Road</span></span>
+                                <span class="lang-en font-en">Silk Road</span>
+                            </h4>
+                            <p class="text-xs md:text-sm text-ink/60 font-en italic tracking-wide dynamic-align" dir="ltr">Bridge the words. Carry the tale.</p>
+                        </div>
+                    </a>
+
+                    <!-- Countdown -->
+                    <a href="https://soroush-zendedel.github.io/countdown/" target="_blank" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                        <img src="./img/countdown.jpg" alt="Countdown Timer App" onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=C'" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">
+                        <div class="flex-1 px-5">
+                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa flex items-center gap-2">شمارش معکوس <span class="text-sm font-en text-ink/50 font-normal">| Countdown</span></span>
+                                <span class="lang-en font-en">Countdown</span>
+                            </h4>
+                            <p class="text-xs md:text-sm text-ink/60 font-en italic tracking-wide dynamic-align" dir="ltr">Observe time. Stay focused.</p>
+                        </div>
+                    </a>
+
+                </div>
+            </section>
+
+            <section class="mt-8">
+                <a href="https://soroush-zendedel.github.io/sabte-ahval/" class="block group-sabte cursor-pointer">
+                    <div class="ornate-frame bg-paper/30 p-8 md:p-12 text-center transition-colors hover:bg-white/60">
+                        <div class="ornate-frame-inner w-full h-full absolute inset-0 pointer-events-none"></div>
+                        
+                        <div class="relative z-10 flex flex-col items-center">
+                            
+                            <!-- Pen Nib Icon -->
+                            <div class="w-16 h-16 mb-6 rounded-full border border-crimson/30 flex items-center justify-center text-crimson text-2xl group-sabte-hover:bg-crimson group-sabte-hover:text-white transition-all bg-white shadow-sm">
+                                <i class="fa-solid fa-pen-nib"></i>
+                            </div>
+                            
+                            <h3 class="text-4xl md:text-5xl font-extrabold text-ink mb-2 tracking-tight">
+                                <span class="lang-fa">ثبت‌احـــوال</span>
+                                <span class="lang-en font-en">SABTE AHVAL</span>
+                            </h3>
+                            
+                            <p class="text-crimson font-en tracking-[0.2em] text-sm md:text-base uppercase mb-6 font-bold" dir="ltr">
+                                Chronicle Thoughts. Register Life.
+                            </p>
+                            
+                            <div class="max-w-xl mx-auto h-px bg-gradient-to-r from-transparent via-ink/20 to-transparent w-full mb-6"></div>
+                            
+                            <p class="text-lg text-ink/70">
+                                <span class="lang-fa">دفتری برای نوشته‌ها، درددل‌ها و اشعار</span>
+                                <span class="lang-en font-en italic">A journal for writings, inner thoughts, and poetry.</span>
+                            </p>
+
+                            <div class="mt-8 text-crimson flex items-center gap-2 opacity-80 group-sabte-hover:opacity-100 transition-opacity font-bold">
+                                <span class="lang-fa">ورود به دفتر</span>
+                                <span class="lang-en font-en">Open Journal</span>
+                                <i class="fa-solid fa-arrow-left lang-fa text-sm"></i>
+                                <i class="fa-solid fa-arrow-right lang-en text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="w-full text-center py-8 text-sm text-ink/40 font-en tracking-wide mt-4" dir="ltr">
+        <p class="mb-3">CRAFTED WITH CODE & CREATIVITY BY SOROUSH ZENDEDEL &copy; <span id="year"></span></p>
+        <a href="mailto:soroush_zendedel@Live.com" class="inline-flex items-center justify-center gap-2 hover:text-crimson transition-colors w-full">
+            <i class="fa-regular fa-envelope"></i>
+            soroush_zendedel@Live.com
+        </a>
+    </footer>
+
+    <script>
+        // Set current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Language Toggle Logic
+        let currentLang = 'fa';
+
+        function toggleLanguage() {
+            const htmlTag = document.documentElement;
+            
+            if (currentLang === 'fa') {
+                currentLang = 'en';
+                htmlTag.setAttribute('lang', 'en');
+                htmlTag.setAttribute('dir', 'ltr');
+                document.body.classList.remove('font-fa');
+                document.body.classList.add('font-en');
+            } else {
+                currentLang = 'fa';
+                htmlTag.setAttribute('lang', 'fa');
+                htmlTag.setAttribute('dir', 'rtl');
+                document.body.classList.remove('font-en');
+                document.body.classList.add('font-fa');
+            }
+        }
+    </script>
+</body>
+</html>
