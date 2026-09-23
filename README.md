@@ -1,6 +1,6 @@
 # سروش زنده‌دل — وب‌سایت نمونه‌کار
 
-وب‌سایت شخصی و دوزبانهٔ سروش زنده‌دل؛ مجموعه‌ای از ابزارها و تجربه‌های دیجیتال در زمینهٔ موسیقی، نوشتن و پروژه‌های خلاقانه. نسخهٔ فارسی راست‌چین است و نسخهٔ انگلیسی در مسیر جداگانهٔ [`/en/`](https://soroush-zendedel.github.io/en/) قرار دارد.
+وب‌سایت شخصی و دوزبانهٔ من؛ مجموعه‌ای از ابزارها و تجربه‌های دیجیتال در زمینهٔ موسیقی، نوشتن و پروژه‌های خلاقانه. نسخهٔ فارسی راست‌چین است و نسخهٔ انگلیسی در مسیر جداگانهٔ [`/en/`](https://soroush-zendedel.github.io/en/) قرار دارد.
 
 **مشاهدهٔ وب‌سایت:** [soroush-zendedel.github.io](https://soroush-zendedel.github.io/)
 
@@ -11,7 +11,7 @@
 - [Khater](https://soroush-zendedel.github.io/khater/) — ابزار تمرین، طراحی و ساخت فونت.
 - [Notella](https://github.com/soroush-zendedel/notella) — اپلیکیشن یادداشت‌برداری پایتون با رابط خط فرمان و وب.
 - [Silk Road](https://soroush-zendedel.github.io/silk-road/) — پروژه‌ای دربارهٔ واژه‌ها و روایت‌های جادهٔ ابریشم.
-- [Countdown](https://soroush-zendedel.github.io/countdown/) — ابزار شمارش معکوس برای مدیریت زمان و تمرکز.
+- [Countdown](https://soroush-zendedel.github.io/countdown/) — پژوهش‌های شمارش معکوس برای دیدن گذر زمان و تاریخ اعداد.
 - [ثبت‌احوال](https://soroush-zendedel.github.io/personal-blog/) — وبلاگ نوشته‌ها، اندیشه‌ها و شعرها.
 
 ## ساختار
