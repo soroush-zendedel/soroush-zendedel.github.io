@@ -65,6 +65,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 
     <style>
+        .top-navigation { display: flex; justify-content: space-between; }
         body {
             background-color: #ffffff;
             color: #1a1a1a;
@@ -175,7 +176,7 @@
 <body class="font-en antialiased min-h-screen selection:bg-crimson selection:text-white p-4 md:p-8 lg:p-12">
 
     <!-- Top Navigation outside the document wrapper -->
-    <nav class="w-full max-w-5xl mx-auto flex justify-between items-center mb-4">
+    <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4">
         <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">About</a>
         <a id="langToggle" href="/" hreflang="fa" aria-label="مشاهده نسخه فارسی" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson transition-all flex items-center gap-2">
             <svg class="h-4 w-4 text-crimson/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
@@ -195,7 +196,7 @@
             <header class="flex flex-col md:flex-row items-center md:items-start gap-10 md:gap-16 border-b border-ink/10 pb-12">
 
                 <!-- Avatar Column -->
-                <div class="flex-shrink-0 avatar-container group">
+                <div class="flex flex-col items-center flex-shrink-0 avatar-container group">
                     <div class="avatar-frame">
                         <img src="../img/me.webp" alt="Soroush Zendedel | سروش زنده‌دل" width="224" height="224" fetchpriority="high" onerror="this.src='https://placehold.co/240x240/1a1a1a/e8e6e1?text=Soroush'" class="art-avatar w-48 h-48 md:w-56 md:h-56 object-cover rounded-full border-4 border-canvas z-10 relative shadow-inner">
                     </div>

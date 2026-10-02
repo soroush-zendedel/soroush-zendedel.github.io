@@ -65,6 +65,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Vazirmatn:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 
     <style>
+        .top-navigation { display: flex; justify-content: space-between; }
         body {
             background-color: #ffffff;
             color: #1a1a1a;
@@ -175,7 +176,7 @@
 <body class="font-fa antialiased min-h-screen selection:bg-crimson selection:text-white p-4 md:p-8 lg:p-12">
 
     <!-- Top Navigation outside the document wrapper -->
-    <nav class="w-full max-w-5xl mx-auto flex justify-between items-center mb-4">
+    <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4">
         <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">درباره‌ی من</a>
         <a id="langToggle" href="/en/" hreflang="en" aria-label="View English version" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson transition-all flex items-center gap-2">
             <svg class="h-4 w-4 text-crimson/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
