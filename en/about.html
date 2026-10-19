@@ -48,6 +48,16 @@
     }
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://soroush-zendedel.github.io/en/" },
+      { "@type": "ListItem", "position": 2, "name": "About Soroush Piri Zendedel" }
+    ]
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -68,6 +78,7 @@
     .projects a{display:block;height:100%;padding:1rem;border:1px solid #1a1a1a14;border-radius:.75rem;background:#fff;color:var(--ink)}
     .projects a:hover{border-color:#b91c1c66;text-decoration:none;box-shadow:0 8px 20px #0000000d}.projects strong{display:block;color:var(--crimson)}
     .links{display:flex;flex-wrap:wrap;gap:.8rem 1.2rem;padding-top:1rem;border-top:1px solid #1a1a1a18;font-weight:600}
+    .breadcrumbs{margin-top:1.5rem;padding-top:.75rem;border-top:1px solid #1a1a1a12;color:#1a1a1a88;font-size:.85rem}.breadcrumbs ol{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin:0;padding:0;list-style:none}.breadcrumbs li+li::before{content:"/";margin-inline-end:.35rem;color:#1a1a1a55}.breadcrumbs a{color:inherit}.breadcrumbs [aria-current="page"]{color:#1a1a1a}
     @media(max-width:640px){body{padding:.75rem}.hero{grid-template-columns:1fr;text-align:center}.portrait-wrap{width:min(60vw,220px)}.content{padding:1.25rem}}
   </style>
 </head>
@@ -132,6 +143,12 @@
         "https://www.youtube.com/@SoroushZendedel" rel="me">LinkedIn</a>
         <a href="https://www.youtube.com/@SoroushZendedel" rel="me">YouTube</a>
         <a href="mailto:soroush_zendedel@Live.com">Email</a>
+      </nav>
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="https://soroush-zendedel.github.io/en/">Home</a></li>
+          <li aria-current="page">About Soroush Piri Zendedel</li>
+        </ol>
       </nav>
     </div>
   </main>
