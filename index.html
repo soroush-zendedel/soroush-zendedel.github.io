@@ -82,10 +82,16 @@
         /* Avatar styling - Artistic frame without touching the face */
         .avatar-frame {
             position: relative;
-            display: inline-block;
+            display: block;
+            width: 208px;
+            height: 208px;
             padding: 8px;
+            box-sizing: border-box;
             border-radius: 50%;
             background: linear-gradient(135deg, #b91c1c 0%, transparent 50%, #1a1a1a 100%);
+        }
+        @media (min-width: 768px) {
+            .avatar-frame { width: 240px; height: 240px; }
         }
         .avatar-frame::before {
             content: '';
@@ -198,7 +204,7 @@
                 <!-- Avatar Column -->
                 <div class="flex flex-col items-center flex-shrink-0 avatar-container group">
                     <div class="avatar-frame">
-                        <img src="./img/me.webp" alt="Soroush Zendedel | سروش زنده‌دل" width="224" height="224" fetchpriority="high" onerror="this.src='https://placehold.co/240x240/1a1a1a/e8e6e1?text=Soroush'" class="art-avatar w-48 h-48 md:w-56 md:h-56 object-cover rounded-full border-4 border-canvas z-10 relative shadow-inner">
+                        <img src="./img/me.webp" alt="Soroush Zendedel | سروش زنده‌دل" width="224" height="224" fetchpriority="high" decoding="async" onerror="this.src='https://placehold.co/240x240/1a1a1a/e8e6e1?text=Soroush'" class="art-avatar w-48 h-48 md:w-56 md:h-56 object-cover rounded-full border-4 border-canvas z-10 relative shadow-inner">
                     </div>
                     <div class="mt-6 text-center">
                         <div class="flex items-center justify-center gap-5 text-ink/40">
