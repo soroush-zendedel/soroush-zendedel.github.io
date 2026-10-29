@@ -510,6 +510,11 @@ async function saveChange(request, response) {
         return send(response, 400, { error: "The current project image could not be archived safely." });
       }
       const imageNameSet = new Set(imageNames);
+      const filename = isProfileImage ? `profile.${extension}` : `${project.id}.${extension}`;
+      const previousImage = project.image;
+      if (isProfileImage && previousImage !== filename && imageNameSet.has(filename)) {
+        return send(response, 409, { error: `The image file img/${filename} already exists; choose a different image format or remove the conflicting file manually.` });
+      }
       let nextArchiveVersion = imageNames.reduce((max, name) => {
         const match = name.match(new RegExp(`^${project.id}-v(\\d+)\\.(?:webp|jpg|jpeg|png)$`, "i"));
         return Math.max(max, Number(match?.[1] || 0));
@@ -527,9 +532,7 @@ async function saveChange(request, response) {
         imageNameSet.add(archiveName);
         archivedImages.push({ from, to, filename, archiveName });
       };
-      const filename = `${project.id}.${extension}`;
-      const previousImage = project.image;
-      if (previousImage !== filename) await archiveImage(previousImage);
+      if (!isProfileImage && previousImage !== filename) await archiveImage(previousImage);
       if (imageNameSet.has(filename)) await archiveImage(filename);
       uploadedFile = join(imageDirectory, filename);
       await writeFile(uploadedFile, imageBytes, { flag: "wx" });

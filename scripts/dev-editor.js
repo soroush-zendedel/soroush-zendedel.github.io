@@ -389,6 +389,11 @@
 
     const imageLabel = document.createElement("label");
     imageLabel.textContent = isEnglish ? "Replace photo" : "جایگزینی عکس";
+    const imageNote = document.createElement("p");
+    imageNote.textContent = isEnglish
+      ? "The new file uses the standard profile.<format> name. The previous image file stays in the repository at its old URL."
+      : "فایل جدید با نام استاندارد profile و پسوند همان تصویر ذخیره می‌شود؛ فایل قبلی در مخزن و نشانی قبلی‌اش باقی می‌ماند.";
+    imageNote.style.cssText = "margin:0 0 8px;font-size:12px;line-height:1.5;color:#78716c";
     const fileInput = document.createElement("input");
     fileInput.type = "file";
     fileInput.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
@@ -425,7 +430,7 @@
         toast(error.message, true);
       }
     });
-    panel.append(header, imageLabel, fileInput, altLabel, altInput, saveAlt, upload);
+    panel.append(header, imageLabel, imageNote, fileInput, altLabel, altInput, saveAlt, upload);
     document.body.append(panel);
     placeSettings(panel, profileImageButton);
   }
