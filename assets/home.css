@@ -94,11 +94,7 @@ body > footer {
   .document-wrapper > div > header [data-social-links] {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.8rem;
-  }
-
-  .document-wrapper > div > header [data-social-links] > .w-8 {
-    display: none;
+    gap: 0.25rem;
   }
 
   .document-wrapper > div > header > .flex-1 > .relative.pt-4 {
@@ -120,4 +116,9 @@ body > footer {
   .document-wrapper [data-project-grid] > a > div {
     padding-inline: 0.25rem;
   }
+}
+
+@media (max-width: 360px) {
+  .document-wrapper > div > header [data-social-links] > .w-8 { width: 1rem; }
+  .document-wrapper > div > header [data-social-links] > a > .font-en.text-sm { font-size: 0.75rem; }
 }
