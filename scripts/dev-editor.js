@@ -6,8 +6,8 @@
     .dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
-    body.dev-editor-on [data-project-id]{pointer-events:none}
-    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-handle{pointer-events:auto}
+    body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
@@ -208,10 +208,26 @@
   }, true);
 
   document.addEventListener("keydown", (event) => {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,[contenteditable=\"true\"]")) {
+      const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
+      if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
     if (!editing) return;
     if (event.key === "Escape") cancelEdit();
     if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) saveEdit();
-  });
+  }, true);
+
+  document.addEventListener("click", (event) => {
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle")) return;
+    const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
+    if (!control) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
   window.addEventListener("resize", () => { if (editing) placeTools(editing.target, editing.tools); });
   window.addEventListener("scroll", () => { if (editing) placeTools(editing.target, editing.tools); }, true);
 
