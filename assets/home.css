@@ -20,6 +20,53 @@ body > footer {
   color: var(--home-muted);
 }
 
+@media (min-width: 768px) {
+  .document-wrapper > div > header {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .document-wrapper > div > .profile-statement {
+    width: min(100%, 52rem);
+    margin-top: 1.5rem;
+    margin-inline: auto;
+    box-sizing: border-box;
+    padding: 2.75rem 1.5rem 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(color-mix(in srgb, var(--home-canvas) 92%, white), color-mix(in srgb, var(--home-canvas) 92%, white)) padding-box,
+      linear-gradient(145deg, rgb(255 255 255 / 88%), color-mix(in srgb, var(--home-line) 68%, white) 42%, rgb(255 255 255 / 72%) 68%, color-mix(in srgb, var(--home-muted) 12%, var(--home-canvas))) border-box;
+  }
+
+  .document-wrapper > div > .profile-statement > .quote-mark {
+    top: 0.65rem;
+    right: 0.85rem;
+    left: auto;
+  }
+
+  .document-wrapper > div > .profile-statement > .quote-mark-mirror {
+    right: auto;
+    left: 0.85rem;
+  }
+
+  .document-wrapper > div > .profile-statement .lang-fa > p:has(> strong[data-edit-field="profile.intro.fa"]),
+  .document-wrapper > div > .profile-statement .lang-en > p:has(> strong[data-edit-field="profile.intro.en"]) {
+    text-align: center;
+  }
+
+  .document-wrapper > div > .profile-statement .lang-fa > p[data-edit-field="profile.bio.fa"],
+  .document-wrapper > div > .profile-statement .lang-en > p[data-edit-field="profile.bio.en"] {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .document-wrapper > div > .profile-statement .lang-fa > p:has(> em[data-edit-field="profile.quote.fa"]),
+  .document-wrapper > div > .profile-statement .lang-en > p:has(> em[data-edit-field="profile.quote.en"]) {
+    text-align: center;
+  }
+}
+
 @media (max-width: 767px) {
   .document-wrapper > div.px-6.py-12 {
     padding: 2rem 1.25rem;
@@ -34,12 +81,12 @@ body > footer {
       "tagline"
       "contact"
       "portrait"
-      "social"
-      "statement";
+      "social";
     justify-items: center;
     align-items: start;
     gap: 0;
-    padding-bottom: 2rem;
+    padding-bottom: 0;
+    border-bottom: 0;
     text-align: center;
   }
 
@@ -94,17 +141,16 @@ body > footer {
   .document-wrapper > div > header [data-social-links] {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 0.25rem;
+    gap: clamp(0.35rem, 2.25vw, 0.75rem);
   }
 
-  .document-wrapper > div > header > .flex-1 > .relative.pt-4 {
-    grid-area: statement;
+  .document-wrapper > div > .profile-statement {
     width: 100%;
-    margin-top: 1.25rem;
-    padding-top: 0.5rem;
+    margin: 1.5rem auto 0;
+    padding: 2.25rem 1rem 1rem;
   }
 
-  .document-wrapper > div > header > .flex-1 > .relative.pt-4 .text-justify {
+  .document-wrapper > div > .profile-statement .text-justify {
     text-align: center;
   }
 
