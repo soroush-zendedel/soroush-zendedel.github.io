@@ -693,7 +693,7 @@
       label: isEnglish ? "Replace portrait · current file: " + personData.image.file : "جایگزینی تصویر · فایل فعلی: " + personData.image.file,
       type: "file",
       wide: true,
-      note: isEnglish ? "WebP, JPEG, or PNG · up to 5 MB. The previous image is retained." : "WebP، JPEG یا PNG · حداکثر ۵ مگابایت. تصویر قبلی نگه داشته می‌شود.",
+      note: isEnglish ? "WebP, JPEG, or PNG · converted to the stable .jpg address. The previous image is retained." : "WebP، JPEG یا PNG · با نشانی ثابت ‎.jpg ذخیره می‌شود. تصویر قبلی نگه داشته می‌شود.",
     });
     imageField.input.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
     identity.append(imageField.wrapper);
@@ -806,18 +806,33 @@
       book.href = inputSet.href.value.trim();
     }
     const selectedImage = image.files?.[0];
-    if (selectedImage && selectedImage.size > 5 * 1024 * 1024) return toast(isEnglish ? "Portrait must be 5 MB or smaller." : "حجم تصویر باید حداکثر ۵ مگابایت باشد.", true);
+    if (selectedImage && selectedImage.size > 20 * 1024 * 1024) return toast(isEnglish ? "Choose a portrait under 20 MB." : "تصویر باید کمتر از ۲۰ مگابایت باشد.", true);
     if (selectedImage && !["image/webp", "image/jpeg", "image/png"].includes(selectedImage.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG portrait." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
     let imageUpload;
     try {
       if (selectedImage) {
+        const bitmap = await createImageBitmap(selectedImage);
+        const scale = Math.min(1, 1800 / Math.max(bitmap.width, bitmap.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        const context = canvas.getContext("2d");
+        if (!context) throw new Error(isEnglish ? "Could not prepare this portrait." : "آماده‌سازی تصویر ممکن نشد.");
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        bitmap.close();
+        const jpeg = await new Promise((resolve, reject) => canvas.toBlob(
+          (blob) => blob ? resolve(blob) : reject(new Error(isEnglish ? "Could not convert this portrait to JPEG." : "تبدیل تصویر به JPEG انجام نشد.")),
+          "image/jpeg",
+          0.92,
+        ));
+        if (jpeg.size > 5 * 1024 * 1024) throw new Error(isEnglish ? "The converted JPEG must be 5 MB or smaller." : "حجم JPEG نهایی باید حداکثر ۵ مگابایت باشد.");
         const dataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
-          reader.onerror = () => reject(new Error(isEnglish ? "Could not read this image." : "خواندن تصویر ممکن نشد."));
-          reader.readAsDataURL(selectedImage);
+          reader.onerror = () => reject(new Error(isEnglish ? "Could not read this portrait." : "خواندن تصویر ممکن نشد."));
+          reader.readAsDataURL(jpeg);
         });
-        imageUpload = { mime: selectedImage.type, data: String(dataUrl).split(",")[1] };
+        imageUpload = { mime: "image/jpeg", data: String(dataUrl).split(",")[1] };
       }
       save.disabled = true;
       const response = await fetch("/__dev/save", {

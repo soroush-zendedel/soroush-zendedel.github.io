@@ -320,29 +320,23 @@ async function saveChange(request, response) {
       }
       const imageDirectory = join(root, "img");
       const imageNames = await readdir(imageDirectory);
-      if (!/^[a-zA-Z0-9_-]+\.(?:webp|jpe?g|png)$/i.test(currentPerson.image.file) || !imageNames.includes(currentPerson.image.file)) {
+      if (currentPerson.image.file !== "soroush-zendedel.jpg" || !imageNames.includes(currentPerson.image.file)) {
         return send(response, 400, { error: "The current person portrait could not be found safely." });
       }
       if (payload.imageUpload) {
-        const extensions = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
-        const extension = extensions[payload.imageUpload.mime];
         const encoded = payload.imageUpload.data;
-        if (!extension || typeof encoded !== "string") return send(response, 400, { error: "Choose a WebP, JPEG, or PNG portrait." });
+        if (payload.imageUpload.mime !== "image/jpeg" || typeof encoded !== "string") return send(response, 400, { error: "Portrait uploads must be converted to JPEG." });
         const imageBytes = Buffer.from(encoded, "base64");
         if (!imageBytes.length || imageBytes.length > 5 * 1024 * 1024 || imageBytes.toString("base64") !== encoded) return send(response, 400, { error: "Portrait must be valid and 5 MB or smaller." });
-        const validImage = extension === "webp"
-          ? imageBytes.length > 12 && imageBytes.toString("ascii", 0, 4) === "RIFF" && imageBytes.toString("ascii", 8, 12) === "WEBP"
-          : extension === "jpg"
-            ? imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9
-            : imageBytes.length > 8 && imageBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+        const validImage = imageBytes.length > 4 && imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9;
         if (!validImage) return send(response, 400, { error: "The file contents do not match the selected image type." });
-        const baseName = "soroush-zendedel-about";
-        const fileName = `${baseName}.${extension}`;
+        const baseName = "soroush-zendedel";
+        const fileName = "soroush-zendedel.jpg";
         const imageNameSet = new Set(imageNames);
-        let version = imageNames.reduce((max, name) => Math.max(max, Number(name.match(new RegExp(`^${baseName}-v(\\d+)\\.(?:webp|jpg|jpeg|png)$`, "i"))?.[1] || 0)), 0);
+        let version = imageNames.reduce((max, name) => Math.max(max, Number(name.match(new RegExp(`^${baseName}-v(\\d+)\\.jpg$`, "i"))?.[1] || 0)), 0);
         const archive = async (name) => {
           let archiveName;
-          do { archiveName = `${baseName}-v${++version}.${extname(name).slice(1).toLowerCase()}`; } while (imageNameSet.has(archiveName));
+          do { archiveName = `${baseName}-v${++version}.jpg`; } while (imageNameSet.has(archiveName));
           const from = join(imageDirectory, name);
           const to = join(imageDirectory, archiveName);
           await rename(from, to);
@@ -355,7 +349,6 @@ async function saveChange(request, response) {
         uploadedFile = join(imageDirectory, fileName);
         await writeFile(uploadedFile, imageBytes, { flag: "wx" });
         uploadedFileCreated = true;
-        updatedPerson.image.file = fileName;
       }
       if (JSON.stringify(currentPerson) === JSON.stringify(updatedPerson) && !payload.imageUpload) return send(response, 200, { unchanged: true });
       originalJson = JSON.stringify(currentPerson, null, 2) + "\n";
