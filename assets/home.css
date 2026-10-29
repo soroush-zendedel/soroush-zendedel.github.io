@@ -26,6 +26,20 @@ body > footer {
     border-bottom: 0;
   }
 
+  .document-wrapper > div > header > .flex-1 {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-top: 0;
+  }
+
+  .document-wrapper > div > header > .flex-1 > a[data-profile-link="contact"] {
+    align-self: center;
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .document-wrapper > div > .profile-statement {
     width: min(100%, 52rem);
     margin-top: 1.5rem;

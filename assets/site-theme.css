@@ -66,7 +66,24 @@ body.font-en { font-family: Lora, serif; }
 }
 
 .top-navigation #langToggle,
-.top-nav #langToggle { gap: 0.5rem; }
+.top-nav #langToggle {
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.top-navigation #langToggle > svg,
+.top-nav #langToggle > svg { display: block; align-self: center; }
+
+.language-toggle-label {
+  display: inline-flex;
+  min-height: 1rem;
+  align-items: center;
+  line-height: 1;
+}
+
+.language-toggle-label[lang="fa"] { transform: translateY(2px); }
 
 .top-navigation a:hover,
 .top-nav a:hover {
@@ -109,14 +126,14 @@ body.font-en { font-family: Lora, serif; }
 .sheet .projects a {
   border-color: var(--home-line);
   border-radius: 0.8rem;
-  background: color-mix(in srgb, var(--home-paper) 70%, white);
+  background: hsla(43, 13%, 90%, 0.3);
   box-shadow: 0 1px 3px rgb(26 26 26 / 5%);
 }
 
 .document-wrapper [data-project-grid] > a:hover,
 .sheet .projects a:hover {
   border-color: var(--home-crimson);
-  background: var(--home-canvas);
+  background: rgb(255 255 255 / 60%);
   box-shadow: 0 8px 20px -16px rgb(26 26 26 / 35%);
 }
 

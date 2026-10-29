@@ -118,7 +118,9 @@ function renderSiteNav(language, currentPage) {
   const languageHref = pagePaths[currentPage][language === "fa" ? "en" : "fa"];
   const languageLabel = language === "fa" ? "EN" : "فا";
   const languageAria = language === "fa" ? "View English version" : "مشاهده نسخه فارسی";
-  const languageText = language === "fa" ? languageLabel : `<span class="font-fa">${languageLabel}</span>`;
+  const languageText = language === "fa"
+    ? `<span class="language-toggle-label font-en" lang="en">${languageLabel}</span>`
+    : `<span class="language-toggle-label font-fa" lang="fa">${languageLabel}</span>`;
   return `  <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4" aria-label="${language === "fa" ? "پیمایش اصلی" : "Main navigation"}">
     ${navLink("home", "./")}
     ${navLink("about", "./about.html")}
