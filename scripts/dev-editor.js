@@ -22,8 +22,7 @@
     .dev-editor-handle:active{cursor:grabbing}
     .dev-editor-settings-button{position:absolute;top:7px;inset-inline-start:46px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
     .dev-profile-image-button{position:absolute;top:14px;inset-inline-end:14px;width:34px;height:34px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
-    .dev-link-settings-button{position:absolute;top:-9px;inset-inline-end:-10px;width:25px;height:25px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:13px;line-height:1}
-    .dev-editable-link{position:relative}
+    .dev-link-settings-button{position:fixed;width:25px;height:25px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:13px;line-height:1}
     .dev-social-settings-button{width:28px;height:28px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:14px;line-height:1}
     .dev-social-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 0;border-bottom:1px solid #29252418}
     .dev-social-row .dev-social-url{grid-column:1/-1}
@@ -105,7 +104,6 @@
   }
   const profileLinkButtons = [];
   document.querySelectorAll("a[data-profile-link]").forEach((link) => {
-    link.classList.add("dev-editable-link");
     const button = document.createElement("button");
     button.className = "dev-link-settings-button";
     button.type = "button";
@@ -113,8 +111,9 @@
     button.textContent = "⚙";
     button.title = isEnglish ? "Change link" : "تغییر نشانی";
     button.setAttribute("aria-label", button.title);
+    button._profileLink = link;
     button.addEventListener("click", () => openProfileLinkSettings(link, button));
-    link.append(button);
+    document.body.append(button);
     profileLinkButtons.push(button);
   });
   const socialContainer = document.querySelector("[data-social-links]");
@@ -226,6 +225,20 @@
 
   function closeProjectSettings() {
     document.querySelector(".dev-editor-settings")?.remove();
+  }
+
+  function updateProfileLinkButtons() {
+    if (!enabled) return;
+    profileLinkButtons.forEach((button) => {
+      const rect = button._profileLink.getBoundingClientRect();
+      if (!button._profileLink.isConnected || rect.width === 0 || rect.height === 0) {
+        button.hidden = true;
+        return;
+      }
+      button.hidden = false;
+      button.style.top = `${Math.max(4, rect.top - 9)}px`;
+      button.style.left = `${Math.max(4, Math.min(window.innerWidth - 29, rect.right - 14))}px`;
+    });
   }
 
   function openProjectSettings(wrapper, link, trigger) {
@@ -595,6 +608,7 @@
     addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
     if (profileImageButton) profileImageButton.hidden = !enabled;
     profileLinkButtons.forEach((button) => { button.hidden = !enabled; });
+    updateProfileLinkButtons();
     if (socialSettingsButton) socialSettingsButton.hidden = !enabled;
     if (enabled) wrapCards();
     else {
@@ -975,10 +989,12 @@
   window.addEventListener("resize", () => {
     if (editing) placeTools(editing.target, editing.tools);
     repositionSettings();
+    updateProfileLinkButtons();
   });
   window.addEventListener("scroll", () => {
     if (editing) placeTools(editing.target, editing.tools);
     repositionSettings();
+    updateProfileLinkButtons();
   }, true);
 
   document.addEventListener("dragstart", (event) => {
