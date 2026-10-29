@@ -693,21 +693,25 @@
       label: isEnglish ? "Replace portrait · current file: " + personData.image.file : "جایگزینی تصویر · فایل فعلی: " + personData.image.file,
       type: "file",
       wide: true,
-      note: isEnglish ? "WebP, JPEG, or PNG · converted to JPEG. The current filename stays in use unless you change it below." : "WebP، JPEG یا PNG · به JPEG تبدیل می‌شود. نام فعلی حفظ می‌شود مگر اینکه در کادر زیر آن را تغییر بدهی.",
+      note: isEnglish ? "The selected image is saved as-is; its extension is taken from the file." : "عکس انتخاب‌شده بدون تبدیل ذخیره می‌شود و پسوندش از خود فایل گرفته می‌شود.",
     });
-    imageField.input.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
+    imageField.input.accept = "image/jpeg,image/png,image/webp,image/gif,image/avif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.avif,.bmp";
     identity.append(imageField.wrapper);
     const imageNameField = makeFormField({
       id: "person-image-name",
-      label: isEnglish ? "Portrait filename (.jpg)" : "نام فایل عکس (.jpg)",
+      label: isEnglish ? "Portrait filename · extension follows selected image" : "نام فایل عکس · پسوند از تصویر انتخابی گرفته می‌شود",
       type: "text",
       required: true,
-      maxLength: 120,
+      maxLength: 116,
       wide: true,
       note: isEnglish ? "Keeping the current name is best for SEO. If changed, the old image remains in the repository and available at its old URL; the new URL will be used in page metadata and Person structured data." : "برای سئو بهتر است نام فعلی حفظ شود. اگر نام را عوض کنی، عکس قبلی در مخزن و نشانی قبلی باقی می‌ماند؛ نشانی جدید در اطلاعات صفحه و دادهٔ ساختاریافتهٔ Person قرار می‌گیرد.",
     });
-    imageNameField.input.value = personData.image.file;
+    imageNameField.input.value = personData.image.file.replace(/\.[^.]+$/, "");
     imageNameField.input.dir = "ltr";
+    imageField.input.addEventListener("change", () => {
+      const extension = imageField.input.files?.[0]?.name.match(/\.[^.]+$/)?.[0] || personData.image.file.match(/\.[^.]+$/)?.[0] || "";
+      imageNameField.wrapper.querySelector("label").textContent = (isEnglish ? "Portrait filename · selected extension: " : "نام فایل عکس · پسوند انتخابی: ") + extension;
+    });
     identity.append(imageNameField.wrapper);
 
     const career = addGroup(isEnglish ? "Professional experience and education" : "مسیر حرفه‌ای و تحصیلات");
@@ -819,42 +823,30 @@
     }
     const selectedImage = image.files?.[0];
     const requestedImageName = imageName.value.trim();
-    if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(requestedImageName)) return toast(isEnglish ? "Use an English filename with letters, numbers, and hyphens, ending in .jpg." : "نام انگلیسی شامل حروف، عدد و خط تیره وارد کن که به ‎.jpg ختم شود.", true);
-    if (!selectedImage && requestedImageName !== personData.image.file) return toast(isEnglish ? "Choose a new portrait before changing its filename." : "برای تغییر نام فایل، ابتدا عکس جدید را انتخاب کن.", true);
-    if (selectedImage && requestedImageName !== personData.image.file) {
+    if (!/^[a-z0-9][a-z0-9-]{0,115}$/i.test(requestedImageName)) return toast(isEnglish ? "Use an English filename with letters, numbers, and hyphens; the extension is automatic." : "نام انگلیسی شامل حروف، عدد و خط تیره وارد کن؛ پسوند خودکار تعیین می‌شود.", true);
+    const sourceExtension = selectedImage?.name.match(/\.[^.]+$/)?.[0].toLowerCase();
+    if (!selectedImage && requestedImageName !== personData.image.file.replace(/\.[^.]+$/, "")) return toast(isEnglish ? "Choose a new portrait before changing its filename." : "برای تغییر نام فایل، ابتدا عکس جدید را انتخاب کن.", true);
+    const targetImageName = selectedImage && sourceExtension ? requestedImageName + sourceExtension : personData.image.file;
+    if (selectedImage && targetImageName !== personData.image.file) {
       const confirmed = window.confirm(isEnglish
-        ? `Changing the portrait URL may affect SEO. The old image will remain available at img/${personData.image.file}; the new image will use img/${requestedImageName}, and page metadata and Person structured data will be updated. Continue?`
-        : `تغییر نشانی عکس ممکن است بر سئو اثر بگذارد. عکس قبلی در نشانی img/${personData.image.file} باقی می‌ماند؛ عکس جدید از نشانی img/${requestedImageName} استفاده می‌کند و اطلاعات صفحه و دادهٔ ساختاریافتهٔ Person به‌روز می‌شوند. ادامه می‌دهی؟`);
+        ? `Changing the portrait URL may affect SEO. The old image will remain available at img/${personData.image.file}; the new image will use img/${targetImageName}, and page metadata and Person structured data will be updated. Continue?`
+        : `تغییر نشانی عکس ممکن است بر سئو اثر بگذارد. عکس قبلی در نشانی img/${personData.image.file} باقی می‌ماند؛ عکس جدید از نشانی img/${targetImageName} استفاده می‌کند و اطلاعات صفحه و دادهٔ ساختاریافتهٔ Person به‌روز می‌شوند. ادامه می‌دهی؟`);
       if (!confirmed) return;
-      updated.image.file = requestedImageName;
     }
-    if (selectedImage && selectedImage.size > 20 * 1024 * 1024) return toast(isEnglish ? "Choose a portrait under 20 MB." : "تصویر باید کمتر از ۲۰ مگابایت باشد.", true);
-    if (selectedImage && !["image/webp", "image/jpeg", "image/png"].includes(selectedImage.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG portrait." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
+    if (selectedImage && selectedImage.size > 5 * 1024 * 1024) return toast(isEnglish ? "Choose a portrait under 5 MB." : "حجم تصویر باید حداکثر ۵ مگابایت باشد.", true);
+    if (selectedImage && ![".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif", ".bmp"].includes(sourceExtension)) return toast(isEnglish ? "Use a JPEG, PNG, WebP, GIF, AVIF, or BMP image." : "تصویر باید JPEG، PNG، WebP، GIF، AVIF یا BMP باشد.", true);
     let imageUpload;
     try {
       if (selectedImage) {
-        const bitmap = await createImageBitmap(selectedImage);
-        const scale = Math.min(1, 1800 / Math.max(bitmap.width, bitmap.height));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-        const context = canvas.getContext("2d");
-        if (!context) throw new Error(isEnglish ? "Could not prepare this portrait." : "آماده‌سازی تصویر ممکن نشد.");
-        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-        bitmap.close();
-        const jpeg = await new Promise((resolve, reject) => canvas.toBlob(
-          (blob) => blob ? resolve(blob) : reject(new Error(isEnglish ? "Could not convert this portrait to JPEG." : "تبدیل تصویر به JPEG انجام نشد.")),
-          "image/jpeg",
-          0.92,
-        ));
-        if (jpeg.size > 5 * 1024 * 1024) throw new Error(isEnglish ? "The converted JPEG must be 5 MB or smaller." : "حجم JPEG نهایی باید حداکثر ۵ مگابایت باشد.");
         const dataUrl = await new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result);
           reader.onerror = () => reject(new Error(isEnglish ? "Could not read this portrait." : "خواندن تصویر ممکن نشد."));
-          reader.readAsDataURL(jpeg);
+          reader.readAsDataURL(selectedImage);
         });
-        imageUpload = { mime: "image/jpeg", data: String(dataUrl).split(",")[1] };
+        updated.image.file = targetImageName;
+        const mimeByExtension = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".gif": "image/gif", ".avif": "image/avif", ".bmp": "image/bmp" };
+        imageUpload = { mime: mimeByExtension[sourceExtension], extension: sourceExtension.slice(1), data: String(dataUrl).split(",")[1] };
       }
       save.disabled = true;
       const response = await fetch("/__dev/save", {

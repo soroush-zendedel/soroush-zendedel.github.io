@@ -8,8 +8,8 @@ const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "u
 const socialData = JSON.parse(await readFile(join(root, "content/social.json"), "utf8"));
 const blog = JSON.parse(await readFile(join(root, "content/blog.json"), "utf8"));
 const person = JSON.parse(await readFile(join(root, "content/person.json"), "utf8"));
-if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(person.image.file)) {
-  throw new Error("The About portrait filename must be a safe English .jpg filename.");
+if (!/^[a-z0-9][a-z0-9-]{0,115}\.(?:jpe?g|png|webp|gif|avif|bmp)$/i.test(person.image.file)) {
+  throw new Error("The About portrait filename must be a safe English image filename.");
 }
 const blogIcons = {
   book: '<svg data-blog-icon="book" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 7v14M3 5.5A2.5 2.5 0 0 1 5.5 3H12v18H5.5A2.5 2.5 0 0 0 3 23V5.5ZM21 5.5A2.5 2.5 0 0 0 18.5 3H12v18h6.5A2.5 2.5 0 0 1 21 23V5.5Z"/></svg>',

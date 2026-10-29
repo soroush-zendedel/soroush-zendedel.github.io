@@ -22,6 +22,9 @@ const editableFields = new Set([
 ]);
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
+  ".avif": "image/avif",
+  ".bmp": "image/bmp",
+  ".gif": "image/gif",
   ".html": "text/html; charset=utf-8",
   ".ico": "image/x-icon",
   ".jpg": "image/jpeg",
@@ -320,25 +323,45 @@ async function saveChange(request, response) {
       }
       const imageDirectory = join(root, "img");
       const imageNames = await readdir(imageDirectory);
-      if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(currentPerson.image.file) || !imageNames.includes(currentPerson.image.file)) {
+      if (!/^[a-z0-9][a-z0-9-]{0,115}\.(?:jpe?g|png|webp|gif|avif|bmp)$/i.test(currentPerson.image.file) || !imageNames.includes(currentPerson.image.file)) {
         return send(response, 400, { error: "The current person portrait could not be found safely." });
       }
       if (payload.imageUpload) {
         const encoded = payload.imageUpload.data;
-        if (payload.imageUpload.mime !== "image/jpeg" || typeof encoded !== "string") return send(response, 400, { error: "Portrait uploads must be converted to JPEG." });
+        const imageFormats = {
+          jpg: { mime: "image/jpeg", extensions: ["jpg", "jpeg"] }, jpeg: { mime: "image/jpeg", extensions: ["jpg", "jpeg"] },
+          png: { mime: "image/png", extensions: ["png"] }, webp: { mime: "image/webp", extensions: ["webp"] },
+          gif: { mime: "image/gif", extensions: ["gif"] }, avif: { mime: "image/avif", extensions: ["avif"] }, bmp: { mime: "image/bmp", extensions: ["bmp"] },
+        };
+        const extension = typeof payload.imageUpload.extension === "string" ? payload.imageUpload.extension.toLowerCase() : "";
+        const format = imageFormats[extension];
+        if (!format || !format.extensions.includes(extension) || payload.imageUpload.mime !== format.mime || typeof encoded !== "string") {
+          return send(response, 400, { error: "Choose a supported image and keep its original format." });
+        }
         const imageBytes = Buffer.from(encoded, "base64");
         if (!imageBytes.length || imageBytes.length > 5 * 1024 * 1024 || imageBytes.toString("base64") !== encoded) return send(response, 400, { error: "Portrait must be valid and 5 MB or smaller." });
-        const validImage = imageBytes.length > 4 && imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9;
+        const validImage = extension === "jpg" || extension === "jpeg"
+          ? imageBytes.length > 4 && imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9
+          : extension === "png"
+            ? imageBytes.length > 8 && imageBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+            : extension === "webp"
+              ? imageBytes.length > 12 && imageBytes.toString("ascii", 0, 4) === "RIFF" && imageBytes.toString("ascii", 8, 12) === "WEBP"
+              : extension === "gif"
+                ? ["GIF87a", "GIF89a"].includes(imageBytes.toString("ascii", 0, 6))
+                : extension === "avif"
+                  ? imageBytes.toString("ascii", 4, 12).includes("avif")
+                  : imageBytes.toString("ascii", 0, 2) === "BM";
         if (!validImage) return send(response, 400, { error: "The file contents do not match the selected image type." });
         const fileName = typeof submitted.image?.file === "string" ? submitted.image.file.trim() : "";
-        if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(fileName)) return send(response, 400, { error: "Use a safe English .jpg portrait filename." });
+        if (!/^[a-z0-9][a-z0-9-]{0,115}\.(?:jpe?g|png|webp|gif|avif|bmp)$/i.test(fileName) || extname(fileName).slice(1).toLowerCase() !== extension) return send(response, 400, { error: "Use a safe English image filename with its original extension." });
         const imageNameSet = new Set(imageNames);
         if (fileName !== currentPerson.image.file && imageNameSet.has(fileName)) return send(response, 409, { error: `The image file img/${fileName} already exists; choose a different filename.` });
-        const baseName = currentPerson.image.file.replace(/\.jpg$/i, "");
-        let version = imageNames.reduce((max, name) => Math.max(max, Number(name.match(new RegExp(`^${baseName}-v(\\d+)\\.jpg$`, "i"))?.[1] || 0)), 0);
+        const baseName = currentPerson.image.file.replace(/\.[^.]+$/, "");
+        const oldExtension = extname(currentPerson.image.file).slice(1).toLowerCase();
+        let version = imageNames.reduce((max, name) => Math.max(max, Number(name.match(new RegExp(`^${baseName}-v(\\d+)\\.${oldExtension}$`, "i"))?.[1] || 0)), 0);
         const archive = async (name) => {
           let archiveName;
-          do { archiveName = `${baseName}-v${++version}.jpg`; } while (imageNameSet.has(archiveName));
+          do { archiveName = `${baseName}-v${++version}.${oldExtension}`; } while (imageNameSet.has(archiveName));
           const from = join(imageDirectory, name);
           const to = join(imageDirectory, archiveName);
           await rename(from, to);
