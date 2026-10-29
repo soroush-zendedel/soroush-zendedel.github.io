@@ -17,6 +17,15 @@ body.font-en {
   color: #1a1a1a;
 }
 
+.top-navigation {
+  justify-content: flex-start;
+  gap: 0.5rem;
+}
+
+.top-navigation > a:last-child {
+  margin-inline-start: auto;
+}
+
 .top-navigation a {
   min-height: 44px;
   display: inline-flex;
