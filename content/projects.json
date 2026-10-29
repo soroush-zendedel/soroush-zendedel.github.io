@@ -116,37 +116,8 @@
     }
   },
   {
-    "id": "silk-road",
-    "order": 5,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/silk-road/",
-    "image": "silkroad.webp",
-    "imageFallback": "SR",
-    "home": {
-      "fa": {
-        "name": "جاده ابریشم",
-        "description": "پروژه‌ای با تمرکز بر واژه‌ها و روایت‌های جاده ابریشم."
-      },
-      "en": {
-        "name": "Silk Road",
-        "description": "A project centered on the words and stories of the Silk Road."
-      },
-      "alt": "Silk Road Project"
-    },
-    "about": {
-      "fa": {
-        "name": "جاده‌ی ابریشم",
-        "description": "پروژه‌ای درباره‌ی واژه‌ها و روایت‌های جاده‌ی ابریشم."
-      },
-      "en": {
-        "name": "Silk Road",
-        "description": "A project about the words and stories of the Silk Road."
-      }
-    }
-  },
-  {
     "id": "countdown",
-    "order": 6,
+    "order": 5,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/countdown/",
     "image": "countdown.webp",
@@ -170,6 +141,35 @@
       "en": {
         "name": "Countdown",
         "description": "A project exploring the passage of time and the history of numbers."
+      }
+    }
+  },
+  {
+    "id": "silk-road",
+    "order": 6,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/silk-road/",
+    "image": "silkroad.webp",
+    "imageFallback": "SR",
+    "home": {
+      "fa": {
+        "name": "جاده ابریشم",
+        "description": "پروژه‌ای با تمرکز بر واژه‌ها و روایت‌های جاده ابریشم."
+      },
+      "en": {
+        "name": "Silk Road",
+        "description": "A project centered on the words and stories of the Silk Road."
+      },
+      "alt": "Silk Road Project"
+    },
+    "about": {
+      "fa": {
+        "name": "جاده‌ی ابریشم",
+        "description": "پروژه‌ای درباره‌ی واژه‌ها و روایت‌های جاده‌ی ابریشم."
+      },
+      "en": {
+        "name": "Silk Road",
+        "description": "A project about the words and stories of the Silk Road."
       }
     }
   }
