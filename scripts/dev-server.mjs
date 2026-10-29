@@ -77,6 +77,44 @@ async function requireCleanWorkingTree() {
   if (stdout.trim()) throw new Error("Working tree is not clean. Commit or discard other changes before using the editor.");
 }
 
+async function syncEditorBranch() {
+  await requireCleanWorkingTree();
+  const { stdout: branch } = await runGit(["branch", "--show-current"]);
+  if (branch.trim() !== "edit-content") throw new Error("Switch to the edit-content branch before saving or publishing.");
+
+  await runGit(["fetch", "origin"]);
+  const remoteRef = "refs/remotes/origin/edit-content";
+  let remoteHead;
+  try {
+    remoteHead = (await runGit(["rev-parse", "--verify", remoteRef])).stdout.trim();
+  } catch {
+    return;
+  }
+
+  const { stdout: upstream } = await runGit(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]).catch(() => ({ stdout: "" }));
+  if (upstream.trim() !== "origin/edit-content") {
+    await runGit(["branch", "--set-upstream-to=origin/edit-content", "edit-content"]);
+  }
+
+  const { stdout: localHead } = await runGit(["rev-parse", "HEAD"]);
+  try {
+    await runGit(["merge-base", "--is-ancestor", remoteHead, localHead.trim()]);
+    return;
+  } catch {}
+  try {
+    await runGit(["merge-base", "--is-ancestor", localHead.trim(), remoteHead]);
+    await runGit(["merge", "--ff-only", remoteHead]);
+    return;
+  } catch {}
+
+  try {
+    await runGit(["rebase", remoteHead]);
+  } catch {
+    try { await runGit(["rebase", "--abort"]); } catch {}
+    throw new Error("GitHub has newer edits that overlap local changes. No new commit was made; resolve the overlap, then try again.");
+  }
+}
+
 async function getEditorSession(base) {
   if (typeof base !== "string" || !/^[0-9a-f]{40,64}$/i.test(base)) {
     throw new Error("Editing session is missing or invalid. Start a new edit session.");
@@ -98,17 +136,17 @@ async function getEditorSession(base) {
     ]);
     const { stdout: remoteRefs } = await runGit(["branch", "--remotes", "--contains", commit]);
     const files = changedFiles.trim().split(/\r?\n/).filter(Boolean);
+    if (remoteRefs.trim()) {
+      effectiveBase = commit;
+      pendingCommits = [];
+      continue;
+    }
     if (!subject.startsWith("content:") || !files.length || files.some((file) =>
       !allowedFiles.has(file) && !/^img\/[a-z0-9-]+(?:-v\d+)?\.(?:webp|jpg|jpeg|png)$/i.test(file)
     )) {
       throw new Error("This session includes commits outside the project editor; nothing was undone.");
     }
-    if (remoteRefs.trim()) {
-      effectiveBase = commit;
-      pendingCommits = [];
-    } else {
-      pendingCommits.push(commit);
-    }
+    pendingCommits.push(commit);
   }
   return { base: effectiveBase, commits: pendingCommits };
 }
@@ -121,6 +159,7 @@ async function handleEditSession(request, response) {
     const payload = await readBody(request);
     if (payload.action === "start") {
       await ensureEditorBranch();
+      await syncEditorBranch();
       let { stdout: base } = await runGit(["rev-parse", "HEAD"]);
       try {
         const { stdout: upstream } = await runGit(["rev-parse", "--verify", "@{u}"]);
@@ -152,7 +191,7 @@ async function handlePublish(request, response) {
   saving = true;
   try {
     const payload = await readBody(request);
-    await requireCleanWorkingTree();
+    await syncEditorBranch();
     const { stdout: branch } = await runGit(["branch", "--show-current"]);
     if (branch.trim() !== "edit-content") throw new Error("Publish is only available from the edit-content branch.");
     const session = await getEditorSession(payload.base);
@@ -244,7 +283,7 @@ async function saveChange(request, response) {
   let uploadedFileCreated = false;
   const archivedImages = [];
   try {
-    await requireCleanWorkingTree();
+    await syncEditorBranch();
     const payload = await readBody(request);
     const projects = JSON.parse(await readFile(projectFile, "utf8"));
     originalJson = JSON.stringify(projects, null, 2) + "\n";
