@@ -3,16 +3,18 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-publish,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-action-dock{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 24px);z-index:2147483000;pointer-events:none}
     .dev-editor-toggle{position:static;transform:none;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;pointer-events:auto}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
+    .dev-editor-publish{position:static;border:1px solid #29252422;border-radius:999px;padding:10px 14px;background:#fdfcfb;color:#292524;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:auto}
     .dev-editor-undo{position:fixed;left:50%;inset-inline-start:auto;bottom:66px;transform:translateX(-50%);max-width:calc(100vw - 36px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
     .dev-editor-add{position:static;border:1px solid #b91c1c55;border-radius:999px;padding:10px 15px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:auto}
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
-    .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
-    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-person-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
+    body.dev-editor-on .dev-editor-publish{pointer-events:auto}
+    .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled,.dev-editor-publish:disabled{opacity:.55;cursor:wait}
+    .dev-editor-add[hidden],.dev-editor-publish[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-person-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
     body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button,body.dev-editor-on .dev-person-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
@@ -84,6 +86,14 @@
   toggle.textContent = isEnglish ? "✎ Edit" : "✎ ویرایش";
   toggle.setAttribute("aria-pressed", "false");
   actionDock.append(toggle);
+
+  const publishButton = document.createElement("button");
+  publishButton.className = "dev-editor-publish";
+  publishButton.type = "button";
+  publishButton.hidden = true;
+  publishButton.textContent = isEnglish ? "↑ Push for review" : "↑ ارسال برای بررسی";
+  publishButton.title = isEnglish ? "Push edit-content and open its GitHub comparison" : "ارسال شاخهٔ ویرایش به گیت‌هاب و بازکردن مقایسه با main";
+  actionDock.append(publishButton);
 
   const undoButton = document.createElement("button");
   undoButton.className = "dev-editor-undo";
@@ -1119,6 +1129,7 @@
       ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
       : (isEnglish ? "✎ Edit" : "✎ ویرایش");
     undoButton.hidden = !enabled || sessionCommitCount === 0;
+    publishButton.hidden = !enabled || sessionCommitCount === 0;
     addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
     if (profileImageButton) profileImageButton.hidden = !enabled;
     profileLinkButtons.forEach((button) => { button.hidden = !enabled; });
@@ -1290,6 +1301,39 @@
     return result;
   }
 
+  async function publishEditSession() {
+    if (!sessionBase || !sessionCommitCount) return;
+    const reviewTab = window.open("about:blank", "_blank");
+    publishButton.disabled = true;
+    toggle.disabled = true;
+    try {
+      const response = await fetch("/__dev/publish", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify({ base: sessionBase }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "Could not push the edit branch." : "ارسال شاخهٔ ویرایش انجام نشد."));
+      sessionBase = result.base;
+      sessionCommitCount = 0;
+      sessionStorage.setItem("dev-editor-session-base", sessionBase);
+      if (reviewTab) {
+        reviewTab.opener = null;
+        reviewTab.location = result.compareUrl;
+      }
+      setEnabled(true);
+      toast(isEnglish
+        ? "Edits pushed. Review and merge the pull request to publish the site."
+        : "تغییرات ارسال شد؛ برای انتشار سایت، درخواست ادغام را بررسی و در main ادغام کنید.");
+    } catch (error) {
+      reviewTab?.close();
+      toast(error.message, true);
+    } finally {
+      publishButton.disabled = false;
+      toggle.disabled = false;
+    }
+  }
+
   async function enterEditMode() {
     toggle.disabled = true;
     try {
@@ -1457,6 +1501,7 @@
     }
   });
   undoButton.addEventListener("click", undoEditSession);
+  publishButton.addEventListener("click", publishEditSession);
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
     if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button")) closeProjectSettings();

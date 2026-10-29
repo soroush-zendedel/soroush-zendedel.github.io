@@ -49,6 +49,26 @@ async function runGit(args) {
   return execFile("git", args, { cwd: root, windowsHide: true, maxBuffer: 1024 * 1024 });
 }
 
+async function ensureEditorBranch() {
+  await requireCleanWorkingTree();
+  const { stdout: currentBranch } = await runGit(["branch", "--show-current"]);
+  if (currentBranch.trim() === "edit-content") return;
+
+  const { stdout: localBranches } = await runGit(["branch", "--format=%(refname:short)"]);
+  if (localBranches.split(/\r?\n/).includes("edit-content")) {
+    await runGit(["switch", "edit-content"]);
+    return;
+  }
+
+  const { stdout: remoteBranches } = await runGit(["branch", "--remotes", "--format=%(refname:short)"]);
+  if (remoteBranches.split(/\r?\n/).includes("origin/edit-content")) {
+    await runGit(["switch", "--track", "origin/edit-content"]);
+    return;
+  }
+
+  await runGit(["switch", "-c", "edit-content"]);
+}
+
 async function requireCleanWorkingTree() {
   const { stdout } = await runGit(["status", "--porcelain"]);
   if (stdout.trim()) throw new Error("Working tree is not clean. Commit or discard other changes before using the editor.");
@@ -90,7 +110,7 @@ async function handleEditSession(request, response) {
   try {
     const payload = await readBody(request);
     if (payload.action === "start") {
-      await requireCleanWorkingTree();
+      await ensureEditorBranch();
       const { stdout } = await runGit(["rev-parse", "HEAD"]);
       return send(response, 200, { base: stdout.trim(), count: 0 });
     }
@@ -103,6 +123,31 @@ async function handleEditSession(request, response) {
     return send(response, 200, { undone: commits.length });
   } catch (error) {
     return send(response, 409, { error: error.message || "Could not update the edit session." });
+  } finally {
+    saving = false;
+  }
+}
+
+async function handlePublish(request, response) {
+  if (!isAuthorized(request)) return send(response, 403, { error: "Editor request rejected." });
+  if (saving) return send(response, 409, { error: "Another edit is being saved." });
+  saving = true;
+  try {
+    const payload = await readBody(request);
+    await requireCleanWorkingTree();
+    const { stdout: branch } = await runGit(["branch", "--show-current"]);
+    if (branch.trim() !== "edit-content") throw new Error("Publish is only available from the edit-content branch.");
+    const commits = await getEditorSession(payload.base);
+    if (!commits.length) return send(response, 409, { error: "There are no new edits to publish." });
+    await runGit(["push", "--set-upstream", "origin", "edit-content"]);
+    const { stdout: head } = await runGit(["rev-parse", "HEAD"]);
+    return send(response, 200, {
+      base: head.trim(),
+      compareUrl: "https://github.com/soroush-zendedel/soroush-zendedel.github.io/compare/main...edit-content?expand=1",
+      count: commits.length,
+    });
+  } catch (error) {
+    return send(response, 409, { error: error.message || "Could not publish the edit branch." });
   } finally {
     saving = false;
   }
@@ -680,6 +725,7 @@ const server = createServer(async (request, response) => {
   }
   if (url.pathname === "/__dev/save" && request.method === "POST") return saveChange(request, response);
   if (url.pathname === "/__dev/session" && request.method === "POST") return handleEditSession(request, response);
+  if (url.pathname === "/__dev/publish" && request.method === "POST") return handlePublish(request, response);
   if (request.method !== "GET" && request.method !== "HEAD") return send(response, 405, "Method not allowed", "text/plain; charset=utf-8");
   return serveFile(request, response, url.pathname);
 });
