@@ -1600,6 +1600,9 @@
       setEnabled(true);
     }).catch((error) => {
       sessionStorage.removeItem("dev-editor-session-active");
+      sessionStorage.removeItem("dev-editor-session-base");
+      sessionBase = "";
+      sessionCommitCount = 0;
       setEnabled(false);
       toast(error.message, true);
     });
