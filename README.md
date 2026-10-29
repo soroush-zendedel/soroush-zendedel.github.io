@@ -1,112 +1,305 @@
-# سروش زنده‌دل — وب‌سایت نمونه‌کار
+# وب‌سایت سروش زنده‌دل
 
-وب‌سایت شخصی و دوزبانهٔ من؛ مجموعه‌ای از ابزارها و تجربه‌های دیجیتال در زمینهٔ موسیقی، نوشتن و پروژه‌های خلاقانه. نسخهٔ فارسی راست‌چین است و نسخهٔ انگلیسی در مسیر جداگانهٔ [`/en/`](https://soroush-zendedel.github.io/en/) قرار دارد.
+وب‌سایت شخصی دوزبانهٔ سروش زنده‌دل با صفحه‌های فارسی و انگلیسی، معرفی پروژه‌ها و صفحهٔ درباره. نسخهٔ منتشرشده با GitHub Pages از فایل‌های استاتیک همین مخزن ساخته می‌شود؛ برای نمایش سایت به سرور برنامه، پایگاه داده، Docker یا سرویس‌های فونت خارجی نیاز نیست.
 
-**مشاهدهٔ وب‌سایت:** [soroush-zendedel.github.io](https://soroush-zendedel.github.io/)
+**نسخهٔ زنده:** [soroush-zendedel.github.io](https://soroush-zendedel.github.io/)
 
-## پروژه‌ها
+## نیازمندی‌ها
 
-- [Tara](https://soroush-zendedel.github.io/tara/) — ابزار دیداری برای یادگیری و تمرین تئوری موسیقی.
-- [Shenobin](https://soroush-zendedel.github.io/shenobin/) — محیط ساخت موسیقی برای آهنگ‌سازی، بررسی هارمونی و خروجی MIDI یا WAV.
-- [Khater](https://soroush-zendedel.github.io/khater/) — ابزار تمرین، طراحی و ساخت فونت.
-- [Notella](https://github.com/soroush-zendedel/notella) — اپلیکیشن یادداشت‌برداری پایتون با رابط خط فرمان و وب.
-- [Silk Road](https://soroush-zendedel.github.io/silk-road/) — پروژه‌ای دربارهٔ واژه‌ها و روایت‌های جادهٔ ابریشم.
-- [Countdown](https://soroush-zendedel.github.io/countdown/) — پژوهش‌های شمارش معکوس برای دیدن گذر زمان و تاریخ اعداد.
-- [ثبت‌احوال](https://soroush-zendedel.github.io/personal-blog/) — وبلاگ نوشته‌ها، اندیشه‌ها و شعرها.
+- **Node.js نسخهٔ ۲۰ یا جدیدتر** برای اجرای پیش‌نمایش و اسکریپت‌های ساخت.
+- **pnpm نسخهٔ ۹ یا جدیدتر** برای نصب Tailwind CSS و ساخت دوبارهٔ CSS.
+- **Git** برای دریافت پروژه و ثبت تغییرات.
+- دسترسی GitHub به مخزن برای push کردن تغییرات. ساده‌ترین راه برای شروع، GitHub Desktop یا Git Credential Manager است. اگر آدرس SSH مخزن را استفاده می‌کنید، باید کلید SSH خود را در GitHub ثبت کرده باشید.
 
-## ساختار
+برای استفادهٔ معمول از ویرایشگر محتوا، لازم نیست CSS را دوباره بسازید. برای تغییر استایل و ساخت CSS، `pnpm install` لازم است.
 
-- `index.html` — صفحهٔ اصلی فارسی.
-- `en/index.html` — نسخهٔ انگلیسی.
-- `projects.html` و `en/projects.html` — فهرست کامل و تک‌ستونهٔ پروژه‌ها به فارسی و انگلیسی؛ هر دو صفحه از `content/projects.json` تولید می‌شوند.
-- `content/projects.json` — مرجع ترتیب، وضعیت نمایش، لینک و متن دوزبانهٔ پروژه‌ها.
-- `scripts/build-site.mjs` — ساخت فهرست پروژه‌ها در صفحهٔ اصلی، صفحهٔ پروژه‌ها و صفحهٔ درباره، برای هر دو زبان.
-- `assets/site.css` — استایل کامپایل‌شده و فشردهٔ Tailwind CSS.
-- `img/` — تصویرهای اصلی و نسخه‌های WebP مورد استفادهٔ سایت.
-- `robots.txt` و `sitemap.xml` — فایل‌های راهنمای خزنده‌های موتور جست‌وجو.
+## اجرای محلی
 
-## توسعه
+### ۱. دریافت پروژه
 
-برای اجرای پیش‌نمایش محلی با ویرایش متن و لینک، جایگزینی تصویر، افزودن پروژه و مرتب‌سازی اولویت‌ها، بدون نصب بستهٔ اضافه:
+با HTTPS:
 
 ```bash
-node scripts/dev-server.mjs
+git clone https://github.com/soroush-zendedel/soroush-zendedel.github.io.git
+cd soroush-zendedel.github.io
 ```
 
-سپس [پیش‌نمایش محلی](http://localhost:8082/) را باز کنید. در صورت استفاده از npm، دستور `npm run dev` هم در دسترس است.
+یا پروژه را با GitHub Desktop از همین مخزن Clone کنید.
 
-ویرایش فقط هنگام اجرای این سرور در دسترس است. تأیید هر تغییر، فایل داده و صفحه‌های تولیدشده را به‌روزرسانی می‌کند و یک کامیت مستقل می‌سازد؛ لغو تغییری ذخیره نمی‌کند. اگر تغییر ذخیره‌نشدهٔ دیگری در مخزن باشد، ویرایشگر برای جلوگیری از ترکیب تغییرها ذخیره را متوقف می‌کند.
-از مودال افزودن پروژه می‌توان نام و توضیح هر دو زبان، لینک و تصویر را وارد کرد. شش پروژهٔ اول بر اساس `order` در صفحهٔ اصلی نمایش داده می‌شوند؛ صفحهٔ فهرست پروژه‌ها همهٔ پروژه‌های فعال را نشان می‌دهد.
-در هر نوبت ویرایش می‌توان همهٔ کامیت‌های ساخته‌شده توسط ویرایشگر را با دکمهٔ «لغو این نوبت» به وضعیت پیش از شروع برگرداند؛ این کار پس از تأیید انجام می‌شود و اگر در آن بازه کامیت نامرتبطی وجود داشته باشد، متوقف خواهد شد.
+### ۲. نصب وابستگی‌ها
 
-برای تولید صفحه‌های HTML از فهرست پروژه‌ها، Node.js کافی است:
+اگر pnpm را ندارید، پس از نصب Node.js آن را نصب کنید:
+
+```bash
+npm install --global pnpm
+```
+
+سپس در پوشهٔ پروژه اجرا کنید:
+
+```bash
+pnpm install
+```
+
+### ۳. باز کردن پیش‌نمایش
+
+```bash
+pnpm dev
+```
+
+سایت را در مرورگر در نشانی [http://localhost:8082](http://localhost:8082) ببینید. برای توقف سرور، در همان پنجره `Ctrl+C` را بزنید. اگر پورت ۸۰۸۲ در دسترس نباشد، می‌توان پورت دیگری تعیین کرد؛ مثلاً در PowerShell ویندوز:
+
+```powershell
+$env:PORT=8083; pnpm dev
+```
+
+## ویرایش محتوا در سایت
+
+ویرایشگر بصری فقط با سرور محلی بالا فعال است و در نسخهٔ زنده نمایش داده نمی‌شود.
+
+۱. پیش از شروع، تغییرات قبلی را commit کنید یا کنار بگذارید تا مخزن تمیز باشد. ویرایشگر تغییرهای نامرتبط را وارد commitهای محتوایی نمی‌کند.
+
+۲. در پیش‌نمایش، «ویرایش» را روشن کنید و روی بخش موردنظر یا دکمهٔ تنظیمات آن بزنید. متن‌های فارسی و انگلیسی، لینک‌ها، تصویرها، پروژه‌ها، ترتیب و نمایش پروژه‌ها، شبکه‌های اجتماعی، اطلاعات تماس، کارت بلاگ و اطلاعات صفحهٔ درباره از همین رابط قابل تغییرند.
+
+۳. هر بار که یک تغییر را تأیید می‌کنید، ویرایشگر داده و صفحه‌های HTML تولیدشده را ذخیره می‌کند و یک commit جداگانه روی شاخهٔ `edit-content` می‌سازد. این commit هنوز سایت زنده را تغییر نمی‌دهد.
+
+۴. پس از آماده‌شدن تغییرها، «ارسال برای بررسی» را بزنید. ویرایشگر شاخهٔ `edit-content` را به GitHub می‌فرستد و صفحهٔ مقایسه با `main` را باز می‌کند.
+
+۵. در GitHub، درخواست ادغام (Pull request) با **Base: `main`** و **Compare: `edit-content`** بسازید. بخش **Files changed** را بررسی کنید و سپس PR را Merge کنید. اگر GitHub صفحهٔ Compare را باز کرد، دکمهٔ **Create pull request** شما را به همین مرحله می‌برد.
+
+۶. پس از ادغام در `main`، GitHub Pages سایت زنده را از فایل‌های جدید منتشر می‌کند. انتشار معمولاً کمی زمان می‌برد؛ وضعیت آن را در بخش **Deployments** مخزن ببینید.
+
+### همگام‌کردن شاخهٔ محتوا پس از ادغام
+
+بعد از Merge، برای اینکه شمارندهٔ جلو/عقب `edit-content` نسبت به `main` دوباره صفر شود، در مخزن محلی و در حالی که تغییر ذخیره‌نشده‌ای ندارید اجرا کنید:
+
+```bash
+git switch edit-content
+git fetch origin
+git merge --ff-only origin/main
+git push origin edit-content
+```
+
+این دستورها فقط شاخهٔ محتوا را به commit ادغام‌شدهٔ `main` جلو می‌آورند؛ تاریخچه را بازنویسی نمی‌کنند. ویرایشگر نیز پیش از ذخیره یا ارسال بعدی، شاخه را با تغییرهای تازهٔ GitHub بررسی و همگام می‌کند.
+
+## فایل‌های داده و صفحه‌ها
+
+فایل‌های JSON مرجع اصلی محتوای قابل‌ویرایش‌اند:
+
+| فایل | کاربرد |
+| --- | --- |
+| `content/profile.json` | نام، عنوان، معرفی و تصویر آواتار صفحهٔ اصلی |
+| `content/person.json` | اطلاعات صفحهٔ درباره، تصویر شخص، متن زندگی‌نامه و اطلاعات ساختاریافتهٔ Person/SEO |
+| `content/projects.json` | پروژه‌ها، متن فارسی و انگلیسی، لینک، تصویر، ترتیب و وضعیت نمایش |
+| `content/social.json` | لینک‌ها و برچسب شبکه‌های اجتماعی |
+| `content/contact.json` | روش‌ها و اطلاعات تماس |
+| `content/blog.json` | عنوان، توضیح، لینک و آیکون کارت بلاگ |
+
+در `content/projects.json`، پروژه‌های فعال بر اساس `order` مرتب می‌شوند؛ شش پروژهٔ اول در صفحهٔ اصلی و همهٔ پروژه‌های فعال در صفحهٔ پروژه‌ها نمایش داده می‌شوند. مقدار `visible: false` پروژه را از نمایش عمومی پنهان می‌کند.
+
+صفحه‌های اصلی فارسی و انگلیسی به‌ترتیب `index.html` و `en/index.html` هستند. صفحه‌های دیگر شامل `about.html`، `en/about.html`، `projects.html` و `en/projects.html` می‌شوند. این HTMLها خروجی‌های آمادهٔ انتشارند و باید همراه دادهٔ منبع commit شوند.
+
+## تغییر مستقیم داده یا کد
+
+ویرایشگر بصری برای تغییر محتوا ساده‌ترین راه است. اگر JSON را دستی تغییر دادید، صفحه‌های HTML وابسته را دوباره تولید کنید:
 
 ```bash
 pnpm run build:site
 ```
 
-برای بازسازی CSS به Node.js و pnpm نیاز است:
+این فرمان داده‌ها را اعتبارسنجی می‌کند و فهرست پروژه‌ها و محتوای قابل‌ویرایش را در شش صفحهٔ HTML بالا بازسازی می‌کند.
+
+اگر فایل‌های CSS، کلاس‌های Tailwind یا `tailwind.input.css` را تغییر دادید، وابستگی‌ها را نصب و CSS را دوباره بسازید:
 
 ```bash
 pnpm install
 pnpm run build:css
 ```
 
-فایل‌های HTML تولیدشده و `assets/site.css` خروجی‌های مورد استفادهٔ سایت‌اند و باید همراه تغییرهای منبع پوش شوند. سایت استاتیک است و برای انتشار به فرایند build در GitHub Pages نیاز ندارد.
+خروجی در `assets/site.css` نوشته می‌شود. فونت‌ها نیز داخل `assets/fonts/` هستند و از همان مخزن بارگیری می‌شوند.
+
+برای تغییر فنی روی `main`، ابتدا آن را تازه کنید:
+
+```bash
+git switch main
+git pull --ff-only origin main
+```
+
+پس از تغییر و بازبینی محلی، فایل‌های لازم—including خروجی‌های ساخته‌شده—را commit و push کنید:
+
+```bash
+git status
+git diff --check
+git add <files>
+git commit -m "Describe the change"
+git push origin main
+```
+
+Push مستقیم به `main`، پس از انتشار خودکار GitHub Pages، سایت زنده را تغییر می‌دهد. برای محتوایی که باید پیش از انتشار بررسی شود، از ویرایشگر و شاخهٔ `edit-content` و روند Pull request بالا استفاده کنید. همکارانی که اجازهٔ push مستقیم به مخزن ندارند، باید از مخزن Fork‌شدهٔ خود PR به `main` بفرستند.
+
+## ساختار پروژه
+
+```text
+assets/                 CSS، فونت‌های محلی و فایل‌های رابط کاربری
+content/                داده‌های JSON فارسی/انگلیسی
+en/                     صفحه‌های انگلیسی
+img/                    تصویرهای سایت
+scripts/build-site.mjs  اعتبارسنجی داده و تولید HTML
+scripts/dev-server.mjs  سرور پیش‌نمایش محلی و اتصال ویرایشگر به Git
+scripts/dev-editor.js   رابط ویرایش که فقط سرور محلی آن را اضافه می‌کند
+index.html              صفحهٔ اصلی فارسی
+about.html              صفحهٔ دربارهٔ فارسی
+projects.html           فهرست پروژه‌های فارسی
+```
+
+## روش انتشار
+
+این مخزن یک وب‌سایت استاتیک است. فایل‌های HTML، CSS، تصویر، فونت و sitemap در خود مخزن آماده‌اند؛ بنابراین برای انتشار، سرور backend یا فرمان deploy جداگانه لازم نیست. GitHub Pages از شاخهٔ `main` و ریشهٔ مخزن فایل‌ها را منتشر می‌کند. تغییر محتوا ابتدا در شاخهٔ `edit-content` آماده و بازبینی می‌شود؛ پس از Merge شدن PR در `main`، نسخهٔ زنده به‌روز می‌شود.
 
 ---
 
-# Soroush Zendedel — Portfolio
+# Soroush Zendedel — Personal Website
 
-A bilingual personal portfolio featuring creative digital tools and projects around music, writing, and digital experiences. The Persian edition is right-to-left; the English edition lives at [`/en/`](https://soroush-zendedel.github.io/en/).
+A bilingual portfolio with Persian and English home, about, and project pages. The published website is static: GitHub Pages serves the files in this repository. It needs no application server, database, Docker, or remote font service.
 
-**Visit the website:** [soroush-zendedel.github.io](https://soroush-zendedel.github.io/)
+**Live website:** [soroush-zendedel.github.io](https://soroush-zendedel.github.io/)
 
-## Projects
+## Requirements
 
-- [Tara](https://soroush-zendedel.github.io/tara/) — A visual tool for learning and practicing music theory.
-- [Shenobin](https://soroush-zendedel.github.io/shenobin/) — A browser-based music studio for composition, harmony, and MIDI or WAV export.
-- [Khater](https://soroush-zendedel.github.io/khater/) — A tool for practicing, designing, and creating fonts.
-- [Notella](https://github.com/soroush-zendedel/notella) — A Python note-taking app with command-line and web interfaces.
-- [Silk Road](https://soroush-zendedel.github.io/silk-road/) — A project about the words and stories of the Silk Road.
-- [Countdown](https://soroush-zendedel.github.io/countdown/) — A countdown timer for time awareness and focus.
-- [Sabte Ahval](https://soroush-zendedel.github.io/personal-blog/) — A personal blog for writing, reflections, and poetry.
+- **Node.js 20 or newer** for the local preview and build scripts.
+- **pnpm 9 or newer** to install Tailwind CSS and rebuild the stylesheet.
+- **Git** to clone the repository and record changes.
+- GitHub access to push changes. GitHub Desktop or Git Credential Manager is the simplest authentication option. If the repository uses SSH, configure an SSH key in GitHub first.
 
-## Project structure
+You do not need to rebuild CSS for ordinary content edits. `pnpm install` is required for style changes and CSS builds.
 
-- `index.html` — Persian home page.
-- `en/index.html` — English edition.
-- `content/projects.json` — source of truth for project order, visibility, links, and bilingual text.
-- `scripts/build-site.mjs` — generates project lists on the home, project-directory, and about pages in both languages.
-- `assets/site.css` — Minified, compiled Tailwind CSS.
-- `img/` — Original images and the WebP versions served by the site.
-- `robots.txt` and `sitemap.xml` — Search crawler guidance and sitemap.
+## Run locally
 
-## Development
-
-Start the local preview with project editing, image replacement, project creation, and drag-to-prioritize, without installing an additional package:
+### 1. Clone the repository
 
 ```bash
-node scripts/dev-server.mjs
+git clone https://github.com/soroush-zendedel/soroush-zendedel.github.io.git
+cd soroush-zendedel.github.io
 ```
 
-Then open the [local preview](http://localhost:8082/). If you use npm, `npm run dev` is also available.
+You can also clone it with GitHub Desktop.
 
-The editor is available only through this local server. Each confirmed edit updates the data and generated pages in its own Git commit; canceling leaves files unchanged. Saving is blocked while other uncommitted changes exist, so unrelated work is never included.
-The add-project dialog captures Persian and English names and descriptions, the URL, and an image. The first six projects by `order` appear on the home page; the full directory includes every visible project.
-During an editing session, the “Undo this session” button can restore all editor commits to the state from before editing began. It asks for confirmation and refuses to proceed if unrelated commits are found in that range.
+### 2. Install pnpm and project dependencies
 
-Use Node.js to generate the project lists from their data:
+If pnpm is not installed, run this after installing Node.js:
+
+```bash
+npm install --global pnpm
+pnpm install
+```
+
+### 3. Start the preview
+
+```bash
+pnpm dev
+```
+
+Open [http://localhost:8082](http://localhost:8082). Press `Ctrl+C` in the terminal to stop the server. You can select another port, for example in Windows PowerShell:
+
+```powershell
+$env:PORT=8083; pnpm dev
+```
+
+## Edit website content
+
+The visual editor is available only through the local preview; it is not shown on the live website.
+
+1. Start with a clean working tree. Commit or set aside unrelated changes first.
+2. Enable **Edit** in the preview and open the settings for the section you want to change. The editor supports bilingual text, links, images, projects, project order and visibility, social links, contact methods, the blog card, and About-page details.
+3. Each confirmed change updates its data and generated HTML, then creates a separate commit on `edit-content`. It does not publish the live site.
+4. When the edits are ready, click **Push for review**. The editor pushes `edit-content` to GitHub and opens a comparison with `main`.
+5. On GitHub, create a pull request with **Base: `main`** and **Compare: `edit-content`**. Review **Files changed**, then merge the PR. The **Create pull request** button on the comparison page opens this step.
+6. GitHub Pages publishes the updated files from `main`. Check the repository’s **Deployments** section for publication status.
+
+### Sync `edit-content` after merging
+
+After the PR is merged, run these commands in a clean local checkout to bring the content branch back to the same commit as `main`:
+
+```bash
+git switch edit-content
+git fetch origin
+git merge --ff-only origin/main
+git push origin edit-content
+```
+
+This is a fast-forward update; it does not rewrite history. Before the next save or publish, the visual editor also checks GitHub and synchronizes its branch.
+
+## Content data and pages
+
+These JSON files are the source of truth for editable content:
+
+| File | Purpose |
+| --- | --- |
+| `content/profile.json` | Home-page name, role, introduction, and avatar |
+| `content/person.json` | About-page identity, portrait, biography, and Person/SEO data |
+| `content/projects.json` | Bilingual project text, links, images, order, and visibility |
+| `content/social.json` | Social network labels and links |
+| `content/contact.json` | Contact methods and details |
+| `content/blog.json` | Blog-card title, description, link, and icon |
+
+Visible projects are sorted by `order`. The first six appear on the home page; the projects page lists all visible projects. Set `visible` to `false` to hide a project from public pages.
+
+The Persian and English pages are `index.html` and `en/index.html`. Other generated pages are `about.html`, `en/about.html`, `projects.html`, and `en/projects.html`. Commit generated HTML together with its source-data changes.
+
+## Build after manual changes
+
+After editing JSON files by hand, regenerate the HTML pages:
 
 ```bash
 pnpm run build:site
 ```
 
-Node.js and pnpm are required to rebuild the stylesheet:
+The script validates the data and rebuilds the editable content and project lists in the six HTML pages above.
+
+After changing CSS, Tailwind classes, or `tailwind.input.css`, install dependencies and rebuild the stylesheet:
 
 ```bash
 pnpm install
 pnpm run build:css
 ```
 
-The generated HTML and `assets/site.css` are the files served by GitHub Pages. Commit generated HTML with source-data changes; the site remains static and needs no GitHub Pages build step.
+The output is `assets/site.css`. The site fonts are stored in `assets/fonts/` and served from this repository.
+
+## Code changes and Git
+
+For direct development on `main`, update it first:
+
+```bash
+git switch main
+git pull --ff-only origin main
+```
+
+After reviewing your local changes, commit and push the required source and generated files:
+
+```bash
+git status
+git diff --check
+git add <files>
+git commit -m "Describe the change"
+git push origin main
+```
+
+A direct push to `main` publishes through GitHub Pages. For content that should be reviewed before it goes live, use the visual editor and `edit-content` pull-request flow above. Contributors without direct push access should work from a fork and submit a pull request to `main`.
+
+## Project layout
+
+```text
+assets/                 CSS, local fonts, and interface assets
+content/                Persian/English JSON data
+en/                     English pages
+img/                    Site images
+scripts/build-site.mjs  Validates data and generates HTML
+scripts/dev-server.mjs  Local preview server and Git editor integration
+scripts/dev-editor.js   Editor UI injected only by the local server
+index.html              Persian home page
+about.html              Persian About page
+projects.html           Persian project directory
+```
+
+## Deployment
+
+This repository is a static website. HTML, CSS, images, fonts, and sitemap files are committed and ready to serve; no backend or separate deploy command is needed. GitHub Pages publishes the repository root from `main`. Content changes are prepared on `edit-content`, reviewed in a pull request, and go live after that PR is merged into `main`.
