@@ -1,36 +1,7 @@
 [
   {
-    "id": "tara",
-    "order": 1,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/tara/",
-    "image": "tara.webp",
-    "imageFallback": "T",
-    "home": {
-      "fa": {
-        "name": "تارا",
-        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
-      },
-      "en": {
-        "name": "Tara",
-        "description": "A visual tool for learning and practicing music theory."
-      },
-      "alt": "Tara - Music Theory Application"
-    },
-    "about": {
-      "fa": {
-        "name": "تارا",
-        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
-      },
-      "en": {
-        "name": "Tara",
-        "description": "A visual tool for learning and practicing music theory."
-      }
-    }
-  },
-  {
     "id": "shenobin",
-    "order": 2,
+    "order": 1,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/shenobin/",
     "image": "shenobin.webp",
@@ -54,6 +25,35 @@
       "en": {
         "name": "ShenoBin",
         "description": "A workspace for composing music and exploring harmony."
+      }
+    }
+  },
+  {
+    "id": "tara",
+    "order": 2,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/tara/",
+    "image": "tara.webp",
+    "imageFallback": "T",
+    "home": {
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
+      },
+      "alt": "Tara - Music Theory Application"
+    },
+    "about": {
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
       }
     }
   },
