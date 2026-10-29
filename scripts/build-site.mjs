@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projects = JSON.parse(await readFile(join(root, "content/projects.json"), "utf8"));
+const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "utf8"));
 
 function validateProjects(items) {
   const ids = new Set();
@@ -30,6 +31,28 @@ function escapeHtml(value) {
     '"': "&quot;",
     "'": "&#39;",
   })[char]);
+}
+
+function renderProfileFields(html, language, file) {
+  for (const [key, translations] of Object.entries(profile.fields)) {
+    const value = translations[language];
+    if (typeof value !== "string") throw new Error(`Missing ${language} profile content: ${key}`);
+    const field = `profile.${key}.${language}`;
+    const escapedField = field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matcher = new RegExp(`(<([a-z][a-z0-9]*)\\b(?=[^>]*\\bdata-edit-field="${escapedField}")[^>]*>)[\\s\\S]*?(<\\/\\2>)`, "gi");
+    let matches = 0;
+    html = html.replace(matcher, (_match, opening, _tag, closing) => {
+      matches += 1;
+      return `${opening}${escapeHtml(value)}${closing}`;
+    });
+    if (matches !== 1) throw new Error(`Expected one ${field} marker in ${file}; found ${matches}`);
+  }
+  const imagePrefix = language === "en" ? "../img/" : "./img/";
+  const imagePattern = /(<img\s+src=")[^"]+("[^>]*class="art-avatar\b)/;
+  if (!imagePattern.test(html)) throw new Error(`Profile image marker is missing in ${file}`);
+  html = html.replace(imagePattern, `$1${imagePrefix}${escapeHtml(profile.avatar.image)}$2`);
+  html = html.replace(/(<img\s+src="[^"]+"\s+alt=")[^"]*("[^>]*class="art-avatar\b)/, `$1${escapeHtml(profile.avatar.alt)}$2`);
+  return html;
 }
 
 function renderHomeImage(project, language) {
@@ -94,6 +117,7 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "index.html" : "en/index.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = renderProfileFields(html, language, file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }

@@ -11,9 +11,9 @@
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
     .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
-    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
+    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
-    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
@@ -21,6 +21,7 @@
     .dev-editor-handle{position:absolute;top:7px;inset-inline-start:7px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:grab;font-size:18px;line-height:1}
     .dev-editor-handle:active{cursor:grabbing}
     .dev-editor-settings-button{position:absolute;top:7px;inset-inline-start:46px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
+    .dev-profile-image-button{position:absolute;top:14px;inset-inline-end:14px;width:34px;height:34px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
     .dev-editor-settings{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(300px,calc(100vw - 32px));max-height:calc(100vh - 16px);overflow-y:auto;padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
     .dev-editor-settings-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
     .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
@@ -77,6 +78,19 @@
   addButton.textContent = isEnglish ? "＋ Add project" : "＋ افزودن پروژه";
   addButton.addEventListener("click", openAddProjectModal);
   document.body.append(addButton);
+
+  const avatarFrame = document.querySelector(".avatar-frame");
+  const profileImageButton = avatarFrame ? document.createElement("button") : null;
+  if (profileImageButton) {
+    profileImageButton.className = "dev-profile-image-button";
+    profileImageButton.type = "button";
+    profileImageButton.hidden = true;
+    profileImageButton.textContent = "⚙";
+    profileImageButton.title = isEnglish ? "Profile photo settings" : "تنظیم تصویر اصلی";
+    profileImageButton.setAttribute("aria-label", profileImageButton.title);
+    profileImageButton.addEventListener("click", openProfileImageSettings);
+    avatarFrame.append(profileImageButton);
+  }
 
   const modalLayer = document.createElement("div");
   modalLayer.className = "dev-editor-modal-layer";
@@ -249,6 +263,71 @@
     linkInput.focus();
   }
 
+  function openProfileImageSettings() {
+    if (!enabled || !profileImageButton || !avatarFrame) return;
+    closeProjectSettings();
+    const panel = document.createElement("div");
+    panel.className = "dev-editor-settings";
+    panel.dataset.projectId = "profile-image";
+    panel._trigger = profileImageButton;
+    panel.addEventListener("click", (event) => event.stopPropagation());
+
+    const header = document.createElement("div");
+    header.className = "dev-editor-settings-header";
+    const heading = document.createElement("span");
+    heading.textContent = isEnglish ? "Profile image" : "تصویر اصلی";
+    const close = document.createElement("button");
+    close.className = "dev-editor-settings-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.title = isEnglish ? "Close" : "بستن";
+    close.setAttribute("aria-label", close.title);
+    close.addEventListener("click", closeProjectSettings);
+    header.append(heading, close);
+
+    const imageLabel = document.createElement("label");
+    imageLabel.textContent = isEnglish ? "Replace photo" : "جایگزینی عکس";
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
+    fileInput.setAttribute("aria-label", imageLabel.textContent);
+    const altLabel = document.createElement("label");
+    altLabel.textContent = isEnglish ? "Image alt text" : "متن جایگزین تصویر";
+    const altInput = document.createElement("input");
+    altInput.type = "text";
+    altInput.maxLength = 300;
+    altInput.value = avatarFrame.querySelector(".art-avatar")?.alt || "";
+    altInput.setAttribute("aria-label", altLabel.textContent);
+    altInput.style.cssText = "box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524";
+    const saveAlt = makeSettingsButton(isEnglish ? "Save alt text" : "ذخیرهٔ متن جایگزین", async (event) => {
+      await saveProjectSetting({ type: "updateProfile", field: "profile.avatar.alt", value: altInput.value }, event.currentTarget);
+    });
+    const upload = makeSettingsButton(isEnglish ? "Upload and activate" : "بارگذاری و فعال‌سازی", async (event) => {
+      const button = event.currentTarget;
+      const file = fileInput.files?.[0];
+      if (!file) return toast(isEnglish ? "Choose an image first." : "ابتدا یک تصویر انتخاب کنید.", true);
+      if (file.size > 5 * 1024 * 1024) return toast(isEnglish ? "Image must be 5 MB or smaller." : "حجم تصویر باید حداکثر ۵ مگابایت باشد.", true);
+      if (!["image/webp", "image/jpeg", "image/png"].includes(file.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG image." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
+      if (!altInput.value.trim()) return toast(isEnglish ? "Add alt text for accessibility and SEO." : "برای دسترس‌پذیری و سئو متن جایگزین وارد کنید.", true);
+      button.disabled = true;
+      try {
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error(isEnglish ? "Could not read this image." : "خواندن تصویر ممکن نشد."));
+          reader.readAsDataURL(file);
+        });
+        await saveProjectSetting({ type: "uploadProfileImage", projectId: "me", alt: altInput.value, mime: file.type, data: String(dataUrl).split(",")[1] }, button);
+      } catch (error) {
+        button.disabled = false;
+        toast(error.message, true);
+      }
+    });
+    panel.append(header, imageLabel, fileInput, altLabel, altInput, saveAlt, upload);
+    document.body.append(panel);
+    placeSettings(panel, profileImageButton);
+  }
+
   async function saveProjectSetting(payload, button) {
     button.disabled = true;
     try {
@@ -280,6 +359,7 @@
       : (isEnglish ? "✎ Edit" : "✎ ویرایش");
     undoButton.hidden = !enabled || sessionCommitCount === 0;
     addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
+    if (profileImageButton) profileImageButton.hidden = !enabled;
     if (enabled) wrapCards();
     else {
       if (editing) cancelEdit();
@@ -514,9 +594,10 @@
   async function saveEdit() {
     if (!editing) return;
     const target = editing.target;
+    const isProfileField = target.dataset.editField.startsWith("profile.");
     const payload = {
-      type: "update",
-      projectId: editing.projectId,
+      type: isProfileField ? "updateProfile" : "update",
+      ...(isProfileField ? {} : { projectId: editing.projectId }),
       field: target.dataset.editField,
       value: target.innerText.replace(/\s+/g, " ").trim(),
     };
@@ -612,14 +693,14 @@
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
     if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
-    if (!project) return;
+    if (!project && !field.dataset.editField.startsWith("profile.")) return;
     event.preventDefault();
     event.stopPropagation();
-    beginEdit(field, project.dataset.projectId);
+    beginEdit(field, project?.dataset.projectId || "");
   }, true);
 
   document.addEventListener("keydown", (event) => {
@@ -631,7 +712,7 @@
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -645,7 +726,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();

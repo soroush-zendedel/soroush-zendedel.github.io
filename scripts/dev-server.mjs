@@ -9,6 +9,7 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 const execFile = promisify(execFileCallback);
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projectFile = join(root, "content", "projects.json");
+const profileFile = join(root, "content", "profile.json");
 const port = Number(process.env.PORT || 8082);
 const token = randomBytes(24).toString("hex");
 const generatedFiles = ["index.html", "en/index.html", "about.html", "en/about.html", "projects.html", "en/projects.html"];
@@ -57,7 +58,7 @@ async function getEditorSession(base) {
   }
   const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
   const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
-  const allowedFiles = new Set(["content/projects.json", ...generatedFiles]);
+  const allowedFiles = new Set(["content/projects.json", "content/profile.json", ...generatedFiles]);
   for (const commit of commits) {
     const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
       runGit(["show", "-s", "--format=%s", commit]),
@@ -129,6 +130,8 @@ async function saveChange(request, response) {
   saving = true;
 
   let originalJson;
+  let contentFile = projectFile;
+  let dataToWrite;
   let staged = false;
   let uploadedFile;
   let uploadedFileCreated = false;
@@ -138,9 +141,27 @@ async function saveChange(request, response) {
     const payload = await readBody(request);
     const projects = JSON.parse(await readFile(projectFile, "utf8"));
     originalJson = JSON.stringify(projects, null, 2) + "\n";
+    dataToWrite = projects;
     let message;
 
-    if (payload.type === "addProject") {
+    if (payload.type === "updateProfile") {
+      const profile = JSON.parse(await readFile(profileFile, "utf8"));
+      const field = typeof payload.field === "string" ? payload.field : "";
+      const value = typeof payload.value === "string" ? payload.value.trim().replace(/\s+/g, " ") : null;
+      const match = field.match(/^profile\.([a-zA-Z0-9]+)\.(fa|en)$/);
+      const isAlt = field === "profile.avatar.alt";
+      if ((!match && !isAlt) || value === null) return send(response, 400, { error: "Unsupported profile field." });
+      const target = isAlt ? profile.avatar : profile.fields[match[1]];
+      const key = isAlt ? "alt" : match[2];
+      const maxLength = isAlt ? 300 : match[1] === "bio" ? 1200 : 500;
+      if (!target || value.length > maxLength || !value) return send(response, 400, { error: "Profile text must be non-empty and within its character limit." });
+      if (target[key] === value) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(profile, null, 2) + "\n";
+      contentFile = profileFile;
+      dataToWrite = profile;
+      target[key] = value;
+      message = `content: update profile ${isAlt ? "image alt" : `${match[1]} ${match[2]}`}`;
+    } else if (payload.type === "addProject") {
       const projectId = typeof payload.id === "string" ? payload.id.trim() : "";
       const faName = typeof payload.faName === "string" ? payload.faName.trim().replace(/\s+/g, " ") : "";
       const enName = typeof payload.enName === "string" ? payload.enName.trim().replace(/\s+/g, " ") : "";
@@ -228,12 +249,28 @@ async function saveChange(request, response) {
       if (project.href === value) return send(response, 200, { unchanged: true });
       project.href = value;
       message = `content: update ${project.id} link`;
-    } else if (payload.type === "uploadImage") {
+    } else if (payload.type === "uploadImage" || payload.type === "uploadProfileImage") {
+      const isProfileImage = payload.type === "uploadProfileImage";
       if (typeof payload.projectId !== "string" || typeof payload.mime !== "string" || typeof payload.data !== "string") {
         return send(response, 400, { error: "Invalid image upload." });
       }
-      const project = projects.find((item) => item.id === payload.projectId);
-      if (!project) return send(response, 404, { error: "Project not found." });
+      let profile;
+      let project;
+      if (isProfileImage) {
+        profile = JSON.parse(await readFile(profileFile, "utf8"));
+        originalJson = JSON.stringify(profile, null, 2) + "\n";
+        if (typeof payload.alt === "string") {
+          const alt = payload.alt.trim().replace(/\s+/g, " ");
+          if (!alt || alt.length > 300) return send(response, 400, { error: "Image alt text must be non-empty and under 300 characters." });
+          profile.avatar.alt = alt;
+        }
+        contentFile = profileFile;
+        dataToWrite = profile;
+        project = { id: "me", image: profile.avatar.image };
+      } else {
+        project = projects.find((item) => item.id === payload.projectId);
+        if (!project) return send(response, 404, { error: "Project not found." });
+      }
       const extensions = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
       const extension = extensions[payload.mime];
       if (!extension) return send(response, 400, { error: "Use a WebP, JPEG, or PNG image." });
@@ -279,6 +316,7 @@ async function saveChange(request, response) {
       await writeFile(uploadedFile, imageBytes, { flag: "wx" });
       uploadedFileCreated = true;
       project.image = filename;
+      if (isProfileImage) profile.avatar.image = filename;
       message = `content: replace ${project.id} image`;
     } else if (payload.type === "reorder") {
       if (!Array.isArray(payload.projectIds) || payload.projectIds.length > projects.length || payload.projectIds.some((id) => typeof id !== "string")) {
@@ -311,12 +349,12 @@ async function saveChange(request, response) {
       return send(response, 400, { error: "Unsupported editor action." });
     }
 
-    const temporaryFile = `${projectFile}.tmp`;
-    await writeFile(temporaryFile, JSON.stringify(projects, null, 2) + "\n", "utf8");
-    await rename(temporaryFile, projectFile);
+    const temporaryFile = `${contentFile}.tmp`;
+    await writeFile(temporaryFile, JSON.stringify(dataToWrite, null, 2) + "\n", "utf8");
+    await rename(temporaryFile, contentFile);
     await execFile(process.execPath, [join(root, "scripts", "build-site.mjs")], { cwd: root, windowsHide: true });
     const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
-    const changedPaths = ["content/projects.json", ...generatedFiles, ...imagePaths];
+    const changedPaths = [relative(root, contentFile).split(sep).join("/"), ...generatedFiles, ...imagePaths];
     await runGit(["add", "--", ...changedPaths]);
     staged = true;
     const { stdout } = await runGit(["commit", "-m", message]);
@@ -325,11 +363,11 @@ async function saveChange(request, response) {
   } catch (error) {
     if (staged) {
       const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
-      try { await runGit(["reset", "--", "content/projects.json", ...generatedFiles, ...imagePaths]); } catch {}
+      try { await runGit(["reset", "--", relative(root, contentFile).split(sep).join("/"), ...generatedFiles, ...imagePaths]); } catch {}
     }
     if (originalJson) {
       try {
-        await writeFile(projectFile, originalJson, "utf8");
+        await writeFile(contentFile, originalJson, "utf8");
         await execFile(process.execPath, [join(root, "scripts", "build-site.mjs")], { cwd: root, windowsHide: true });
       } catch (rollbackError) {
         console.error("Editor rollback failed:", rollbackError);
