@@ -1,36 +1,7 @@
 [
   {
-    "id": "khater",
-    "order": 1,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/khater/",
-    "image": "khater.webp",
-    "imageFallback": "K",
-    "home": {
-      "fa": {
-        "name": "خطِر",
-        "description": "ابزاری برای تمرین، طراحی و ساخت فونت."
-      },
-      "en": {
-        "name": "Khater",
-        "description": "A tool for practicing, designing, and creating fonts."
-      },
-      "alt": "Khater - Font Design Tool"
-    },
-    "about": {
-      "fa": {
-        "name": "خطر (Khater)",
-        "description": "ابزاری برای تمرین، طراحی و ساخت فونت فارسی."
-      },
-      "en": {
-        "name": "Khater",
-        "description": "A tool for practicing, designing, and creating Persian typefaces."
-      }
-    }
-  },
-  {
     "id": "shenobin",
-    "order": 2,
+    "order": 1,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/shenobin/",
     "image": "shenobin.webp",
@@ -54,6 +25,35 @@
       "en": {
         "name": "ShenoBin",
         "description": "A workspace for composing music and exploring harmony."
+      }
+    }
+  },
+  {
+    "id": "khater",
+    "order": 2,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/khater/",
+    "image": "khater.webp",
+    "imageFallback": "K",
+    "home": {
+      "fa": {
+        "name": "خطِر",
+        "description": "ابزاری برای تمرین، طراحی و ساخت فونت."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing, designing, and creating fonts."
+      },
+      "alt": "Khater - Font Design Tool"
+    },
+    "about": {
+      "fa": {
+        "name": "خطر (Khater)",
+        "description": "ابزاری برای تمرین، طراحی و ساخت فونت فارسی."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing, designing, and creating Persian typefaces."
       }
     }
   },
