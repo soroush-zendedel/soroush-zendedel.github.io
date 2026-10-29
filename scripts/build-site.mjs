@@ -42,21 +42,21 @@ function renderHomeProject(project, language) {
   const fa = project.home.fa;
   const en = project.home.en;
   return `                    <!-- ${escapeHtml(project.id)} -->
-                    <a href="${escapeHtml(project.href)}" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson text-start">
+                    <a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson text-start">
                         ${renderHomeImage(project, language)}
                         <div class="flex-1 px-5">
                             <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
-                                <span class="lang-fa flex items-center gap-2">${escapeHtml(fa.name)} <span class="text-sm font-en text-ink/50 font-normal">| ${escapeHtml(en.name)}</span></span>
-                                <span class="lang-en font-en">${escapeHtml(en.name)}</span>
+                                <span class="lang-fa flex items-center gap-2"><span data-edit-field="home.fa.name">${escapeHtml(fa.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| <span data-edit-field="home.en.name">${escapeHtml(en.name)}</span></span></span>
+                                <span class="lang-en font-en" data-edit-field="home.en.name">${escapeHtml(en.name)}</span>
                             </h4>
-                            <p class="text-sm text-ink/70 leading-relaxed dynamic-align"><span class="lang-fa">${escapeHtml(fa.description)}</span><span class="lang-en font-en">${escapeHtml(en.description)}</span></p>
+                            <p class="text-sm text-ink/70 leading-relaxed dynamic-align"><span class="lang-fa" data-edit-field="home.fa.description">${escapeHtml(fa.description)}</span><span class="lang-en font-en" data-edit-field="home.en.description">${escapeHtml(en.description)}</span></p>
                         </div>
                     </a>`;
 }
 
 function renderAboutProject(project, language) {
   const copy = project.about[language];
-  return `          <li><a href="${escapeHtml(project.href)}"><strong>${escapeHtml(copy.name)}</strong>${escapeHtml(copy.description)}</a></li>`;
+  return `          <li><a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong><span data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span></a></li>`;
 }
 
 function replaceRegion(html, start, end, content, file) {

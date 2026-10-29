@@ -26,6 +26,14 @@
 
 ## توسعه
 
+برای اجرای پیش‌نمایش محلی با ابزار ویرایش متن و ترتیب پروژه‌ها:
+
+```bash
+pnpm run dev
+```
+
+ویرایش فقط هنگام اجرای این سرور در دسترس است. تأیید هر تغییر، فایل داده و صفحه‌های تولیدشده را به‌روزرسانی می‌کند و یک کامیت مستقل می‌سازد؛ لغو تغییری ذخیره نمی‌کند. اگر تغییر ذخیره‌نشدهٔ دیگری در مخزن باشد، ویرایشگر برای جلوگیری از ترکیب تغییرها ذخیره را متوقف می‌کند.
+
 برای تولید صفحه‌های HTML از فهرست پروژه‌ها، Node.js کافی است:
 
 ```bash
@@ -70,6 +78,14 @@ A bilingual personal portfolio featuring creative digital tools and projects aro
 - `robots.txt` and `sitemap.xml` — Search crawler guidance and sitemap.
 
 ## Development
+
+Start the local preview with inline project-text editing and drag-to-reorder:
+
+```bash
+pnpm run dev
+```
+
+The editor is available only through this local server. Each confirmed edit updates the data and generated pages in its own Git commit; canceling leaves files unchanged. Saving is blocked while other uncommitted changes exist, so unrelated work is never included.
 
 Use Node.js to generate the project lists from their data:
 

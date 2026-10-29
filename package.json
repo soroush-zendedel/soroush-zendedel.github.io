@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "dev": "node scripts/dev-server.mjs",
     "build:site": "node scripts/build-site.mjs",
     "build:css": "tailwindcss -i ./tailwind.input.css -o ./assets/site.css --minify"
   },

@@ -7,13 +7,25 @@
     "image": "tara.webp",
     "imageFallback": "T",
     "home": {
-      "fa": { "name": "تارا", "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی." },
-      "en": { "name": "Tara", "description": "A visual tool for learning and practicing music theory." },
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
+      },
       "alt": "Tara - Music Theory Application"
     },
     "about": {
-      "fa": { "name": "تارا", "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی." },
-      "en": { "name": "Tara", "description": "A visual tool for learning and practicing music theory." }
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
+      }
     }
   },
   {
@@ -24,13 +36,25 @@
     "image": "shenobin.webp",
     "imageFallback": "S",
     "home": {
-      "fa": { "name": "شنوبین", "description": "محیطی برای ساخت موسیقی، بررسی هارمونی و خروجی گرفتن از ایده‌ها به MIDI یا WAV." },
-      "en": { "name": "Shenobin", "description": "A browser-based music studio for composing, exploring harmony, and exporting ideas to MIDI or WAV." },
+      "fa": {
+        "name": "شنوبین",
+        "description": "محیطی برای ساخت موسیقی، بررسی هارمونی و خروجی گرفتن از ایده‌ها به MIDI یا WAV."
+      },
+      "en": {
+        "name": "Shenobin",
+        "description": "A browser-based music studio for composing, exploring harmony, and exporting ideas to MIDI or WAV."
+      },
       "alt": ""
     },
     "about": {
-      "fa": { "name": "شنوبین", "description": "محیطی برای ساخت موسیقی، بررسی هارمونی و ساخت ایده‌های موسیقایی." },
-      "en": { "name": "ShenoBin", "description": "A workspace for composing music and exploring harmony." }
+      "fa": {
+        "name": "شنوبین",
+        "description": "محیطی برای ساخت موسیقی، بررسی هارمونی و ساخت ایده‌های موسیقایی."
+      },
+      "en": {
+        "name": "ShenoBin",
+        "description": "A workspace for composing music and exploring harmony."
+      }
     }
   },
   {
@@ -41,13 +65,25 @@
     "image": "khater.webp",
     "imageFallback": "K",
     "home": {
-      "fa": { "name": "خطِر", "description": "ابزاری برای تمرین، طراحی و ساخت فونت." },
-      "en": { "name": "Khater", "description": "A tool for practicing, designing, and creating fonts." },
+      "fa": {
+        "name": "خطِر",
+        "description": "ابزاری برای تمرین، طراحی و ساخت فونت."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing, designing, and creating fonts."
+      },
       "alt": "Khater - Font Design Tool"
     },
     "about": {
-      "fa": { "name": "خطر (Khater)", "description": "ابزاری برای تمرین، طراحی و ساخت فونت فارسی." },
-      "en": { "name": "Khater", "description": "A tool for practicing, designing, and creating Persian typefaces." }
+      "fa": {
+        "name": "خطر (Khater)",
+        "description": "ابزاری برای تمرین، طراحی و ساخت فونت فارسی."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing, designing, and creating Persian typefaces."
+      }
     }
   },
   {
@@ -58,13 +94,25 @@
     "image": "notella.webp",
     "imageFallback": "N",
     "home": {
-      "fa": { "name": "نوتلا", "description": "اپلیکیشن یادداشت‌برداری با رابط خط فرمان و وب؛ یادداشت‌ها به‌صورت محلی ذخیره می‌شوند." },
-      "en": { "name": "Notella", "description": "A Python note-taking app with CLI and web interfaces; notes are stored locally." },
+      "fa": {
+        "name": "نوتلا",
+        "description": "اپلیکیشن یادداشت‌برداری با رابط خط فرمان و وب؛ یادداشت‌ها به‌صورت محلی ذخیره می‌شوند."
+      },
+      "en": {
+        "name": "Notella",
+        "description": "A Python note-taking app with CLI and web interfaces; notes are stored locally."
+      },
       "alt": "Notella - Note Taking App"
     },
     "about": {
-      "fa": { "name": "نوتلا (Notella)", "description": "ابزار یادداشت‌برداری با رابط خط فرمان و وب." },
-      "en": { "name": "Notella", "description": "A note-taking tool with command-line and web interfaces." }
+      "fa": {
+        "name": "نوتلا (Notella)",
+        "description": "ابزار یادداشت‌برداری با رابط خط فرمان و وب."
+      },
+      "en": {
+        "name": "Notella",
+        "description": "A note-taking tool with command-line and web interfaces."
+      }
     }
   },
   {
@@ -75,13 +123,25 @@
     "image": "silkroad.webp",
     "imageFallback": "SR",
     "home": {
-      "fa": { "name": "جاده ابریشم", "description": "پروژه‌ای با تمرکز بر واژه‌ها و روایت‌های جاده ابریشم." },
-      "en": { "name": "Silk Road", "description": "A project centered on the words and stories of the Silk Road." },
+      "fa": {
+        "name": "جاده ابریشم",
+        "description": "پروژه‌ای با تمرکز بر واژه‌ها و روایت‌های جاده ابریشم."
+      },
+      "en": {
+        "name": "Silk Road",
+        "description": "A project centered on the words and stories of the Silk Road."
+      },
       "alt": "Silk Road Project"
     },
     "about": {
-      "fa": { "name": "جاده‌ی ابریشم", "description": "پروژه‌ای درباره‌ی واژه‌ها و روایت‌های جاده‌ی ابریشم." },
-      "en": { "name": "Silk Road", "description": "A project about the words and stories of the Silk Road." }
+      "fa": {
+        "name": "جاده‌ی ابریشم",
+        "description": "پروژه‌ای درباره‌ی واژه‌ها و روایت‌های جاده‌ی ابریشم."
+      },
+      "en": {
+        "name": "Silk Road",
+        "description": "A project about the words and stories of the Silk Road."
+      }
     }
   },
   {
@@ -92,13 +152,25 @@
     "image": "countdown.webp",
     "imageFallback": "C",
     "home": {
-      "fa": { "name": "شمارش معکوس", "description": "پژوش‌های شمارش معکوس برای دیدن گذر زمان و تاریخ اعداد." },
-      "en": { "name": "Countdown", "description": "A book that makes the passage of time visible and helps you stay focused." },
+      "fa": {
+        "name": "شمارش معکوس",
+        "description": "پژوش‌های شمارش معکوس برای دیدن گذر زمان و تاریخ اعداد."
+      },
+      "en": {
+        "name": "Countdown",
+        "description": "A book that makes the passage of time visible and helps you stay focused."
+      },
       "alt": "Countdown Timer App"
     },
     "about": {
-      "fa": { "name": "شمارش معکوس", "description": "پروژه‌ای برای دیدن گذر زمان و تاریخ اعداد." },
-      "en": { "name": "Countdown", "description": "A project exploring the passage of time and the history of numbers." }
+      "fa": {
+        "name": "شمارش معکوس",
+        "description": "پروژه‌ای برای دیدن گذر زمان و تاریخ اعداد."
+      },
+      "en": {
+        "name": "Countdown",
+        "description": "A project exploring the passage of time and the history of numbers."
+      }
     }
   }
 ]
