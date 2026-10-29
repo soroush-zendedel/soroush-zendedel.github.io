@@ -78,6 +78,7 @@ async function requireCleanWorkingTree() {
 }
 
 async function syncEditorBranch() {
+  await ensureEditorBranch();
   await requireCleanWorkingTree();
   const { stdout: branch } = await runGit(["branch", "--show-current"]);
   if (branch.trim() !== "edit-content") throw new Error("Switch to the edit-content branch before saving or publishing.");
@@ -160,9 +161,8 @@ async function handleEditSession(request, response) {
   saving = true;
   try {
     const payload = await readBody(request);
+    await syncEditorBranch();
     if (payload.action === "start") {
-      await ensureEditorBranch();
-      await syncEditorBranch();
       let { stdout: base } = await runGit(["rev-parse", "HEAD"]);
       try {
         const { stdout: upstream } = await runGit(["rev-parse", "--verify", "@{u}"]);
