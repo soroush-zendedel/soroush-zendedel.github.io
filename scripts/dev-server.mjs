@@ -12,6 +12,7 @@ const projectFile = join(root, "content", "projects.json");
 const profileFile = join(root, "content", "profile.json");
 const socialFile = join(root, "content", "social.json");
 const blogFile = join(root, "content", "blog.json");
+const personFile = join(root, "content", "person.json");
 const port = Number(process.env.PORT || 8082);
 const token = randomBytes(24).toString("hex");
 const generatedFiles = ["index.html", "en/index.html", "about.html", "en/about.html", "projects.html", "en/projects.html"];
@@ -60,7 +61,7 @@ async function getEditorSession(base) {
   }
   const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
   const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
-  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/blog.json", ...generatedFiles]);
+  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/blog.json", "content/person.json", ...generatedFiles]);
   for (const commit of commits) {
     const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
       runGit(["show", "-s", "--format=%s", commit]),
@@ -236,6 +237,131 @@ async function saveChange(request, response) {
       contentFile = blogFile;
       dataToWrite = updatedBlog;
       message = "content: update blog card";
+    } else if (payload.type === "savePerson") {
+      const currentPerson = JSON.parse(await readFile(personFile, "utf8"));
+      const submitted = payload.person;
+      if (!submitted || typeof submitted !== "object") return send(response, 400, { error: "Person data is missing." });
+      const updatedPerson = JSON.parse(JSON.stringify(currentPerson));
+      const textLimits = {
+        seoTitle: 200, seoDescription: 500, name: 200, knownAsRole: 500, intro: 3000,
+        careerTitle: 150, educationTitle: 150, familyTitle: 150, languagesTitle: 150,
+        languageProficiency: 500, skills: 800, workTitle: 150, writingTitle: 150,
+        writingText: 1000, blogLinkText: 100, blogHref: 2000, profilesLabel: 120,
+        homeLabel: 120, aboutLabel: 200, breadcrumbLabel: 120,
+      };
+      for (const [key, maxLength] of Object.entries(textLimits)) {
+        for (const language of ["fa", "en"]) {
+          const value = typeof submitted.fields?.[key]?.[language] === "string" ? submitted.fields[key][language].trim() : "";
+          if (!value || value.length > maxLength) return send(response, 400, { error: `Complete the About page field ${key} in both languages (up to ${maxLength} characters).` });
+          if (key === "blogHref" && !isSafeProfileUrl(value)) return send(response, 400, { error: "Enter a safe http, https, or mailto blog URL." });
+          updatedPerson.fields[key][language] = value;
+        }
+      }
+      for (const key of ["image", "family"]) {
+        for (const language of ["fa", "en"]) {
+          const value = typeof (key === "image" ? submitted.image?.alt?.[language] : submitted.family?.[language]) === "string"
+            ? (key === "image" ? submitted.image.alt[language] : submitted.family[language]).trim()
+            : "";
+          const maxLength = key === "image" ? 300 : 3000;
+          if (!value || value.length > maxLength) return send(response, 400, { error: `Complete the ${key} content in both languages (up to ${maxLength} characters).` });
+          if (key === "image") updatedPerson.image.alt[language] = value;
+          else updatedPerson.family[language] = value;
+        }
+      }
+      for (const language of ["fa", "en"]) {
+        const writingTokens = updatedPerson.fields.writingText[language].match(/\{\{blog\}\}/g) || [];
+        if (writingTokens.length !== 1) return send(response, 400, { error: "Keep exactly one {{blog}} marker in each writing description." });
+        for (const book of currentPerson.books) {
+          const matches = updatedPerson.family[language].match(new RegExp(`\\{\\{${book.id}\\}\\}`, "g")) || [];
+          if (matches.length !== 1) return send(response, 400, { error: `Keep exactly one {{${book.id}}} marker in each family story.` });
+        }
+      }
+      for (const key of ["career", "education"]) {
+        const items = submitted[key];
+        if (!Array.isArray(items) || !items.length || items.length > 20) return send(response, 400, { error: `Add between 1 and 20 ${key} items.` });
+        updatedPerson[key] = [];
+        for (const item of items) {
+          const translated = {};
+          for (const language of ["fa", "en"]) {
+            const value = typeof item?.[language] === "string" ? item[language].trim() : "";
+            if (!value || value.length > 600) return send(response, 400, { error: `Each ${key} item needs Persian and English text under 600 characters.` });
+            translated[language] = value;
+          }
+          updatedPerson[key].push(translated);
+        }
+      }
+      if (!Array.isArray(submitted.books) || submitted.books.length !== currentPerson.books.length) return send(response, 400, { error: "Keep the existing family book entries complete." });
+      for (const book of updatedPerson.books) {
+        const input = submitted.books.find((item) => item?.id === book.id);
+        if (!input || !isSafeProfileUrl(input.href)) return send(response, 400, { error: "Enter a safe link for each family book." });
+        book.href = input.href.trim();
+        for (const language of ["fa", "en"]) {
+          const value = typeof input.label?.[language] === "string" ? input.label[language].trim() : "";
+          if (!value || value.length > 200) return send(response, 400, { error: "Each family book needs a Persian and English title." });
+          book.label[language] = value;
+        }
+      }
+      const schema = submitted.structuredData;
+      if (!schema || typeof schema.fullName !== "string" || !schema.fullName.trim() || schema.fullName.trim().length > 200) {
+        return send(response, 400, { error: "Add the person's full name for structured data." });
+      }
+      updatedPerson.structuredData.fullName = schema.fullName.trim();
+      for (const language of ["fa", "en"]) {
+        const value = typeof schema.descriptions?.[language] === "string" ? schema.descriptions[language].trim() : "";
+        if (!value || value.length > 800) return send(response, 400, { error: "Add both short Person descriptions for structured data." });
+        updatedPerson.structuredData.descriptions[language] = value;
+      }
+      for (const key of ["alternateNames", "jobTitles", "knowsLanguage", "alumniOf", "knowsAbout"]) {
+        const values = schema[key];
+        if (!Array.isArray(values) || !values.length || values.length > 50 || values.some((value) => typeof value !== "string" || !value.trim() || value.trim().length > 200)) {
+          return send(response, 400, { error: `Add between 1 and 50 valid ${key} values.` });
+        }
+        updatedPerson.structuredData[key] = values.map((value) => value.trim());
+      }
+      const imageDirectory = join(root, "img");
+      const imageNames = await readdir(imageDirectory);
+      if (!/^[a-zA-Z0-9_-]+\.(?:webp|jpe?g|png)$/i.test(currentPerson.image.file) || !imageNames.includes(currentPerson.image.file)) {
+        return send(response, 400, { error: "The current person portrait could not be found safely." });
+      }
+      if (payload.imageUpload) {
+        const extensions = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
+        const extension = extensions[payload.imageUpload.mime];
+        const encoded = payload.imageUpload.data;
+        if (!extension || typeof encoded !== "string") return send(response, 400, { error: "Choose a WebP, JPEG, or PNG portrait." });
+        const imageBytes = Buffer.from(encoded, "base64");
+        if (!imageBytes.length || imageBytes.length > 5 * 1024 * 1024 || imageBytes.toString("base64") !== encoded) return send(response, 400, { error: "Portrait must be valid and 5 MB or smaller." });
+        const validImage = extension === "webp"
+          ? imageBytes.length > 12 && imageBytes.toString("ascii", 0, 4) === "RIFF" && imageBytes.toString("ascii", 8, 12) === "WEBP"
+          : extension === "jpg"
+            ? imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9
+            : imageBytes.length > 8 && imageBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+        if (!validImage) return send(response, 400, { error: "The file contents do not match the selected image type." });
+        const baseName = "soroush-zendedel-about";
+        const fileName = `${baseName}.${extension}`;
+        const imageNameSet = new Set(imageNames);
+        let version = imageNames.reduce((max, name) => Math.max(max, Number(name.match(new RegExp(`^${baseName}-v(\\d+)\\.(?:webp|jpg|jpeg|png)$`, "i"))?.[1] || 0)), 0);
+        const archive = async (name) => {
+          let archiveName;
+          do { archiveName = `${baseName}-v${++version}.${extname(name).slice(1).toLowerCase()}`; } while (imageNameSet.has(archiveName));
+          const from = join(imageDirectory, name);
+          const to = join(imageDirectory, archiveName);
+          await rename(from, to);
+          imageNameSet.delete(name);
+          imageNameSet.add(archiveName);
+          archivedImages.push({ from, to, filename: name, archiveName });
+        };
+        if (imageNameSet.has(currentPerson.image.file)) await archive(currentPerson.image.file);
+        if (imageNameSet.has(fileName)) await archive(fileName);
+        uploadedFile = join(imageDirectory, fileName);
+        await writeFile(uploadedFile, imageBytes, { flag: "wx" });
+        uploadedFileCreated = true;
+        updatedPerson.image.file = fileName;
+      }
+      if (JSON.stringify(currentPerson) === JSON.stringify(updatedPerson) && !payload.imageUpload) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(currentPerson, null, 2) + "\n";
+      contentFile = personFile;
+      dataToWrite = updatedPerson;
+      message = "content: update person profile";
     } else if (payload.type === "addProject") {
       const projectId = typeof payload.id === "string" ? payload.id.trim() : "";
       const faName = typeof payload.faName === "string" ? payload.faName.trim().replace(/\s+/g, " ") : "";

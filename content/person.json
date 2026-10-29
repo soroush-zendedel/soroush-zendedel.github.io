@@ -1,0 +1,93 @@
+{
+  "image": {
+    "file": "soroush-zendedel.jpg",
+    "alt": {
+      "fa": "سروش پیری زنده‌دل",
+      "en": "Soroush Piri Zendedel"
+    }
+  },
+  "fields": {
+    "seoTitle": {
+      "fa": "درباره‌ی سروش پیری زنده‌دل | برنامه‌نویس و تکنیکال آرتیست",
+      "en": "About Soroush Piri Zendedel | Software Developer and Technical Artist"
+    },
+    "seoDescription": {
+      "fa": "زندگی‌نامه‌ی سروش پیری زنده‌دل، شناخته‌شده با نام سروش زنده‌دل؛ توسعه‌دهنده‌ی نرم‌افزار، تکنیکال آرتیست و نویسنده.",
+      "en": "Biography of Soroush Piri Zendedel, known as Soroush Zendedel: software developer, technical artist, and writer."
+    },
+    "name": {
+      "fa": "سروش پیری زنده‌دل",
+      "en": "Soroush Piri Zendedel"
+    },
+    "knownAsRole": {
+      "fa": "شناخته‌شده با نام سروش زنده‌دل · توسعه‌دهنده‌ی نرم‌افزار · تکنیکال آرتیست · نویسنده",
+      "en": "Known as Soroush Zendedel · Software Developer · Technical Artist · Writer"
+    },
+    "intro": {
+      "fa": "من سروش پیری زنده‌دل هستم و بیشتر با نام سروش زنده‌دل شناخته می‌شوم. توسعه‌دهنده‌ی نرم‌افزار، تکنیکال آرتیست و نویسنده‌ام. بین دنیای فکر و احساس قدم می‌زنم؛ از فناوری و هنر یاد می‌گیرم و تلاش می‌کنم آگاهانه و صادقانه پیش بروم. در پروژه‌هایم دوست دارم برنامه‌نویسی و فناوری را با هنر و چیزهایی که دوست دارم—مثل موسیقی، طراحی و نوشتن—ترکیب کنم و از آن‌ها تجربه‌های دیجیتال خلاقانه بسازم.",
+      "en": "I am Soroush Piri Zendedel, known as Soroush Zendedel. I am a software developer, technical artist, and writer. I walk between thought and emotion, learning from technology and art, and try to move forward with more awareness and honesty. In my projects, I like to bring programming and technology together with art and the things I care about—such as music, design, and writing—and shape them into expressive digital experiences."
+    },
+    "careerTitle": { "fa": "مسیر حرفه‌ای", "en": "Professional experience" },
+    "educationTitle": { "fa": "تحصیلات", "en": "Education" },
+    "familyTitle": { "fa": "خانواده و ریشه‌های فرهنگی", "en": "Family and cultural roots" },
+    "languagesTitle": { "fa": "زبان‌ها و مهارت‌ها", "en": "Languages and skills" },
+    "languageProficiency": {
+      "fa": "فارسی: زبان مادری · انگلیسی: مهارت حرفه‌ای کاری",
+      "en": "Persian: native or bilingual proficiency · English: professional working proficiency"
+    },
+    "skills": {
+      "fa": "توسعه‌ی تمام‌پشته، Python، Django، Linux، برنامه‌های وب، نویسندگی و شعر.",
+      "en": "Full-stack development, Python, Django, Linux, web applications, writing, and poetry."
+    },
+    "workTitle": { "fa": "پروژه‌ها و حوزه‌های کار", "en": "Projects and areas of work" },
+    "writingTitle": { "fa": "نوشتن", "en": "Writing" },
+    "writingText": {
+      "fa": "در {{blog}} شعرها، دل‌نوشته‌ها و یادداشت‌هایم را منتشر می‌کنم؛ نوشتن بخش دیگری از کار خلاقانه‌ی من در کنار برنامه‌نویسی و ساخت ابزارهای دیجیتال است.",
+      "en": "I publish poems, personal reflections, and notes on {{blog}}. Writing is another part of my creative work alongside programming and building digital tools."
+    },
+    "blogLinkText": { "fa": "ثبت‌احوال", "en": "Sabte Ahval" },
+    "blogHref": { "fa": "https://soroush-zendedel.github.io/personal-blog/", "en": "https://soroush-zendedel.github.io/personal-blog/" },
+    "profilesLabel": { "fa": "پروفایل‌های رسمی", "en": "Official profiles" },
+    "breadcrumbLabel": { "fa": "مسیر صفحه", "en": "Breadcrumb" },
+    "homeLabel": { "fa": "صفحه‌ی اصلی", "en": "Home" },
+    "aboutLabel": { "fa": "درباره‌ی سروش پیری زنده‌دل", "en": "About Soroush Piri Zendedel" }
+  },
+  "career": [
+    { "fa": "توسعه‌دهنده‌ی نرم‌افزار مستقل — از ۲۰۱۶ تاکنون: توسعه‌ی وب و نرم‌افزار با تمرکز بر Python، Django، برنامه‌های وب و Linux.", "en": "Freelance Software Developer · 2016–present: web and full-stack software development, with a focus on Python, Django, web applications, and Linux." },
+    { "fa": "تدریس کامپیوتر و مسئولیت آزمایشگاه — مجتمع آموزشی منصور، بخشی از سال ۲۰۲۵.", "en": "Computer Teacher and Computer Lab Coordinator · Mansour Educational Complex · for part of 2025." },
+    { "fa": "توسعه‌دهنده‌ی نرم‌افزار — مؤسسه‌ی مردم‌نهاد اندیشه و تعاون زرین زاریس، ۲۰۱۹ تا ۲۰۲۲.", "en": "Software Developer · Andishe and Ta'avon Zarin Zaris NGO · 2019–2022." }
+  ],
+  "education": [
+    { "fa": "مجتمع آموزشی منصور: تحصیل در دوره‌ی راهنمایی و دبیرستان.", "en": "Mansour Educational Complex: attended for middle school and high school." },
+    { "fa": "دانشگاه زابل: کارشناسی فناوری اطلاعات، ۲۰۱۲ تا ۲۰۱۶.", "en": "University of Zabol: Bachelor's degree in Information Technology, 2012–2016." },
+    { "fa": "دانشگاه سیستان و بلوچستان: تحصیل در علوم کامپیوتر، ۲۰۱۲ تا ۲۰۱۴؛ سپس انتقال به دانشگاه زابل.", "en": "Sistan and Baluchestan University: Computer Science studies, 2012–2014; later transferred to the University of Zabol." }
+  ],
+  "family": {
+    "fa": "پدرم، علیرضا پیری زنده‌دل، شاعر و آموزگار آموزش‌وپرورش و معلم نمونه‌ی کشوری بوده است. او چندین کتاب در زمینه‌های فرهنگ، سیاست و شعر نوشته که بخش زیادی از آن‌ها به سیستان و زابل می‌پردازند. از کتاب‌های او می‌توان به {{book1}} و {{book2}} اشاره کرد. پیوند من با سیستان و زابل و علاقه‌ام به نوشتن و هنر نیز بخشی از همین پیشینه‌ی فرهنگی و خانوادگی است.",
+    "en": "My father, Alireza Piri Zendedel, is a poet and an educator who taught in Iran’s public education system and was selected as a national exemplary teacher. He has written several books on culture, politics, and poetry, many of them focused on Sistan and the city of Zabol. His books include {{book1}} and {{book2}}. My connection to Sistan and Zabol, and my interest in writing and art, are also part of this family and cultural background."
+  },
+  "books": [
+    {
+      "id": "book1",
+      "label": { "fa": "«دلبرم هامون‌زاد»", "en": "Delbaram Hamoonzad" },
+      "href": "https://www.adinehbook.com/product/9648923681/%DA%A9%D8%AA%D8%A7%D8%A8-%D8%AF%D9%84%D8%A8%D8%B1%D9%85-%D9%87%D8%A7%D9%85%D9%88%D9%86-%D8%B2%D8%A7%D8%AF-%D8%A7%D8%AB%D8%B1-%D8%B9%D9%84%DB%8C%D8%B1%D8%B6%D8%A7-%D9%BE%DB%8C%D8%B1%DB%8C-%D8%B2%D9%86%D8%AF%D9%87-%D8%AF%D9%84-%D9%86%D8%B4%D8%B1-%D8%AA%D9%81%D8%AA%D8%A7%D9%86"
+    },
+    {
+      "id": "book2",
+      "label": { "fa": "«در چنبری از سراب»", "en": "Dar Chenbari az Sarab (In a Ring of Mirage)" },
+      "href": "https://ketabema.com/book/e9c0e6df-94d5-4e6a-a9ca-197afe7c9367/%D8%AF%D8%B1-%DA%86%D9%86%D8%A8%D8%B1%DB%8C-%D8%A7%D8%B2-%D8%B3%D8%B1%D8%A7%D8%A8-%D9%85%D8%AC%D9%85%D9%88%D8%B9%D9%87-%D8%B7%D8%B1%D8%AD%D9%87%D8%A7%DB%8C-%D8%B4%D8%B9%D8%B1%DB%8C-%D8%B9%D9%84%DB%8C%D8%B1%D8%B6%D8%A7-%D9%BE%DB%8C%D8%B1%DB%8C-%D8%B2%D9%86%D8%AF%D9%87%D8%AF%D9%84-%D9%87%D8%A7%D9%85%D9%88%D9%86%D8%B2%D8%A7%D8%AF/"
+    }
+  ],
+  "structuredData": {
+    "fullName": "Soroush Piri Zendedel",
+    "alternateNames": ["Soroush Zendedel", "سروش زنده‌دل", "سروش زنده دل", "سروش پیری زنده‌دل", "سروش پیری زنده دل"],
+    "jobTitles": ["Software Developer", "Technical Artist", "Writer"],
+    "descriptions": {
+      "fa": "برنامه‌نویس، تکنیکال آرتیست و نویسنده؛ سازنده‌ی ابزارهای دیجیتال برای موسیقی، طراحی فونت و نوشتن.",
+      "en": "Programmer, technical artist, and writer creating digital tools and experiences for music, type design, and writing."
+    },
+    "knowsLanguage": ["fa", "en"],
+    "alumniOf": ["Mansour Educational Complex", "University of Zabol"],
+    "knowsAbout": ["Full-stack development", "Python", "Django", "Linux", "Web applications", "Music", "Persian type design", "Writing", "Poetry"]
+  }
+}

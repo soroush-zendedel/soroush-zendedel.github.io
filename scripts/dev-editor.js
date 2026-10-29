@@ -3,7 +3,7 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
     .dev-editor-undo{position:fixed;inset-inline-start:150px;bottom:18px;max-width:calc(100vw - 176px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
@@ -11,9 +11,9 @@
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
     .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
-    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
+    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-person-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
-    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button,body.dev-editor-on .dev-person-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
@@ -25,6 +25,7 @@
     .dev-link-settings-button{position:fixed;width:25px;height:25px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:13px;line-height:1}
     .dev-social-settings-button{width:28px;height:28px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:14px;line-height:1}
     .dev-blog-settings-button{position:fixed;width:28px;height:28px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:14px;line-height:1}
+    .dev-person-settings-button{position:fixed;top:18px;inset-inline-end:18px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:15px;line-height:1}
     .dev-social-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 0;border-bottom:1px solid #29252418}
     .dev-social-row .dev-social-url{grid-column:1/-1}
     .dev-social-row label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
@@ -32,8 +33,11 @@
     .dev-social-row-actions{grid-column:1/-1;display:flex;align-items:center;gap:6px}
     .dev-social-row-actions button{padding:5px 8px;border:0;border-radius:6px;background:#eee9e3;color:#292524;cursor:pointer}
     .dev-social-row-actions button[data-delete]{margin-inline-start:auto;color:#7f1d1d}
-    body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button{pointer-events:auto}
-    .dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden]{display:none!important}
+    body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button,body.dev-editor-on .dev-person-settings-button{pointer-events:auto}
+    .dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-person-settings-button[hidden]{display:none!important}
+    .dev-person-modal-group{margin:0 0 12px;border:1px solid #2925241c;border-radius:9px;background:#fff}
+    .dev-person-modal-group summary{padding:10px 12px;cursor:pointer;font-size:13px;font-weight:800}
+    .dev-person-modal-group .dev-editor-form-grid{padding:0 12px 12px}
     .dev-editor-settings{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(300px,calc(100vw - 32px));max-height:calc(100vh - 16px);overflow-y:auto;padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
     .dev-editor-settings-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
     .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
@@ -141,6 +145,20 @@
     blogSettingsButton.setAttribute("aria-label", blogSettingsButton.title);
     blogSettingsButton.addEventListener("click", openBlogSettingsModal);
     document.body.append(blogSettingsButton);
+  }
+  const personPage = document.querySelector("[data-person-page]");
+  let personData = null;
+  try { personData = personPage ? JSON.parse(personPage.dataset.personData || "null") : null; } catch { personData = null; }
+  const personSettingsButton = personPage && personData ? document.createElement("button") : null;
+  if (personSettingsButton) {
+    personSettingsButton.className = "dev-person-settings-button";
+    personSettingsButton.type = "button";
+    personSettingsButton.hidden = true;
+    personSettingsButton.textContent = "⚙";
+    personSettingsButton.title = isEnglish ? "Edit About page content" : "ویرایش محتوای صفحهٔ درباره";
+    personSettingsButton.setAttribute("aria-label", personSettingsButton.title);
+    personSettingsButton.addEventListener("click", openPersonSettingsModal);
+    document.body.append(personSettingsButton);
   }
 
   const modalLayer = document.createElement("div");
@@ -262,6 +280,15 @@
     if (!blogSettingsButton.hidden) {
       blogSettingsButton.style.top = `${Math.max(4, rect.top + 8)}px`;
       blogSettingsButton.style.left = `${Math.max(4, Math.min(window.innerWidth - 34, rect.right - 36))}px`;
+    }
+  }
+
+  function updatePersonSettingsButton() {
+    if (!personSettingsButton || !personPage) return;
+    const rect = personPage.getBoundingClientRect();
+    personSettingsButton.hidden = !enabled || rect.width === 0 || rect.height === 0;
+    if (!personSettingsButton.hidden) {
+      personSettingsButton.style.top = `${Math.max(8, Math.min(window.innerHeight - 40, rect.top + 8))}px`;
     }
   }
 
@@ -570,6 +597,246 @@
     }
   }
 
+  function openPersonSettingsModal() {
+    if (!enabled || !personData) return;
+    modal.replaceChildren();
+    modal.setAttribute("aria-labelledby", "dev-person-modal-title");
+    const header = document.createElement("header");
+    header.className = "dev-editor-modal-header";
+    const title = document.createElement("h2");
+    title.id = "dev-person-modal-title";
+    title.textContent = isEnglish ? "About page · Person" : "صفحهٔ درباره · شخص";
+    const close = document.createElement("button");
+    close.className = "dev-editor-modal-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", isEnglish ? "Close" : "بستن");
+    close.addEventListener("click", closeAddProjectModal);
+    header.append(title, close);
+
+    const form = document.createElement("form");
+    form.className = "dev-editor-project-form";
+    const pairs = {};
+    const arrays = {};
+    const bookInputs = {};
+    const schemaLists = {};
+    const addGroup = (label, open = false) => {
+      const details = document.createElement("details");
+      details.className = "dev-person-modal-group";
+      details.open = open;
+      const summary = document.createElement("summary");
+      summary.textContent = label;
+      const grid = document.createElement("div");
+      grid.className = "dev-editor-form-grid";
+      details.append(summary, grid);
+      form.append(details);
+      return grid;
+    };
+    const addPair = (grid, key, label, type, maxLength, wide = false, source = "fields") => {
+      const inputs = {};
+      for (const language of ["fa", "en"]) {
+        const languageLabel = language === "fa" ? "فارسی" : "English";
+        const field = makeFormField({
+          id: "person-" + key + "-" + language,
+          label: label + " · " + languageLabel,
+          type,
+          required: true,
+          maxLength,
+          wide: wide || type === "textarea",
+          rows: 4,
+        });
+        const value = source === "family"
+          ? personData.family[language]
+          : source === "image"
+            ? personData.image.alt[language]
+            : source === "schema"
+              ? personData.structuredData.descriptions[language]
+              : personData.fields[key][language];
+        field.input.value = value || "";
+        field.input.dir = language === "fa" ? "rtl" : "ltr";
+        inputs[language] = field.input;
+        grid.append(field.wrapper);
+      }
+      pairs[key] = { inputs, source };
+      return inputs;
+    };
+    const addTextArray = (grid, key, label, current, schema = false) => {
+      const fields = {};
+      for (const language of ["fa", "en"]) {
+        const languageLabel = language === "fa" ? "فارسی" : "English";
+        const field = makeFormField({
+          id: "person-list-" + key + "-" + language,
+          label: label + " · " + languageLabel + " (هر مورد در یک خط)",
+          type: "textarea",
+          required: true,
+          maxLength: 12000,
+          wide: true,
+          rows: 5,
+        });
+        field.input.value = current.map((item) => schema ? item : item[language]).join("\n");
+        field.input.dir = language === "fa" ? "rtl" : "ltr";
+        fields[language] = field.input;
+        grid.append(field.wrapper);
+      }
+      (schema ? schemaLists : arrays)[key] = fields;
+    };
+
+    const identity = addGroup(isEnglish ? "Identity and search preview" : "هویت و نمایش در جست‌وجو", true);
+    addPair(identity, "seoTitle", isEnglish ? "Page title" : "عنوان صفحه", "text", 200);
+    addPair(identity, "seoDescription", isEnglish ? "Search description" : "توضیح سئو", "textarea", 500);
+    addPair(identity, "name", isEnglish ? "Full name" : "نام کامل", "text", 200);
+    addPair(identity, "knownAsRole", isEnglish ? "Known as and roles" : "نام شناخته‌شده و نقش‌ها", "textarea", 500);
+    addPair(identity, "intro", isEnglish ? "Introduction" : "معرفی", "textarea", 3000);
+    addPair(identity, "imageAlt", isEnglish ? "Portrait alt text" : "متن جایگزین تصویر", "text", 300, true, "image");
+    const imageField = makeFormField({
+      id: "person-image-file",
+      label: isEnglish ? "Replace portrait · current file: " + personData.image.file : "جایگزینی تصویر · فایل فعلی: " + personData.image.file,
+      type: "file",
+      wide: true,
+      note: isEnglish ? "WebP, JPEG, or PNG · up to 5 MB. The previous image is retained." : "WebP، JPEG یا PNG · حداکثر ۵ مگابایت. تصویر قبلی نگه داشته می‌شود.",
+    });
+    imageField.input.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
+    identity.append(imageField.wrapper);
+
+    const career = addGroup(isEnglish ? "Professional experience and education" : "مسیر حرفه‌ای و تحصیلات");
+    addPair(career, "careerTitle", isEnglish ? "Experience heading" : "عنوان مسیر حرفه‌ای", "text", 150, true);
+    addTextArray(career, "career", isEnglish ? "Experience entries" : "موارد مسیر حرفه‌ای", personData.career);
+    addPair(career, "educationTitle", isEnglish ? "Education heading" : "عنوان تحصیلات", "text", 150, true);
+    addTextArray(career, "education", isEnglish ? "Education entries" : "موارد تحصیلات", personData.education);
+
+    const background = addGroup(isEnglish ? "Family, language, and skills" : "خانواده، زبان و مهارت‌ها");
+    addPair(background, "familyTitle", isEnglish ? "Family heading" : "عنوان خانواده", "text", 150, true);
+    addPair(background, "family", isEnglish ? "Family story" : "روایت خانوادگی", "textarea", 3000, true, "family");
+    addPair(background, "languagesTitle", isEnglish ? "Languages heading" : "عنوان زبان‌ها", "text", 150, true);
+    addPair(background, "languageProficiency", isEnglish ? "Language proficiency" : "سطح زبان‌ها", "textarea", 500);
+    addPair(background, "skills", isEnglish ? "Skills" : "مهارت‌ها", "textarea", 800);
+    personData.books.forEach((book, index) => {
+      const labels = {};
+      for (const language of ["fa", "en"]) {
+        const field = makeFormField({
+          id: "person-book-" + index + "-" + language,
+          label: (isEnglish ? "Book " : "کتاب ") + (index + 1) + " · " + (language === "fa" ? "فارسی" : "English"),
+          required: true,
+          maxLength: 200,
+        });
+        field.input.value = book.label[language];
+        field.input.dir = language === "fa" ? "rtl" : "ltr";
+        labels[language] = field.input;
+        background.append(field.wrapper);
+      }
+      const href = makeFormField({ id: "person-book-" + index + "-href", label: (isEnglish ? "Book link " : "پیوند کتاب ") + (index + 1), type: "url", required: true, maxLength: 2000, wide: true });
+      href.input.value = book.href;
+      href.input.dir = "ltr";
+      background.append(href.wrapper);
+      bookInputs[book.id] = { labels, href: href.input };
+    });
+
+    const writing = addGroup(isEnglish ? "Writing and page labels" : "نوشتن و عنوان‌های صفحه");
+    addPair(writing, "workTitle", isEnglish ? "Projects heading" : "عنوان پروژه‌ها", "text", 150, true);
+    addPair(writing, "writingTitle", isEnglish ? "Writing heading" : "عنوان نوشتن", "text", 150, true);
+    addPair(writing, "writingText", isEnglish ? "Writing description · keep {{blog}} for the link" : "توضیح نوشتن · جای پیوند را با {{blog}} مشخص کن", "textarea", 1000, true);
+    addPair(writing, "blogLinkText", isEnglish ? "Blog link text" : "متن پیوند بلاگ", "text", 100);
+    addPair(writing, "blogHref", isEnglish ? "Blog URL" : "نشانی بلاگ", "url", 2000, true);
+    addPair(writing, "profilesLabel", isEnglish ? "Profiles navigation label" : "عنوان پیوندهای پروفایل", "text", 120, true);
+    addPair(writing, "homeLabel", isEnglish ? "Home breadcrumb" : "عنوان مسیر خانه", "text", 120);
+    addPair(writing, "aboutLabel", isEnglish ? "About breadcrumb" : "عنوان مسیر درباره", "text", 200);
+    addPair(writing, "breadcrumbLabel", isEnglish ? "Breadcrumb accessibility label" : "عنوان دسترس‌پذیری مسیر صفحه", "text", 120, true);
+
+    const schema = addGroup(isEnglish ? "Person structured data" : "دادهٔ ساختاریافتهٔ شخص");
+    const fullName = makeFormField({ id: "person-schema-name", label: isEnglish ? "Schema full name" : "نام کامل در دادهٔ ساختاریافته", required: true, maxLength: 200, wide: true });
+    fullName.input.value = personData.structuredData.fullName;
+    schema.append(fullName.wrapper);
+    addPair(schema, "schemaDescription", isEnglish ? "Person description" : "توضیح Person", "textarea", 800, true, "schema");
+    addTextArray(schema, "alternateNames", isEnglish ? "Alternate names" : "نام‌های دیگر", personData.structuredData.alternateNames, true);
+    addTextArray(schema, "jobTitles", isEnglish ? "Job titles" : "عنوان‌های شغلی", personData.structuredData.jobTitles, true);
+    addTextArray(schema, "knowsLanguage", isEnglish ? "Languages" : "زبان‌ها", personData.structuredData.knowsLanguage, true);
+    addTextArray(schema, "alumniOf", isEnglish ? "Education organizations" : "مراکز آموزشی", personData.structuredData.alumniOf, true);
+    addTextArray(schema, "knowsAbout", isEnglish ? "Areas of knowledge" : "حوزه‌های دانشی", personData.structuredData.knowsAbout, true);
+    const schemaNote = document.createElement("p");
+    schemaNote.className = "dev-editor-form-note";
+    schemaNote.textContent = isEnglish ? "Profile URLs for sameAs come from the social links data." : "پیوندهای sameAs از دادهٔ شبکه‌های اجتماعی خوانده می‌شوند.";
+    schema.append(schemaNote);
+
+    const actions = document.createElement("div");
+    actions.className = "dev-editor-modal-actions";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = isEnglish ? "Cancel" : "لغو";
+    cancel.addEventListener("click", closeAddProjectModal);
+    const save = document.createElement("button");
+    save.type = "submit";
+    save.dataset.submit = "";
+    save.textContent = isEnglish ? "Save About page" : "ذخیرهٔ صفحهٔ درباره";
+    actions.append(cancel, save);
+    form.append(actions);
+    form.addEventListener("submit", (event) => savePersonSettings(event, { pairs, arrays, bookInputs, schemaLists, fullName: fullName.input, image: imageField.input, save }));
+    modal.append(header, form);
+    modalLayer.hidden = false;
+    close.focus();
+  }
+
+  async function savePersonSettings(event, controls) {
+    event.preventDefault();
+    const { pairs, arrays, bookInputs, schemaLists, fullName, image, save } = controls;
+    const form = modal.querySelector("form");
+    if (!form.reportValidity()) return;
+    const updated = JSON.parse(JSON.stringify(personData));
+    for (const [key, config] of Object.entries(pairs)) {
+      for (const language of ["fa", "en"]) {
+        const value = config.inputs[language].value.trim();
+        if (config.source === "family") updated.family[language] = value;
+        else if (config.source === "image") updated.image.alt[language] = value;
+        else if (config.source === "schema") updated.structuredData.descriptions[language] = value;
+        else updated.fields[key][language] = value;
+      }
+    }
+    for (const [key, inputs] of Object.entries(arrays)) {
+      const fa = inputs.fa.value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+      const en = inputs.en.value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+      if (fa.length !== en.length) return toast(isEnglish ? "Add the same number of Persian and English list items." : "تعداد موارد فارسی و انگلیسی فهرست باید برابر باشد.", true);
+      updated[key] = fa.map((item, index) => ({ fa: item, en: en[index] }));
+    }
+    for (const [key, input] of Object.entries(schemaLists)) {
+      updated.structuredData[key] = input.fa.value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+    }
+    updated.structuredData.fullName = fullName.value.trim();
+    for (const [id, inputSet] of Object.entries(bookInputs)) {
+      const book = updated.books.find((item) => item.id === id);
+      book.label = { fa: inputSet.labels.fa.value.trim(), en: inputSet.labels.en.value.trim() };
+      book.href = inputSet.href.value.trim();
+    }
+    const selectedImage = image.files?.[0];
+    if (selectedImage && selectedImage.size > 5 * 1024 * 1024) return toast(isEnglish ? "Portrait must be 5 MB or smaller." : "حجم تصویر باید حداکثر ۵ مگابایت باشد.", true);
+    if (selectedImage && !["image/webp", "image/jpeg", "image/png"].includes(selectedImage.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG portrait." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
+    let imageUpload;
+    try {
+      if (selectedImage) {
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error(isEnglish ? "Could not read this image." : "خواندن تصویر ممکن نشد."));
+          reader.readAsDataURL(selectedImage);
+        });
+        imageUpload = { mime: selectedImage.type, data: String(dataUrl).split(",")[1] };
+      }
+      save.disabled = true;
+      const response = await fetch("/__dev/save", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify({ type: "savePerson", person: updated, imageUpload }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "About page could not be saved." : "ذخیرهٔ صفحهٔ درباره انجام نشد."));
+      closeAddProjectModal();
+      if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
+      toast(isEnglish ? "About page saved · commit " + result.commit : "صفحهٔ درباره ذخیره شد · کامیت " + result.commit);
+      setTimeout(() => location.reload(), 700);
+    } catch (error) {
+      save.disabled = false;
+      toast(error.message, true);
+    }
+  }
+
   function renderSocialRows(list) {
     list.replaceChildren();
     socialDraft.forEach((item, index) => {
@@ -752,6 +1019,8 @@
     updateProfileLinkButtons();
     if (socialSettingsButton) socialSettingsButton.hidden = !enabled;
     updateBlogSettingsButton();
+    if (personSettingsButton) personSettingsButton.hidden = !enabled;
+    updatePersonSettingsButton();
     if (enabled) wrapCards();
     else {
       if (editing) cancelEdit();
@@ -1084,8 +1353,8 @@
   undoButton.addEventListener("click", undoEditSession);
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
-    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button")) closeProjectSettings();
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -1104,7 +1373,7 @@
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -1118,7 +1387,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();
@@ -1133,12 +1402,14 @@
     repositionSettings();
     updateProfileLinkButtons();
     updateBlogSettingsButton();
+    updatePersonSettingsButton();
   });
   window.addEventListener("scroll", () => {
     if (editing) placeTools(editing.target, editing.tools);
     repositionSettings();
     updateProfileLinkButtons();
     updateBlogSettingsButton();
+    updatePersonSettingsButton();
   }, true);
 
   document.addEventListener("dragstart", (event) => {
