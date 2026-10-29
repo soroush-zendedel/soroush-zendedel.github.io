@@ -35,6 +35,7 @@ function escapeHtml(value) {
 
 function renderProfileFields(html, language, file) {
   for (const [key, translations] of Object.entries(profile.fields)) {
+    if ((key === "role" && file === "en/index.html") || (key === "roleEnglishPage" && file !== "en/index.html")) continue;
     const value = translations[language];
     if (typeof value !== "string") throw new Error(`Missing ${language} profile content: ${key}`);
     const field = `profile.${key}.${language}`;
