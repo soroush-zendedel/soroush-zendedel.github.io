@@ -3,9 +3,12 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
+    .dev-editor-undo{position:fixed;inset-inline-start:150px;bottom:18px;max-width:calc(100vw - 176px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
+    body.dev-editor-on .dev-editor-undo{pointer-events:auto}
+    .dev-editor-toggle:disabled,.dev-editor-undo:disabled{opacity:.55;cursor:wait}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
     body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
@@ -39,9 +42,19 @@
   toggle.setAttribute("aria-pressed", "false");
   document.body.append(toggle);
 
+  const undoButton = document.createElement("button");
+  undoButton.className = "dev-editor-undo";
+  undoButton.type = "button";
+  undoButton.hidden = true;
+  undoButton.textContent = isEnglish ? "↶ Undo this session" : "↶ لغو این نوبت";
+  undoButton.title = isEnglish ? "Undo all edits in this editing session" : "بازگرداندن همهٔ تغییرهای این نوبت ویرایش";
+  document.body.append(undoButton);
+
   let enabled = false;
   let editing = null;
   let toastTimer;
+  let sessionBase = sessionStorage.getItem("dev-editor-session-base") || "";
+  let sessionCommitCount = 0;
 
   function toast(message, error = false) {
     document.querySelector(".dev-editor-toast")?.remove();
@@ -216,15 +229,82 @@
 
   function setEnabled(value) {
     enabled = value;
+    if (enabled) sessionStorage.setItem("dev-editor-session-active", "1");
+    else sessionStorage.removeItem("dev-editor-session-active");
     document.body.classList.toggle("dev-editor-on", enabled);
     toggle.setAttribute("aria-pressed", String(enabled));
     toggle.textContent = enabled
       ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
       : (isEnglish ? "✎ Edit" : "✎ ویرایش");
+    undoButton.hidden = !enabled || sessionCommitCount === 0;
     if (enabled) wrapCards();
     else {
       if (editing) cancelEdit();
       unwrapCards();
+    }
+  }
+
+  async function requestEditSession(action, base = "") {
+    const response = await fetch("/__dev/session", {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-editor-token": token },
+      body: JSON.stringify({ action, base }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || (isEnglish ? "Could not manage the edit session." : "مدیریت نوبت ویرایش ممکن نشد."));
+    return result;
+  }
+
+  async function enterEditMode() {
+    toggle.disabled = true;
+    try {
+      let result;
+      if (sessionBase) {
+        try {
+          result = await requestEditSession("status", sessionBase);
+        } catch (error) {
+          sessionStorage.removeItem("dev-editor-session-base");
+          sessionBase = "";
+          toast(isEnglish
+            ? "The previous edit session cannot be undone. A new session has started."
+            : "نوبت قبلی را نمی‌توان یک‌جا برگرداند؛ نوبت تازه‌ای آغاز شد.", true);
+        }
+      }
+      if (!result) {
+        result = await requestEditSession("start");
+        sessionBase = result.base;
+        sessionStorage.setItem("dev-editor-session-base", sessionBase);
+      }
+      sessionCommitCount = result.count || 0;
+      setEnabled(true);
+    } catch (error) {
+      toast(error.message, true);
+    } finally {
+      toggle.disabled = false;
+    }
+  }
+
+  async function undoEditSession() {
+    if (!sessionBase || !sessionCommitCount) return;
+    const message = isEnglish
+      ? `Undo all ${sessionCommitCount} project edit commit(s) made in this session? This restores the files to their state before editing began.`
+      : `همهٔ ${sessionCommitCount} کامیت این نوبت ویرایش برگردد؟ فایل‌ها به وضعیت پیش از شروع ویرایش بازمی‌گردند.`;
+    if (!window.confirm(message)) return;
+    undoButton.disabled = true;
+    toggle.disabled = true;
+    try {
+      const result = await requestEditSession("undo", sessionBase);
+      sessionStorage.removeItem("dev-editor-session-base");
+      sessionStorage.removeItem("dev-editor-session-active");
+      sessionBase = "";
+      sessionCommitCount = 0;
+      setEnabled(false);
+      toast(isEnglish ? `Undid ${result.undone || 0} edit commit(s).` : `${result.undone || 0} کامیت برگردانده شد.`);
+      setTimeout(() => location.reload(), 700);
+    } catch (error) {
+      undoButton.disabled = false;
+      toggle.disabled = false;
+      toast(error.message, true);
     }
   }
 
@@ -330,11 +410,21 @@
     }
   }
 
-  toggle.addEventListener("click", () => setEnabled(!enabled));
+  toggle.addEventListener("click", () => {
+    if (enabled) {
+      sessionStorage.removeItem("dev-editor-session-base");
+      sessionBase = "";
+      sessionCommitCount = 0;
+      setEnabled(false);
+    } else {
+      enterEditMode();
+    }
+  });
+  undoButton.addEventListener("click", undoEditSession);
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
     if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -349,7 +439,7 @@
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -363,7 +453,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();
@@ -417,4 +507,15 @@
     const ids = [...target.parentNode.querySelectorAll(":scope > .dev-project-wrap")].map((item) => item.dataset.projectId);
     saveOrder(ids);
   });
+
+  if (sessionBase && sessionStorage.getItem("dev-editor-session-active") === "1") {
+    requestEditSession("status", sessionBase).then((result) => {
+      sessionCommitCount = result.count || 0;
+      setEnabled(true);
+    }).catch((error) => {
+      sessionStorage.removeItem("dev-editor-session-active");
+      setEnabled(false);
+      toast(error.message, true);
+    });
+  }
 })();

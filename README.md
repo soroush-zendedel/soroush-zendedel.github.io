@@ -35,6 +35,7 @@ node scripts/dev-server.mjs
 سپس [پیش‌نمایش محلی](http://localhost:8082/) را باز کنید. در صورت استفاده از npm، دستور `npm run dev` هم در دسترس است.
 
 ویرایش فقط هنگام اجرای این سرور در دسترس است. تأیید هر تغییر، فایل داده و صفحه‌های تولیدشده را به‌روزرسانی می‌کند و یک کامیت مستقل می‌سازد؛ لغو تغییری ذخیره نمی‌کند. اگر تغییر ذخیره‌نشدهٔ دیگری در مخزن باشد، ویرایشگر برای جلوگیری از ترکیب تغییرها ذخیره را متوقف می‌کند.
+در هر نوبت ویرایش می‌توان همهٔ کامیت‌های ساخته‌شده توسط ویرایشگر را با دکمهٔ «لغو این نوبت» به وضعیت پیش از شروع برگرداند؛ این کار پس از تأیید انجام می‌شود و اگر در آن بازه کامیت نامرتبطی وجود داشته باشد، متوقف خواهد شد.
 
 برای تولید صفحه‌های HTML از فهرست پروژه‌ها، Node.js کافی است:
 
@@ -90,6 +91,7 @@ node scripts/dev-server.mjs
 Then open the [local preview](http://localhost:8082/). If you use npm, `npm run dev` is also available.
 
 The editor is available only through this local server. Each confirmed edit updates the data and generated pages in its own Git commit; canceling leaves files unchanged. Saving is blocked while other uncommitted changes exist, so unrelated work is never included.
+During an editing session, the “Undo this session” button can restore all editor commits to the state from before editing began. It asks for confirmation and refuses to proceed if unrelated commits are found in that range.
 
 Use Node.js to generate the project lists from their data:
 

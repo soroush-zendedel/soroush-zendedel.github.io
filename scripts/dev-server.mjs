@@ -46,6 +46,60 @@ async function requireCleanWorkingTree() {
   if (stdout.trim()) throw new Error("Working tree is not clean. Commit or discard other changes before using the editor.");
 }
 
+async function getEditorSession(base) {
+  if (typeof base !== "string" || !/^[0-9a-f]{40,64}$/i.test(base)) {
+    throw new Error("Editing session is missing or invalid. Start a new edit session.");
+  }
+  try {
+    await runGit(["merge-base", "--is-ancestor", base, "HEAD"]);
+  } catch {
+    throw new Error("The current branch no longer contains the start of this editing session.");
+  }
+  const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
+  const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
+  const allowedFiles = new Set(["content/projects.json", ...generatedFiles]);
+  for (const commit of commits) {
+    const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
+      runGit(["show", "-s", "--format=%s", commit]),
+      runGit(["diff-tree", "--no-commit-id", "--name-only", "-r", commit]),
+    ]);
+    const { stdout: remoteRefs } = await runGit(["branch", "--remotes", "--contains", commit]);
+    const files = changedFiles.trim().split(/\r?\n/).filter(Boolean);
+    if (remoteRefs.trim()) throw new Error("This session contains a commit already pushed to a remote; nothing was undone.");
+    if (!subject.startsWith("content:") || !files.length || files.some((file) =>
+      !allowedFiles.has(file) && !/^img\/[a-z0-9-]+(?:-v\d+)?\.(?:webp|jpg|jpeg|png)$/i.test(file)
+    )) {
+      throw new Error("This session includes commits outside the project editor; nothing was undone.");
+    }
+  }
+  return commits;
+}
+
+async function handleEditSession(request, response) {
+  if (!isAuthorized(request)) return send(response, 403, { error: "Editor request rejected." });
+  if (saving) return send(response, 409, { error: "Another edit is being saved." });
+  saving = true;
+  try {
+    const payload = await readBody(request);
+    if (payload.action === "start") {
+      await requireCleanWorkingTree();
+      const { stdout } = await runGit(["rev-parse", "HEAD"]);
+      return send(response, 200, { base: stdout.trim(), count: 0 });
+    }
+    const commits = await getEditorSession(payload.base);
+    if (payload.action === "status") return send(response, 200, { base: payload.base, count: commits.length });
+    if (payload.action !== "undo") return send(response, 400, { error: "Unsupported session action." });
+    await requireCleanWorkingTree();
+    if (!commits.length) return send(response, 200, { unchanged: true, count: 0 });
+    await runGit(["reset", "--hard", payload.base]);
+    return send(response, 200, { undone: commits.length });
+  } catch (error) {
+    return send(response, 409, { error: error.message || "Could not update the edit session." });
+  } finally {
+    saving = false;
+  }
+}
+
 async function readBody(request) {
   let body = "";
   for await (const chunk of request) {
@@ -260,6 +314,7 @@ const server = createServer(async (request, response) => {
     }
   }
   if (url.pathname === "/__dev/save" && request.method === "POST") return saveChange(request, response);
+  if (url.pathname === "/__dev/session" && request.method === "POST") return handleEditSession(request, response);
   if (request.method !== "GET" && request.method !== "HEAD") return send(response, 405, "Method not allowed", "text/plain; charset=utf-8");
   return serveFile(request, response, url.pathname);
 });
