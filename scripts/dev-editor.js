@@ -6,6 +6,8 @@
     .dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
+    body.dev-editor-on [data-project-id]{pointer-events:none}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-handle{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
@@ -123,6 +125,10 @@
       target.contentEditable = "false";
       editing.tools.remove();
       editing = null;
+      if (result.unchanged) {
+        toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
+        return;
+      }
       toast(isEnglish ? `Saved · commit ${result.commit}` : `ذخیره شد · کامیت ${result.commit}`);
       setTimeout(() => location.reload(), 700);
     } catch (error) {
@@ -183,7 +189,7 @@
   }
 
   toggle.addEventListener("click", () => setEnabled(!enabled));
-  document.addEventListener("click", (event) => {
+  document.addEventListener("pointerdown", (event) => {
     if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
