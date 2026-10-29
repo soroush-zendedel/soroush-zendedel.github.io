@@ -70,7 +70,7 @@ function renderProfileFields(html, language, file) {
 function renderHomeImage(project, language) {
   const prefix = language === "en" ? "../img/" : "./img/";
   const alt = project.home.alt ? `alt="${escapeHtml(project.home.alt)}"` : 'alt="" aria-hidden="true"';
-  return `<img src="${prefix}${escapeHtml(project.image)}" ${alt} onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=${encodeURIComponent(project.imageFallback)}'" width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">`;
+  return `<img src="${prefix}${escapeHtml(project.image)}" ${alt} width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">`;
 }
 
 function renderHomeProject(project, language) {
@@ -99,7 +99,7 @@ function renderDirectoryProject(project, language) {
   const prefix = language === "en" ? "../img/" : "./img/";
   const alt = project.home.alt ? `alt="${escapeHtml(project.home.alt)}"` : 'alt="" aria-hidden="true"';
   const fallback = encodeURIComponent(project.imageFallback);
-  const image = `<img src="${prefix}${escapeHtml(project.image)}" ${alt} onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=${fallback}'" width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">`;
+  const image = `<img src="${prefix}${escapeHtml(project.image)}" ${alt} width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">`;
   const name = language === "fa"
     ? `<span data-edit-field="home.fa.name">${escapeHtml(copy.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| ${escapeHtml(project.home.en.name)}</span>`
     : `<span data-edit-field="home.en.name">${escapeHtml(copy.name)}</span>`;
