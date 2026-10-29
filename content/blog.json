@@ -1,0 +1,21 @@
+{
+  "href": "https://soroush-zendedel.github.io/personal-blog/",
+  "fields": {
+    "title": {
+      "fa": "ثبت‌احـــوال (بلاگ)",
+      "en": "SABTE AHVAL (Personal Blog)"
+    },
+    "subtitle": {
+      "fa": "Chronicle Thoughts. Register Life.",
+      "en": "Chronicle Thoughts. Register Life."
+    },
+    "description": {
+      "fa": "دفتری برای نوشته‌ها، درددل‌ها و اشعار",
+      "en": "A journal for writings, inner thoughts, and poetry."
+    },
+    "button": {
+      "fa": "ورود به دفتر",
+      "en": "Open Journal"
+    }
+  }
+}

@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projects = JSON.parse(await readFile(join(root, "content/projects.json"), "utf8"));
 const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "utf8"));
+const socialData = JSON.parse(await readFile(join(root, "content/social.json"), "utf8"));
+const blog = JSON.parse(await readFile(join(root, "content/blog.json"), "utf8"));
 
 function validateProjects(items) {
   const ids = new Set();
@@ -120,8 +122,29 @@ function renderProfileLinks(html) {
     });
     if (!matches) throw new Error(`No profile link found for ${key}`);
   }
-  const socials = escapeHtml(JSON.stringify(profile.socials));
+  const socials = escapeHtml(JSON.stringify(socialData.socials));
   return html.replace(/(<div\b[^>]*\bdata-social-links=")[^"]*(")/, `$1${socials}$2`);
+}
+
+function renderBlog(html, language, file) {
+  const card = blog.fields;
+  const linkPattern = /(<a\b[^>]*\bdata-blog-card="true"[^>]*\bhref=")[^"]*("[^>]*>)/;
+  if (!linkPattern.test(html)) throw new Error(`Blog card marker is missing in ${file}`);
+  html = html.replace(linkPattern, `$1${escapeHtml(blog.href)}$2`);
+  for (const [key, translations] of Object.entries(card)) {
+    const value = translations[language];
+    if (typeof value !== "string") throw new Error(`Missing ${language} blog content: ${key}`);
+    const marker = `blog.${key}.${language}`;
+    const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const matcher = new RegExp(`(<([a-z][a-z0-9]*)\\b(?=[^>]*\\bdata-blog-field="${escapedMarker}")[^>]*>)[\\s\\S]*?(<\\/\\2>)`, "gi");
+    let matches = 0;
+    html = html.replace(matcher, (_match, opening, _tag, closing) => {
+      matches += 1;
+      return `${opening}${escapeHtml(value)}${closing}`;
+    });
+    if (matches !== 1) throw new Error(`Expected one ${marker} marker in ${file}; found ${matches}`);
+  }
+  return html;
 }
 
 function replaceRegion(html, start, end, content, file) {
@@ -142,8 +165,9 @@ for (const language of ["fa", "en"]) {
   const path = join(root, file);
   let html = await readFile(path, "utf8");
   html = renderProfileFields(html, language, file);
+  html = renderBlog(html, language, file);
   html = renderProfileLinks(html);
-  html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(profile.socials, language), file);
+  html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(socialData.socials, language), file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }

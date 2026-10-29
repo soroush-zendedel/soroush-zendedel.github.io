@@ -10,6 +10,8 @@ const execFile = promisify(execFileCallback);
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projectFile = join(root, "content", "projects.json");
 const profileFile = join(root, "content", "profile.json");
+const socialFile = join(root, "content", "social.json");
+const blogFile = join(root, "content", "blog.json");
 const port = Number(process.env.PORT || 8082);
 const token = randomBytes(24).toString("hex");
 const generatedFiles = ["index.html", "en/index.html", "about.html", "en/about.html", "projects.html", "en/projects.html"];
@@ -58,7 +60,7 @@ async function getEditorSession(base) {
   }
   const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
   const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
-  const allowedFiles = new Set(["content/projects.json", "content/profile.json", ...generatedFiles]);
+  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/blog.json", ...generatedFiles]);
   for (const commit of commits) {
     const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
       runGit(["show", "-s", "--format=%s", commit]),
@@ -184,7 +186,7 @@ async function saveChange(request, response) {
       profile.links[payload.key] = payload.value.trim();
       message = `content: update profile link ${payload.key}`;
     } else if (payload.type === "saveSocials") {
-      const profile = JSON.parse(await readFile(profileFile, "utf8"));
+      const socialData = JSON.parse(await readFile(socialFile, "utf8"));
       if (!Array.isArray(payload.socials) || payload.socials.length > 30) {
         return send(response, 400, { error: "Add up to 30 social links." });
       }
@@ -202,12 +204,36 @@ async function saveChange(request, response) {
         if (!isSafeProfileUrl(item.href)) return send(response, 400, { error: "Social links must use a safe http, https, or mailto URL." });
       }
       const socials = payload.socials.map((item) => ({ id: item.id, fa: item.fa.trim(), en: item.en.trim(), href: item.href.trim() }));
-      if (JSON.stringify(profile.socials) === JSON.stringify(socials)) return send(response, 200, { unchanged: true });
-      originalJson = JSON.stringify(profile, null, 2) + "\n";
-      contentFile = profileFile;
-      dataToWrite = profile;
-      profile.socials = socials;
+      if (JSON.stringify(socialData.socials) === JSON.stringify(socials)) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(socialData, null, 2) + "\n";
+      contentFile = socialFile;
+      dataToWrite = socialData;
+      socialData.socials = socials;
       message = "content: update social links";
+    } else if (payload.type === "saveBlog") {
+      const currentBlog = JSON.parse(await readFile(blogFile, "utf8"));
+      const href = typeof payload.blog?.href === "string" ? payload.blog.href.trim() : "";
+      if (!isSafeProfileUrl(href)) return send(response, 400, { error: "Enter a safe http, https, or mailto blog URL." });
+      const fields = {};
+      for (const key of ["title", "subtitle", "description", "button"]) {
+        fields[key] = {};
+        for (const language of ["fa", "en"]) {
+          const value = typeof payload.blog?.fields?.[key]?.[language] === "string"
+            ? payload.blog.fields[key][language].trim().replace(/\s+/g, " ")
+            : "";
+          const maxLength = key === "description" ? 500 : key === "subtitle" ? 300 : 200;
+          if (!value || value.length > maxLength) {
+            return send(response, 400, { error: `Complete both language versions of the blog ${key} (up to ${maxLength} characters).` });
+          }
+          fields[key][language] = value;
+        }
+      }
+      const updatedBlog = { href, fields };
+      if (JSON.stringify(currentBlog) === JSON.stringify(updatedBlog)) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(currentBlog, null, 2) + "\n";
+      contentFile = blogFile;
+      dataToWrite = updatedBlog;
+      message = "content: update blog card";
     } else if (payload.type === "addProject") {
       const projectId = typeof payload.id === "string" ? payload.id.trim() : "";
       const faName = typeof payload.faName === "string" ? payload.faName.trim().replace(/\s+/g, " ") : "";

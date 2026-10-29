@@ -3,7 +3,7 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
     .dev-editor-undo{position:fixed;inset-inline-start:150px;bottom:18px;max-width:calc(100vw - 176px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
@@ -11,9 +11,9 @@
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
     .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
-    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
+    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
-    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
@@ -24,6 +24,7 @@
     .dev-profile-image-button{position:absolute;top:14px;inset-inline-end:14px;width:34px;height:34px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
     .dev-link-settings-button{position:fixed;width:25px;height:25px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:13px;line-height:1}
     .dev-social-settings-button{width:28px;height:28px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:14px;line-height:1}
+    .dev-blog-settings-button{position:fixed;width:28px;height:28px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:14px;line-height:1}
     .dev-social-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 0;border-bottom:1px solid #29252418}
     .dev-social-row .dev-social-url{grid-column:1/-1}
     .dev-social-row label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
@@ -31,8 +32,8 @@
     .dev-social-row-actions{grid-column:1/-1;display:flex;align-items:center;gap:6px}
     .dev-social-row-actions button{padding:5px 8px;border:0;border-radius:6px;background:#eee9e3;color:#292524;cursor:pointer}
     .dev-social-row-actions button[data-delete]{margin-inline-start:auto;color:#7f1d1d}
-    body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button{pointer-events:auto}
-    .dev-link-settings-button[hidden],.dev-social-settings-button[hidden]{display:none!important}
+    body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button{pointer-events:auto}
+    .dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden]{display:none!important}
     .dev-editor-settings{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(300px,calc(100vw - 32px));max-height:calc(100vh - 16px);overflow-y:auto;padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
     .dev-editor-settings-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
     .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
@@ -118,6 +119,7 @@
   });
   const socialContainer = document.querySelector("[data-social-links]");
   const socialSettingsButton = socialContainer ? document.createElement("button") : null;
+  let socialDraft = [];
   if (socialSettingsButton) {
     socialSettingsButton.className = "dev-social-settings-button";
     socialSettingsButton.type = "button";
@@ -127,6 +129,18 @@
     socialSettingsButton.setAttribute("aria-label", socialSettingsButton.title);
     socialSettingsButton.addEventListener("click", openSocialSettingsModal);
     socialContainer.append(socialSettingsButton);
+  }
+  const blogCard = document.querySelector("[data-blog-card]");
+  const blogSettingsButton = blogCard ? document.createElement("button") : null;
+  if (blogSettingsButton) {
+    blogSettingsButton.className = "dev-blog-settings-button";
+    blogSettingsButton.type = "button";
+    blogSettingsButton.hidden = true;
+    blogSettingsButton.textContent = "⚙";
+    blogSettingsButton.title = isEnglish ? "Edit blog card" : "ویرایش کارت بلاگ";
+    blogSettingsButton.setAttribute("aria-label", blogSettingsButton.title);
+    blogSettingsButton.addEventListener("click", openBlogSettingsModal);
+    document.body.append(blogSettingsButton);
   }
 
   const modalLayer = document.createElement("div");
@@ -239,6 +253,16 @@
       button.style.top = `${Math.max(4, rect.top - 9)}px`;
       button.style.left = `${Math.max(4, Math.min(window.innerWidth - 29, rect.right - 14))}px`;
     });
+  }
+
+  function updateBlogSettingsButton() {
+    if (!blogSettingsButton || !blogCard) return;
+    const rect = blogCard.getBoundingClientRect();
+    blogSettingsButton.hidden = !enabled || rect.width === 0 || rect.height === 0;
+    if (!blogSettingsButton.hidden) {
+      blogSettingsButton.style.top = `${Math.max(4, rect.top + 8)}px`;
+      blogSettingsButton.style.left = `${Math.max(4, Math.min(window.innerWidth - 34, rect.right - 36))}px`;
+    }
   }
 
   function openProjectSettings(wrapper, link, trigger) {
@@ -429,6 +453,105 @@
     }));
   }
 
+  function openBlogSettingsModal() {
+    if (!enabled || !blogCard) return;
+    modal.replaceChildren();
+    modal.setAttribute("aria-labelledby", "dev-blog-modal-title");
+    const header = document.createElement("header");
+    header.className = "dev-editor-modal-header";
+    const title = document.createElement("h2");
+    title.id = "dev-blog-modal-title";
+    title.textContent = isEnglish ? "Blog card" : "کارت بلاگ";
+    const close = document.createElement("button");
+    close.className = "dev-editor-modal-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", isEnglish ? "Close" : "بستن");
+    close.addEventListener("click", closeAddProjectModal);
+    header.append(title, close);
+
+    const form = document.createElement("form");
+    form.className = "dev-editor-project-form";
+    const grid = document.createElement("div");
+    grid.className = "dev-editor-form-grid";
+    const fields = {};
+    for (const [key, label, type, wide] of [
+      ["title", isEnglish ? "Persian title" : "عنوان فارسی", "text", false],
+      ["title", isEnglish ? "English title" : "عنوان انگلیسی", "text", false],
+      ["subtitle", isEnglish ? "Persian subtitle" : "زیرعنوان فارسی", "text", false],
+      ["subtitle", isEnglish ? "English subtitle" : "زیرعنوان انگلیسی", "text", false],
+      ["description", isEnglish ? "Persian description" : "توضیح فارسی", "textarea", true],
+      ["description", isEnglish ? "English description" : "توضیح انگلیسی", "textarea", true],
+      ["button", isEnglish ? "Persian button text" : "متن دکمهٔ فارسی", "text", false],
+      ["button", isEnglish ? "English button text" : "متن دکمهٔ انگلیسی", "text", false],
+    ]) {
+      const language = fields[key]?.fa !== undefined && fields[key]?.en === undefined ? "en" : "fa";
+      const input = makeFormField({
+        id: `blog-${key}-${language}`,
+        label,
+        type,
+        required: true,
+        maxLength: key === "description" ? 500 : key === "subtitle" ? 300 : 200,
+        wide,
+      });
+      input.input.value = blogCard.querySelector(`[data-blog-field="blog.${key}.${language}"]`)?.textContent.trim() || "";
+      input.input.dir = language === "fa" ? "rtl" : "ltr";
+      fields[key] ||= {};
+      fields[key][language] = input.input;
+      grid.append(input.wrapper);
+    }
+    const hrefField = makeFormField({ id: "blog-href", label: isEnglish ? "Blog link" : "نشانی بلاگ", type: "url", required: true, maxLength: 2000, wide: true });
+    hrefField.input.value = blogCard.getAttribute("href") || "";
+    hrefField.input.dir = "ltr";
+    grid.append(hrefField.wrapper);
+    const note = document.createElement("p");
+    note.className = "dev-editor-form-note";
+    note.textContent = isEnglish ? "The icon and layout stay the same." : "چیدمان و آیکون فعلی حفظ می‌شوند.";
+    grid.append(note);
+    const actions = document.createElement("div");
+    actions.className = "dev-editor-modal-actions";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = isEnglish ? "Cancel" : "لغو";
+    cancel.addEventListener("click", closeAddProjectModal);
+    const save = document.createElement("button");
+    save.type = "submit";
+    save.dataset.submit = "";
+    save.textContent = isEnglish ? "Save card" : "ذخیرهٔ کارت";
+    actions.append(cancel, save);
+    form.append(grid, actions);
+    form.addEventListener("submit", (event) => saveBlogSettings(event, form, fields, hrefField.input, save));
+    modal.append(header, form);
+    modalLayer.hidden = false;
+    close.focus();
+  }
+
+  async function saveBlogSettings(event, form, fields, href, button) {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    button.disabled = true;
+    const blog = { href: href.value, fields: {} };
+    for (const [key, translations] of Object.entries(fields)) {
+      blog.fields[key] = { fa: translations.fa.value, en: translations.en.value };
+    }
+    try {
+      const response = await fetch("/__dev/save", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify({ type: "saveBlog", blog }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "Blog card could not be saved." : "ذخیرهٔ کارت بلاگ انجام نشد."));
+      closeAddProjectModal();
+      if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
+      toast(isEnglish ? `Blog card saved · commit ${result.commit}` : `کارت بلاگ ذخیره شد · کامیت ${result.commit}`);
+      setTimeout(() => location.reload(), 700);
+    } catch (error) {
+      button.disabled = false;
+      toast(error.message, true);
+    }
+  }
+
   function renderSocialRows(list) {
     list.replaceChildren();
     socialDraft.forEach((item, index) => {
@@ -610,6 +733,7 @@
     profileLinkButtons.forEach((button) => { button.hidden = !enabled; });
     updateProfileLinkButtons();
     if (socialSettingsButton) socialSettingsButton.hidden = !enabled;
+    updateBlogSettingsButton();
     if (enabled) wrapCards();
     else {
       if (editing) cancelEdit();
@@ -942,8 +1066,8 @@
   undoButton.addEventListener("click", undoEditSession);
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
-    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button")) closeProjectSettings();
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -962,7 +1086,7 @@
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -976,7 +1100,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();
@@ -990,11 +1114,13 @@
     if (editing) placeTools(editing.target, editing.tools);
     repositionSettings();
     updateProfileLinkButtons();
+    updateBlogSettingsButton();
   });
   window.addEventListener("scroll", () => {
     if (editing) placeTools(editing.target, editing.tools);
     repositionSettings();
     updateProfileLinkButtons();
+    updateBlogSettingsButton();
   }, true);
 
   document.addEventListener("dragstart", (event) => {
