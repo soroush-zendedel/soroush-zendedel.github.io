@@ -26,11 +26,13 @@
 
 ## توسعه
 
-برای اجرای پیش‌نمایش محلی با ابزار ویرایش متن و ترتیب پروژه‌ها:
+برای اجرای پیش‌نمایش محلی با ابزار ویرایش متن و ترتیب پروژه‌ها، بدون نصب بستهٔ اضافه:
 
 ```bash
-pnpm run dev
+node scripts/dev-server.mjs
 ```
+
+سپس [پیش‌نمایش محلی](http://localhost:8082/) را باز کنید. در صورت استفاده از npm، دستور `npm run dev` هم در دسترس است.
 
 ویرایش فقط هنگام اجرای این سرور در دسترس است. تأیید هر تغییر، فایل داده و صفحه‌های تولیدشده را به‌روزرسانی می‌کند و یک کامیت مستقل می‌سازد؛ لغو تغییری ذخیره نمی‌کند. اگر تغییر ذخیره‌نشدهٔ دیگری در مخزن باشد، ویرایشگر برای جلوگیری از ترکیب تغییرها ذخیره را متوقف می‌کند.
 
@@ -79,11 +81,13 @@ A bilingual personal portfolio featuring creative digital tools and projects aro
 
 ## Development
 
-Start the local preview with inline project-text editing and drag-to-reorder:
+Start the local preview with inline project-text editing and drag-to-reorder, without installing any additional package:
 
 ```bash
-pnpm run dev
+node scripts/dev-server.mjs
 ```
+
+Then open the [local preview](http://localhost:8082/). If you use npm, `npm run dev` is also available.
 
 The editor is available only through this local server. Each confirmed edit updates the data and generated pages in its own Git commit; canceling leaves files unchanged. Saving is blocked while other uncommitted changes exist, so unrelated work is never included.
 
