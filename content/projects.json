@@ -1,7 +1,36 @@
 [
   {
-    "id": "shenobin",
+    "id": "khater",
     "order": 1,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/khater/",
+    "image": "khater.webp",
+    "imageFallback": "K",
+    "home": {
+      "fa": {
+        "name": "خطِر",
+        "description": "ابزاری برای تمرین، طراحی و ساخت فونت."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing, designing, and creating fonts."
+      },
+      "alt": "Khater - Font Design Tool"
+    },
+    "about": {
+      "fa": {
+        "name": "خطر (Khater)",
+        "description": "ابزاری برای تمرین، طراحی و ساخت فونت فارسی."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing, designing, and creating Persian typefaces."
+      }
+    }
+  },
+  {
+    "id": "shenobin",
+    "order": 2,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/shenobin/",
     "image": "shenobin.webp",
@@ -30,7 +59,7 @@
   },
   {
     "id": "tara",
-    "order": 2,
+    "order": 3,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/tara/",
     "image": "tara.webp",
@@ -54,35 +83,6 @@
       "en": {
         "name": "Tara",
         "description": "A visual tool for learning and practicing music theory."
-      }
-    }
-  },
-  {
-    "id": "khater",
-    "order": 3,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/khater/",
-    "image": "khater.webp",
-    "imageFallback": "K",
-    "home": {
-      "fa": {
-        "name": "خطِر",
-        "description": "ابزاری برای تمرین، طراحی و ساخت فونت."
-      },
-      "en": {
-        "name": "Khater",
-        "description": "A tool for practicing, designing, and creating fonts."
-      },
-      "alt": "Khater - Font Design Tool"
-    },
-    "about": {
-      "fa": {
-        "name": "خطر (Khater)",
-        "description": "ابزاری برای تمرین، طراحی و ساخت فونت فارسی."
-      },
-      "en": {
-        "name": "Khater",
-        "description": "A tool for practicing, designing, and creating Persian typefaces."
       }
     }
   },
