@@ -65,6 +65,10 @@ function isAuthorized(request) {
   return allowedOrigin && allowedHost && supplied.length === expected.length && timingSafeEqual(supplied, expected);
 }
 
+function isLocalHost(request) {
+  return request.headers.host === `localhost:${port}` || request.headers.host === `127.0.0.1:${port}`;
+}
+
 async function saveChange(request, response) {
   if (!isAuthorized(request)) return send(response, 403, { error: "Editor request rejected." });
   if (saving) return send(response, 409, { error: "Another edit is being saved." });
@@ -168,6 +172,7 @@ async function serveFile(request, response, pathname) {
 }
 
 const server = createServer(async (request, response) => {
+  if (!isLocalHost(request)) return send(response, 403, "Local preview only", "text/plain; charset=utf-8");
   const url = new URL(request.url || "/", `http://${request.headers.host || `localhost:${port}`}`);
   if (url.pathname === "/__dev/editor.js" && request.method === "GET") {
     try {
@@ -182,7 +187,7 @@ const server = createServer(async (request, response) => {
   return serveFile(request, response, url.pathname);
 });
 
-server.listen(port, "127.0.0.1", () => {
+server.listen(port, "0.0.0.0", () => {
   console.log(`Development preview with editor: http://localhost:${port}/`);
 });
 
