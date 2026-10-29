@@ -16,7 +16,7 @@
 .contact-popover[hidden] { display: none; }
 .contact-method {
   display: flex;
-  min-height: 2.8rem;
+  min-height: 3rem;
   align-items: center;
   gap: 0.75rem;
   padding: 0.45rem 0.65rem;
@@ -35,23 +35,41 @@
   outline: none;
 }
 
+.contact-method:hover .contact-method-icon,
+.contact-method:focus-visible .contact-method-icon {
+  border-color: var(--home-crimson, #9b1c1c);
+  background: var(--home-crimson, #9b1c1c);
+  color: #fff;
+}
+
 .contact-method-icon {
   display: grid;
-  width: 2rem;
-  height: 2rem;
-  flex: 0 0 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 2.25rem;
   place-items: center;
+  padding: 0;
   border: 1px solid var(--home-line, #e4dfd6);
   border-radius: 50%;
   color: var(--home-crimson, #9b1c1c);
-  font-size: 1rem;
+  background: color-mix(in srgb, var(--home-paper, #f6f2ea) 42%, white);
+  line-height: 1;
+  transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.contact-method-icon-svg {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 1.25rem;
+  margin: 0;
+  place-self: center;
 }
 
 .contact-method > span:nth-child(2) { flex: 1; }
 .contact-method .lang-fa,
 .contact-method .lang-en { display: block; }
-.contact-method-arrow { color: #8b857c; font-size: 0.8rem; }
-
 @media (prefers-reduced-motion: reduce) {
-  .contact-method { transition: none; }
+  .contact-method,
+  .contact-method-icon { transition: none; }
 }

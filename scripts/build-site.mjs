@@ -18,6 +18,14 @@ const blogIcons = {
   page: '<svg data-blog-icon="page" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
 };
 
+const contactIcons = {
+  phone: '<svg class="contact-method-icon-svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.56 3.58.56.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.19 2.46.56 3.58a1 1 0 0 1-.25 1.01l-2.19 2.2Z"/></svg>',
+  sms: '<svg class="contact-method-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4.75h16v12H9l-5 3v-15Z"/><path d="M8 9h8M8 12.5h6"/></svg>',
+  whatsapp: '<svg class="contact-method-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L4 20l1.1-4A8.2 8.2 0 1 1 20.2 11.7Z"/><g transform="translate(.9 1.75) scale(.82)"><path d="M9 8.3c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.8 1.8c.1.2.1.4-.1.6l-.6.7c-.2.2-.2.4 0 .6.5.9 1.3 1.7 2.3 2.2.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.6-.1l1.7.8c.3.1.4.3.4.5 0 .5-.2 1-.6 1.3-.4.4-1 .6-1.6.5-1-.1-2.2-.7-3.5-1.8-1.5-1.2-2.5-2.7-2.8-3.8-.3-.9-.1-1.7.3-2.3Z"/></g></svg>',
+  telegram: '<svg class="contact-method-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4 20-7Z"/><path d="M22 2 11 13"/></svg>',
+  email: '<svg class="contact-method-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4.5 7 7.5 5.5L19.5 7"/></svg>',
+};
+
 function validateProjects(items) {
   const ids = new Set();
   const orders = new Set();
@@ -179,8 +187,7 @@ function renderContactMenu(language) {
     if (typeof item.fa !== "string" || typeof item.en !== "string" || typeof item.href !== "string") throw new Error(`Incomplete contact method: ${item.id}`);
     const allowed = item.id === "phone" ? /^tel:\+[0-9]{8,15}$/ : item.id === "sms" ? /^sms:\+[0-9]{8,15}$/ : item.id === "whatsapp" ? /^https:\/\/wa\.me\/[0-9]{8,15}$/ : item.id === "telegram" ? /^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}$/ : /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i;
     if (!allowed.test(item.href)) throw new Error(`Unsafe URL for contact method: ${item.id}`);
-    const glyph = { phone: "☎", sms: "▤", whatsapp: "◉", telegram: "➤", email: "✉" }[item.id];
-    return `                    <a class="contact-method" href="${escapeHtml(item.href)}" data-contact-method="${item.id}"><span class="contact-method-icon" aria-hidden="true">${glyph}</span><span><span class="lang-fa">${escapeHtml(item.fa)}</span><span class="lang-en font-en">${escapeHtml(item.en)}</span></span><span class="contact-method-arrow" aria-hidden="true">↗</span></a>`;
+    return `                    <a class="contact-method" href="${escapeHtml(item.href)}" data-contact-method="${item.id}"><span class="contact-method-icon">${contactIcons[item.id]}</span><span><span class="lang-fa">${escapeHtml(item.fa)}</span><span class="lang-en font-en">${escapeHtml(item.en)}</span></span></a>`;
   }).join("\n");
 }
 
