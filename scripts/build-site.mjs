@@ -88,12 +88,13 @@ function replaceRegion(html, start, end, content, file) {
 
 validateProjects(projects);
 const orderedProjects = projects.filter((project) => project.visible).sort((a, b) => a.order - b.order);
+const featuredProjects = orderedProjects.slice(0, 6);
 
 for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "index.html" : "en/index.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
-  html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", orderedProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
+  html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 

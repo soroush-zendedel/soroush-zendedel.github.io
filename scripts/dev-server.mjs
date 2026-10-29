@@ -131,6 +131,7 @@ async function saveChange(request, response) {
   let originalJson;
   let staged = false;
   let uploadedFile;
+  let uploadedFileCreated = false;
   const archivedImages = [];
   try {
     await requireCleanWorkingTree();
@@ -139,7 +140,66 @@ async function saveChange(request, response) {
     originalJson = JSON.stringify(projects, null, 2) + "\n";
     let message;
 
-    if (payload.type === "update") {
+    if (payload.type === "addProject") {
+      const projectId = typeof payload.id === "string" ? payload.id.trim() : "";
+      const faName = typeof payload.faName === "string" ? payload.faName.trim().replace(/\s+/g, " ") : "";
+      const enName = typeof payload.enName === "string" ? payload.enName.trim().replace(/\s+/g, " ") : "";
+      const faDescription = typeof payload.faDescription === "string" ? payload.faDescription.trim().replace(/\s+/g, " ") : "";
+      const enDescription = typeof payload.enDescription === "string" ? payload.enDescription.trim().replace(/\s+/g, " ") : "";
+      const alt = typeof payload.alt === "string" ? payload.alt.trim().replace(/\s+/g, " ") : "";
+      const href = typeof payload.href === "string" ? payload.href.trim() : "";
+      const reservedId = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(projectId);
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(projectId) || projectId.length > 80 || reservedId || projects.some((project) => project.id === projectId)) {
+        return send(response, 400, { error: "Project ID must be a unique English slug (for example, my-project)." });
+      }
+      if (!faName || !enName || !faDescription || !enDescription || faName.length > 200 || enName.length > 200 || faDescription.length > 300 || enDescription.length > 300 || alt.length > 300) {
+        return send(response, 400, { error: "Add both project names and descriptions (up to 300 characters)." });
+      }
+      let parsedHref;
+      try { parsedHref = new URL(href); } catch { return send(response, 400, { error: "Enter a complete http or https project URL." }); }
+      if (!["http:", "https:"].includes(parsedHref.protocol) || href.length > 2_000) {
+        return send(response, 400, { error: "Enter a complete http or https project URL under 2,000 characters." });
+      }
+      const extensions = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
+      const extension = extensions[payload.mime];
+      if (!extension || typeof payload.data !== "string") return send(response, 400, { error: "Choose a WebP, JPEG, or PNG project image." });
+      const imageBytes = Buffer.from(payload.data, "base64");
+      if (!imageBytes.length || imageBytes.length > 5 * 1024 * 1024 || imageBytes.toString("base64") !== payload.data) {
+        return send(response, 400, { error: "Image must be valid and 5 MB or smaller." });
+      }
+      const validImage = extension === "webp"
+        ? imageBytes.length > 12 && imageBytes.toString("ascii", 0, 4) === "RIFF" && imageBytes.toString("ascii", 8, 12) === "WEBP"
+        : extension === "jpg"
+          ? imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9
+          : imageBytes.length > 8 && imageBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+      if (!validImage) return send(response, 400, { error: "The file contents do not match the selected image type." });
+      const imageNames = await readdir(join(root, "img"));
+      const image = `${projectId}.${extension}`;
+      if (imageNames.includes(image)) return send(response, 409, { error: `The image file img/${image} already exists; choose another project ID.` });
+      const fallback = enName.split(/\s+/).slice(0, 3).map((word) => word[0]).join("").toUpperCase() || projectId.slice(0, 2).toUpperCase();
+      const nameOrder = Math.max(0, ...projects.map((project) => project.order)) + 1;
+      projects.push({
+        id: projectId,
+        order: nameOrder,
+        visible: true,
+        href,
+        image,
+        imageFallback: fallback,
+        home: {
+          fa: { name: faName, description: faDescription },
+          en: { name: enName, description: enDescription },
+          alt,
+        },
+        about: {
+          fa: { name: faName, description: faDescription },
+          en: { name: enName, description: enDescription },
+        },
+      });
+      uploadedFile = join(root, "img", image);
+      await writeFile(uploadedFile, imageBytes, { flag: "wx" });
+      uploadedFileCreated = true;
+      message = `content: add ${projectId} project`;
+    } else if (payload.type === "update") {
       if (typeof payload.projectId !== "string" || !editableFields.has(payload.field) || typeof payload.value !== "string") {
         return send(response, 400, { error: "Unsupported project field." });
       }
@@ -217,6 +277,7 @@ async function saveChange(request, response) {
       if (imageNameSet.has(filename)) await archiveImage(filename);
       uploadedFile = join(imageDirectory, filename);
       await writeFile(uploadedFile, imageBytes, { flag: "wx" });
+      uploadedFileCreated = true;
       project.image = filename;
       message = `content: replace ${project.id} image`;
     } else if (payload.type === "reorder") {
@@ -225,17 +286,24 @@ async function saveChange(request, response) {
       }
       const visible = projects.filter((project) => project.visible).sort((a, b) => a.order - b.order);
       const visibleIds = visible.map((project) => project.id);
-      if (payload.projectIds.length !== visibleIds.length || new Set(payload.projectIds).size !== visibleIds.length || payload.projectIds.some((id) => !visibleIds.includes(id))) {
-        return send(response, 400, { error: "The order must contain every visible project once." });
+      const priorityIds = visible.slice(0, 6).map((project) => project.id);
+      const validIds = (expected) => payload.projectIds.length === expected.length && new Set(payload.projectIds).size === expected.length && payload.projectIds.every((id) => expected.includes(id));
+      const fullOrder = validIds(visibleIds);
+      const priorityOrder = validIds(priorityIds);
+      if (!fullOrder && !priorityOrder) {
+        return send(response, 400, { error: "Reorder either all visible projects or the six highest-priority projects." });
       }
       const allProjects = [...projects].sort((a, b) => a.order - b.order);
       const slots = allProjects.map((project) => project.visible);
-      const nextVisible = payload.projectIds.map((id) => projects.find((project) => project.id === id));
+      const nextVisible = fullOrder
+        ? payload.projectIds.map((id) => projects.find((project) => project.id === id))
+        : [...payload.projectIds.map((id) => projects.find((project) => project.id === id)), ...visible.slice(6)];
       let visibleIndex = 0;
       const nextProjects = allProjects.map((project, index) => slots[index] ? nextVisible[visibleIndex++] : project);
       nextProjects.forEach((project, index) => { project.order = index + 1; });
       projects.splice(0, projects.length, ...nextProjects);
-      if (payload.projectIds.every((id, index) => id === visibleIds[index])) {
+      const comparedIds = fullOrder ? visibleIds : priorityIds;
+      if (payload.projectIds.every((id, index) => id === comparedIds[index])) {
         return send(response, 200, { unchanged: true });
       }
       message = "content: reorder projects";
@@ -268,7 +336,9 @@ async function saveChange(request, response) {
       }
     }
     if (uploadedFile) {
-      try { await unlink(uploadedFile); } catch {}
+      if (uploadedFileCreated) {
+        try { await unlink(uploadedFile); } catch {}
+      }
     }
     for (const image of archivedImages.toReversed()) {
       try { await rename(image.to, image.from); } catch {}

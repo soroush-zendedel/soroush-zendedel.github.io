@@ -27,7 +27,7 @@
 
 ## توسعه
 
-برای اجرای پیش‌نمایش محلی با ابزار ویرایش متن و ترتیب پروژه‌ها، بدون نصب بستهٔ اضافه:
+برای اجرای پیش‌نمایش محلی با ویرایش متن و لینک، جایگزینی تصویر، افزودن پروژه و مرتب‌سازی اولویت‌ها، بدون نصب بستهٔ اضافه:
 
 ```bash
 node scripts/dev-server.mjs
@@ -36,6 +36,7 @@ node scripts/dev-server.mjs
 سپس [پیش‌نمایش محلی](http://localhost:8082/) را باز کنید. در صورت استفاده از npm، دستور `npm run dev` هم در دسترس است.
 
 ویرایش فقط هنگام اجرای این سرور در دسترس است. تأیید هر تغییر، فایل داده و صفحه‌های تولیدشده را به‌روزرسانی می‌کند و یک کامیت مستقل می‌سازد؛ لغو تغییری ذخیره نمی‌کند. اگر تغییر ذخیره‌نشدهٔ دیگری در مخزن باشد، ویرایشگر برای جلوگیری از ترکیب تغییرها ذخیره را متوقف می‌کند.
+از مودال افزودن پروژه می‌توان نام و توضیح هر دو زبان، لینک و تصویر را وارد کرد. شش پروژهٔ اول بر اساس `order` در صفحهٔ اصلی نمایش داده می‌شوند؛ صفحهٔ فهرست پروژه‌ها همهٔ پروژه‌های فعال را نشان می‌دهد.
 در هر نوبت ویرایش می‌توان همهٔ کامیت‌های ساخته‌شده توسط ویرایشگر را با دکمهٔ «لغو این نوبت» به وضعیت پیش از شروع برگرداند؛ این کار پس از تأیید انجام می‌شود و اگر در آن بازه کامیت نامرتبطی وجود داشته باشد، متوقف خواهد شد.
 
 برای تولید صفحه‌های HTML از فهرست پروژه‌ها، Node.js کافی است:
@@ -83,7 +84,7 @@ A bilingual personal portfolio featuring creative digital tools and projects aro
 
 ## Development
 
-Start the local preview with inline project-text editing and drag-to-reorder, without installing any additional package:
+Start the local preview with project editing, image replacement, project creation, and drag-to-prioritize, without installing an additional package:
 
 ```bash
 node scripts/dev-server.mjs
@@ -92,6 +93,7 @@ node scripts/dev-server.mjs
 Then open the [local preview](http://localhost:8082/). If you use npm, `npm run dev` is also available.
 
 The editor is available only through this local server. Each confirmed edit updates the data and generated pages in its own Git commit; canceling leaves files unchanged. Saving is blocked while other uncommitted changes exist, so unrelated work is never included.
+The add-project dialog captures Persian and English names and descriptions, the URL, and an image. The first six projects by `order` appear on the home page; the full directory includes every visible project.
 During an editing session, the “Undo this session” button can restore all editor commits to the state from before editing began. It asks for confirmation and refuses to proceed if unrelated commits are found in that range.
 
 Use Node.js to generate the project lists from their data:

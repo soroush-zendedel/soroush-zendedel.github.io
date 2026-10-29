@@ -3,12 +3,15 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
     .dev-editor-undo{position:fixed;inset-inline-start:150px;bottom:18px;max-width:calc(100vw - 176px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
+    .dev-editor-add{position:fixed;inset-inline-start:18px;bottom:70px;border:1px solid #b91c1c55;border-radius:999px;padding:10px 15px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
-    .dev-editor-toggle:disabled,.dev-editor-undo:disabled{opacity:.55;cursor:wait}
+    body.dev-editor-on .dev-editor-add{pointer-events:auto}
+    .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
+    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
     body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
@@ -26,6 +29,23 @@
     .dev-editor-settings input[type="file"]{display:block;width:100%;margin:7px 0}
     .dev-editor-settings button{margin-top:7px;padding:7px 10px;border:0;border-radius:6px;background:#b91c1c;color:#fff;cursor:pointer}
     .dev-editor-settings hr{margin:12px 0;border:0;border-top:1px solid #29252422}
+    .dev-editor-modal-layer{position:fixed;inset:0;z-index:2147483100;display:grid;place-items:center;padding:16px;background:#17141199}
+    body.dev-editor-on .dev-editor-modal-layer,body.dev-editor-on .dev-editor-modal-layer *{pointer-events:auto}
+    .dev-editor-modal{box-sizing:border-box;width:min(640px,100%);max-height:min(92vh,850px);overflow:auto;border:1px solid #1a1a1a20;border-radius:16px;background:#fdfcfb;color:#292524;box-shadow:0 20px 60px #0005;text-align:start}
+    .dev-editor-modal-header{position:sticky;top:0;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid #1a1a1a18;background:#fdfcfb}
+    .dev-editor-modal-header h2{margin:0;font-size:18px;font-weight:800}
+    .dev-editor-modal-close{width:34px;height:34px;border:0;border-radius:8px;background:#eee9e3;color:#292524;cursor:pointer;font-size:22px;line-height:1}
+    .dev-editor-project-form{padding:18px 20px 20px}
+    .dev-editor-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .dev-editor-form-field{min-width:0}.dev-editor-form-field[data-wide]{grid-column:1/-1}
+    .dev-editor-form-field label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
+    .dev-editor-form-field input,.dev-editor-form-field textarea{box-sizing:border-box;width:100%;padding:9px 10px;border:1px solid #29252433;border-radius:7px;background:white;color:#292524;font:inherit;font-size:14px}
+    .dev-editor-form-field textarea{min-height:82px;resize:vertical;line-height:1.6}
+    .dev-editor-form-note{margin:6px 0 0;color:#29252499;font-size:12px;line-height:1.6}
+    .dev-editor-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    .dev-editor-modal-actions button{padding:9px 14px;border:0;border-radius:8px;background:#eee9e3;color:#292524;cursor:pointer;font:inherit;font-size:13px;font-weight:700}
+    .dev-editor-modal-actions button[data-submit]{background:#b91c1c;color:white}
+    @media(max-width:520px){.dev-editor-form-grid{grid-template-columns:1fr}.dev-editor-form-field[data-wide]{grid-column:auto}.dev-editor-modal-layer{padding:10px}.dev-editor-project-form{padding:14px}}
     .dev-project-wrap.dev-dragging{opacity:.45}
     .dev-project-wrap.dev-drop-target{outline:2px solid #b91c1c;outline-offset:3px;border-radius:10px}
     .dev-editor-tools{position:fixed;display:flex;gap:6px;padding:5px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;box-shadow:0 5px 20px #0002}
@@ -49,6 +69,28 @@
   undoButton.textContent = isEnglish ? "↶ Undo this session" : "↶ لغو این نوبت";
   undoButton.title = isEnglish ? "Undo all edits in this editing session" : "بازگرداندن همهٔ تغییرهای این نوبت ویرایش";
   document.body.append(undoButton);
+
+  const addButton = document.createElement("button");
+  addButton.className = "dev-editor-add";
+  addButton.type = "button";
+  addButton.hidden = true;
+  addButton.textContent = isEnglish ? "＋ Add project" : "＋ افزودن پروژه";
+  addButton.addEventListener("click", openAddProjectModal);
+  document.body.append(addButton);
+
+  const modalLayer = document.createElement("div");
+  modalLayer.className = "dev-editor-modal-layer";
+  modalLayer.hidden = true;
+  modalLayer.addEventListener("click", (event) => {
+    if (event.target === modalLayer) closeAddProjectModal();
+  });
+  document.body.append(modalLayer);
+  const modal = document.createElement("section");
+  modal.className = "dev-editor-modal";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "dev-project-modal-title");
+  modalLayer.append(modal);
 
   let enabled = false;
   let editing = null;
@@ -237,10 +279,156 @@
       ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
       : (isEnglish ? "✎ Edit" : "✎ ویرایش");
     undoButton.hidden = !enabled || sessionCommitCount === 0;
+    addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
     if (enabled) wrapCards();
     else {
       if (editing) cancelEdit();
+      closeProjectSettings();
+      closeAddProjectModal();
       unwrapCards();
+    }
+  }
+
+  function closeAddProjectModal() {
+    modalLayer.hidden = true;
+  }
+
+  function makeFormField({ id, label, type = "text", required = false, maxLength, placeholder = "", wide = false, rows = 3, note = "" }) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "dev-editor-form-field";
+    if (wide) wrapper.dataset.wide = "";
+    const title = document.createElement("label");
+    title.htmlFor = id;
+    title.textContent = label;
+    const input = type === "textarea" ? document.createElement("textarea") : document.createElement("input");
+    input.id = id;
+    input.name = id;
+    if (type !== "textarea") input.type = type;
+    else input.rows = rows;
+    input.required = required;
+    if (maxLength) input.maxLength = maxLength;
+    input.placeholder = placeholder;
+    wrapper.append(title, input);
+    if (note) {
+      const helper = document.createElement("p");
+      helper.className = "dev-editor-form-note";
+      helper.textContent = note;
+      wrapper.append(helper);
+    }
+    return { wrapper, input };
+  }
+
+  function slugFromName(value) {
+    return value.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+
+  function openAddProjectModal() {
+    if (!enabled) return;
+    modal.replaceChildren();
+    const header = document.createElement("header");
+    header.className = "dev-editor-modal-header";
+    const title = document.createElement("h2");
+    title.id = "dev-project-modal-title";
+    title.textContent = isEnglish ? "Add a project" : "افزودن پروژه";
+    const close = document.createElement("button");
+    close.className = "dev-editor-modal-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", isEnglish ? "Close" : "بستن");
+    close.addEventListener("click", closeAddProjectModal);
+    header.append(title, close);
+
+    const form = document.createElement("form");
+    form.className = "dev-editor-project-form";
+    const grid = document.createElement("div");
+    grid.className = "dev-editor-form-grid";
+    const fields = {};
+    const fieldSpecs = [
+      ["id", { label: isEnglish ? "Project ID (English slug)" : "شناسهٔ پروژه (نامک انگلیسی)", required: true, maxLength: 80, placeholder: "my-project", note: isEnglish ? "Used in the stable image filename." : "برای نام ثابت فایل تصویر هم استفاده می‌شود." }],
+      ["faName", { label: "عنوان فارسی", required: true, maxLength: 200 }],
+      ["enName", { label: "English title", required: true, maxLength: 200 }],
+      ["faDescription", { label: "توضیح فارسی", type: "textarea", required: true, maxLength: 300 }],
+      ["enDescription", { label: "English description", type: "textarea", required: true, maxLength: 300 }],
+      ["href", { label: isEnglish ? "Project link" : "لینک پروژه", type: "url", required: true, maxLength: 2000, wide: true, placeholder: "https://example.com" }],
+      ["image", { label: isEnglish ? "Project image" : "تصویر پروژه", type: "file", required: true, wide: true, note: isEnglish ? "WebP, JPEG, or PNG · up to 5 MB" : "WebP، JPEG یا PNG · حداکثر ۵ مگابایت" }],
+      ["alt", { label: isEnglish ? "Image alt text (SEO/accessibility)" : "متن جایگزین تصویر (سئو و دسترس‌پذیری)", maxLength: 300, wide: true, note: isEnglish ? "Optional. Leave blank for a decorative image." : "اختیاری؛ اگر تصویر تزئینی است خالی بگذارید." }],
+    ];
+    for (const [key, spec] of fieldSpecs) {
+      const field = makeFormField({ id: `new-project-${key}`, ...spec });
+      fields[key] = field.input;
+      grid.append(field.wrapper);
+    }
+    fields.id.pattern = "[a-z0-9]+(-[a-z0-9]+)*";
+    fields.id.title = isEnglish ? "Use lowercase English letters, numbers, and hyphens." : "از حروف کوچک انگلیسی، عدد و خط تیره استفاده کنید.";
+    fields.image.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
+    const nameHint = document.createElement("p");
+    nameHint.className = "dev-editor-form-note";
+    nameHint.textContent = isEnglish
+      ? "The About page initially uses the same names and descriptions; you can refine them afterward. New projects are added at the end of the full directory."
+      : "عنوان و توضیحات صفحهٔ درباره ابتدا از همین مقادیر استفاده می‌کنند و بعداً جداگانه قابل ویرایش‌اند. پروژهٔ تازه در انتهای فهرست کامل قرار می‌گیرد.";
+    grid.append(nameHint);
+
+    let customId = false;
+    fields.id.addEventListener("input", () => { customId = true; });
+    fields.enName.addEventListener("input", () => { if (!customId) fields.id.value = slugFromName(fields.enName.value); });
+
+    const actions = document.createElement("div");
+    actions.className = "dev-editor-modal-actions";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = isEnglish ? "Cancel" : "لغو";
+    cancel.addEventListener("click", closeAddProjectModal);
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.dataset.submit = "";
+    submit.textContent = isEnglish ? "Add project" : "افزودن پروژه";
+    actions.append(cancel, submit);
+    form.append(grid, actions);
+    form.addEventListener("submit", (event) => saveNewProject(event, form, fields, submit));
+    modal.append(header, form);
+    modalLayer.hidden = false;
+    fields.faName.focus();
+  }
+
+  async function saveNewProject(event, form, fields, submit) {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    const file = fields.image.files?.[0];
+    if (!file) return toast(isEnglish ? "Choose a project image." : "تصویر پروژه را انتخاب کنید.", true);
+    if (file.size > 5 * 1024 * 1024) return toast(isEnglish ? "Image must be 5 MB or smaller." : "حجم تصویر باید حداکثر ۵ مگابایت باشد.", true);
+    if (!["image/webp", "image/jpeg", "image/png"].includes(file.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG image." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
+    submit.disabled = true;
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error(isEnglish ? "Could not read this image." : "خواندن تصویر ممکن نشد."));
+        reader.readAsDataURL(file);
+      });
+      const response = await fetch("/__dev/save", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify({
+          type: "addProject",
+          id: fields.id.value.trim(),
+          faName: fields.faName.value,
+          enName: fields.enName.value,
+          faDescription: fields.faDescription.value,
+          enDescription: fields.enDescription.value,
+          href: fields.href.value,
+          alt: fields.alt.value,
+          mime: file.type,
+          data: String(dataUrl).split(",")[1],
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "Project could not be added." : "افزودن پروژه انجام نشد."));
+      closeAddProjectModal();
+      toast(isEnglish ? `Project added · commit ${result.commit}` : `پروژه اضافه شد · کامیت ${result.commit}`);
+      setTimeout(() => location.reload(), 700);
+    } catch (error) {
+      submit.disabled = false;
+      toast(error.message, true);
     }
   }
 
@@ -424,7 +612,7 @@
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
     if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -435,11 +623,15 @@
   }, true);
 
   document.addEventListener("keydown", (event) => {
+    if (enabled && event.key === "Escape" && !modalLayer.hidden) {
+      closeAddProjectModal();
+      return;
+    }
     if (enabled && event.key === "Escape" && document.querySelector(".dev-editor-settings")) {
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -453,7 +645,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();
