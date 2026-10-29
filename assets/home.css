@@ -1,0 +1,177 @@
+/* Home page visual layer: keeps the live desktop layout and borrows the local
+   preview's softer canvas, paper surfaces, and mobile reading order. */
+:root {
+  --home-canvas: #fdfcfb;
+  --home-paper: #f6f2ea;
+  --home-line: #e4dfd6;
+  --home-muted: #4a463f;
+  --home-crimson: #9b1c1c;
+  --home-crimson-deep: #7a1515;
+}
+
+body.font-fa,
+body.font-en {
+  background-color: var(--home-canvas);
+  background-image: radial-gradient(rgb(26 26 26 / 3.5%) 0.6px, transparent 0.6px);
+  background-size: 7px 7px;
+  color: #1a1a1a;
+}
+
+.top-navigation a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--home-line);
+  background-color: var(--home-canvas);
+  box-shadow: 0 1px 3px rgb(26 26 26 / 8%);
+}
+
+.top-navigation a:hover {
+  border-color: var(--home-crimson);
+  color: var(--home-crimson);
+}
+
+.document-wrapper {
+  border-color: var(--home-line);
+  border-radius: 1.25rem;
+  background-color: color-mix(in srgb, var(--home-canvas) 92%, white);
+  background-image: none;
+  box-shadow: 0 18px 40px -24px rgb(26 26 26 / 28%);
+}
+
+.document-wrapper > .h-1\.5 {
+  opacity: 0.45;
+}
+
+.document-wrapper [data-project-grid] > a {
+  border-color: var(--home-line);
+  border-radius: 0.8rem;
+  background-color: color-mix(in srgb, var(--home-paper) 70%, white);
+  box-shadow: 0 1px 3px rgb(26 26 26 / 5%);
+}
+
+.document-wrapper [data-project-grid] > a:hover {
+  border-color: var(--home-crimson);
+  background-color: var(--home-canvas);
+  box-shadow: 0 8px 20px -16px rgb(26 26 26 / 35%);
+}
+
+.document-wrapper [data-project-grid] > a > img {
+  border-color: var(--home-line);
+  background-color: var(--home-canvas);
+}
+
+.document-wrapper a[data-profile-link="contact"] {
+  background-color: var(--home-crimson);
+}
+
+.document-wrapper a[data-profile-link="contact"]:hover {
+  background-color: var(--home-crimson-deep);
+}
+
+body > footer {
+  color: var(--home-muted);
+}
+
+@media (max-width: 767px) {
+  .document-wrapper > div.px-6.py-12 {
+    padding: 2rem 1.25rem;
+  }
+
+  .document-wrapper > div > header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "name"
+      "role"
+      "tagline"
+      "contact"
+      "portrait"
+      "social"
+      "statement";
+    justify-items: center;
+    align-items: start;
+    gap: 0;
+    padding-bottom: 2rem;
+    text-align: center;
+  }
+
+  .document-wrapper > div > header > .avatar-container,
+  .document-wrapper > div > header > .flex-1 {
+    display: contents;
+  }
+
+  .document-wrapper > div > header > .flex-1 > h1 {
+    grid-area: name;
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    line-height: 1.35;
+  }
+
+  .document-wrapper > div > header > .flex-1 > h2 {
+    grid-area: role;
+    margin: 0 0 0.85rem;
+    color: var(--home-crimson);
+    line-height: 1.7;
+  }
+
+  .document-wrapper > div > header > .flex-1 > p {
+    grid-area: tagline;
+    margin: 0 0 1.15rem;
+    color: var(--home-muted);
+  }
+
+  .document-wrapper > div > header > .flex-1 > a[data-profile-link="contact"] {
+    grid-area: contact;
+    justify-self: center;
+    margin: 0 0 1.75rem;
+  }
+
+  .document-wrapper > div > header .avatar-frame {
+    grid-area: portrait;
+    width: 13.5rem;
+    height: 13.5rem;
+    margin: 0;
+  }
+
+  .document-wrapper > div > header .avatar-frame > .art-avatar {
+    width: 100%;
+    height: 100%;
+  }
+
+  .document-wrapper > div > header > .avatar-container > .mt-6 {
+    grid-area: social;
+    margin-top: 1.25rem;
+  }
+
+  .document-wrapper > div > header [data-social-links] {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .document-wrapper > div > header [data-social-links] > .w-8 {
+    display: none;
+  }
+
+  .document-wrapper > div > header > .flex-1 > .relative.pt-4 {
+    grid-area: statement;
+    width: 100%;
+    margin-top: 1.25rem;
+    padding-top: 0.5rem;
+  }
+
+  .document-wrapper > div > header > .flex-1 > .relative.pt-4 .text-justify {
+    text-align: center;
+  }
+
+  .document-wrapper [data-project-grid] > a {
+    gap: 0.9rem;
+    padding: 0.75rem;
+  }
+
+  .document-wrapper [data-project-grid] > a > div {
+    padding-inline: 0.25rem;
+  }
+}
