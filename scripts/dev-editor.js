@@ -4,10 +4,11 @@
   const style = document.createElement("style");
   style.textContent = `
     .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
-    .dev-editor-toggle{position:fixed;left:50%;inset-inline-start:auto;bottom:18px;transform:translateX(-50%);border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
+    .dev-editor-action-dock{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 24px);z-index:2147483000;pointer-events:none}
+    .dev-editor-toggle{position:static;transform:none;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;pointer-events:auto}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
     .dev-editor-undo{position:fixed;left:50%;inset-inline-start:auto;bottom:66px;transform:translateX(-50%);max-width:calc(100vw - 36px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
-    .dev-editor-add{position:fixed;inset-inline-start:18px;bottom:70px;border:1px solid #b91c1c55;border-radius:999px;padding:10px 15px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
+    .dev-editor-add{position:static;border:1px solid #b91c1c55;border-radius:999px;padding:10px 15px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:auto}
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
     .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
@@ -74,12 +75,15 @@
   `;
   document.head.append(style);
 
+  const actionDock = document.createElement("div");
+  actionDock.className = "dev-editor-action-dock";
+  document.body.append(actionDock);
   const toggle = document.createElement("button");
   toggle.className = "dev-editor-toggle";
   toggle.type = "button";
   toggle.textContent = isEnglish ? "✎ Edit" : "✎ ویرایش";
   toggle.setAttribute("aria-pressed", "false");
-  document.body.append(toggle);
+  actionDock.append(toggle);
 
   const undoButton = document.createElement("button");
   undoButton.className = "dev-editor-undo";
@@ -95,7 +99,7 @@
   addButton.hidden = true;
   addButton.textContent = isEnglish ? "＋ Add project" : "＋ افزودن پروژه";
   addButton.addEventListener("click", openAddProjectModal);
-  document.body.append(addButton);
+  actionDock.append(addButton);
 
   const avatarFrame = document.querySelector(".avatar-frame");
   const profileImageButton = avatarFrame ? document.createElement("button") : null;
