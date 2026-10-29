@@ -11,6 +11,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projectFile = join(root, "content", "projects.json");
 const profileFile = join(root, "content", "profile.json");
 const socialFile = join(root, "content", "social.json");
+const contactFile = join(root, "content", "contact.json");
 const blogFile = join(root, "content", "blog.json");
 const personFile = join(root, "content", "person.json");
 const port = Number(process.env.PORT || 8082);
@@ -64,7 +65,7 @@ async function getEditorSession(base) {
   }
   const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
   const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
-  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/blog.json", "content/person.json", ...generatedFiles]);
+  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/contact.json", "content/blog.json", "content/person.json", ...generatedFiles]);
   for (const commit of commits) {
     const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
       runGit(["show", "-s", "--format=%s", commit]),
@@ -141,6 +142,16 @@ function isSafeProfileUrl(value, allowRelative = false) {
   }
 }
 
+function isSafeContactHref(id, value) {
+  if (typeof value !== "string" || !value || value.length > 300 || /[\u0000-\u0020\\]/.test(value)) return false;
+  if (id === "phone") return /^tel:\+[0-9]{8,15}$/.test(value);
+  if (id === "sms") return /^sms:\+[0-9]{8,15}$/.test(value);
+  if (id === "whatsapp") return /^https:\/\/wa\.me\/[0-9]{8,15}$/.test(value);
+  if (id === "telegram") return /^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}$/.test(value);
+  if (id === "email") return /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(value);
+  return false;
+}
+
 async function saveChange(request, response) {
   if (!isAuthorized(request)) return send(response, 403, { error: "Editor request rejected." });
   if (saving) return send(response, 409, { error: "Another edit is being saved." });
@@ -189,6 +200,30 @@ async function saveChange(request, response) {
       dataToWrite = profile;
       profile.links[payload.key] = payload.value.trim();
       message = `content: update profile link ${payload.key}`;
+    } else if (payload.type === "saveContact") {
+      const contact = JSON.parse(await readFile(contactFile, "utf8"));
+      const expectedIds = ["phone", "sms", "whatsapp", "telegram", "email"];
+      if (!Array.isArray(payload.methods) || payload.methods.length !== expectedIds.length) {
+        return send(response, 400, { error: "All five contact methods are required." });
+      }
+      const methods = payload.methods.map((item, index) => {
+        const id = expectedIds[index];
+        if (!item || item.id !== id) throw new Error("Contact methods are incomplete or out of order.");
+        const fa = typeof item.fa === "string" ? item.fa.trim() : "";
+        const en = typeof item.en === "string" ? item.en.trim() : "";
+        const href = typeof item.href === "string" ? item.href.trim() : "";
+        if (!fa || !en || fa.length > 100 || en.length > 100 || !isSafeContactHref(id, href)) {
+          throw new Error(`Enter valid Persian and English labels and a safe address for ${id}.`);
+        }
+        const current = contact.methods.find((method) => method.id === id);
+        return { ...current, id, fa, en, href };
+      });
+      if (JSON.stringify(contact.methods) === JSON.stringify(methods)) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(contact, null, 2) + "\n";
+      contentFile = contactFile;
+      dataToWrite = contact;
+      contact.methods = methods;
+      message = "content: update contact methods";
     } else if (payload.type === "saveSocials") {
       const socialData = JSON.parse(await readFile(socialFile, "utf8"));
       if (!Array.isArray(payload.socials) || payload.socials.length > 30) {

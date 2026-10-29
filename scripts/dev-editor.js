@@ -4,9 +4,9 @@
   const style = document.createElement("style");
   style.textContent = `
     .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
-    .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
+    .dev-editor-toggle{position:fixed;left:50%;inset-inline-start:auto;bottom:18px;transform:translateX(-50%);border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
-    .dev-editor-undo{position:fixed;inset-inline-start:150px;bottom:18px;max-width:calc(100vw - 176px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
+    .dev-editor-undo{position:fixed;left:50%;inset-inline-start:auto;bottom:66px;transform:translateX(-50%);max-width:calc(100vw - 36px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
     .dev-editor-add{position:fixed;inset-inline-start:18px;bottom:70px;border:1px solid #b91c1c55;border-radius:999px;padding:10px 15px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
@@ -42,7 +42,9 @@
     .dev-editor-settings-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
     .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
     .dev-editor-settings label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
-    .dev-editor-settings input[type="url"]{box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524;direction:ltr}
+    .dev-editor-settings input[type="url"],.dev-editor-settings input[type="text"]{box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524;direction:ltr}
+    .dev-contact-method{margin:10px 0;padding:9px 0;border-bottom:1px solid #29252418}
+    .dev-contact-method strong{display:block;margin-bottom:6px}
     .dev-editor-settings input[type="file"]{display:block;width:100%;margin:7px 0}
     .dev-editor-settings button{margin-top:7px;padding:7px 10px;border:0;border-radius:6px;background:#b91c1c;color:#fff;cursor:pointer}
     .dev-editor-settings hr{margin:12px 0;border:0;border-top:1px solid #29252422}
@@ -117,7 +119,7 @@
     button.title = isEnglish ? "Change link" : "تغییر نشانی";
     button.setAttribute("aria-label", button.title);
     button._profileLink = link;
-    button.addEventListener("click", () => openProfileLinkSettings(link, button));
+    button.addEventListener("click", () => link.dataset.profileLink === "contact" ? openContactSettings(link, button) : openProfileLinkSettings(link, button));
     document.body.append(button);
     profileLinkButtons.push(button);
   });
@@ -473,6 +475,72 @@
     document.body.append(panel);
     placeSettings(panel, trigger);
     input.focus();
+  }
+
+  function openContactSettings(_link, trigger) {
+    if (!enabled) return;
+    closeProjectSettings();
+    const panel = document.createElement("div");
+    panel.className = "dev-editor-settings";
+    panel._trigger = trigger;
+    panel.addEventListener("click", (event) => event.stopPropagation());
+    const header = document.createElement("div");
+    header.className = "dev-editor-settings-header";
+    const heading = document.createElement("span");
+    heading.textContent = isEnglish ? "Contact methods" : "راه‌های تماس";
+    const close = document.createElement("button");
+    close.className = "dev-editor-settings-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", isEnglish ? "Close" : "بستن");
+    close.addEventListener("click", closeProjectSettings);
+    header.append(heading, close);
+
+    const methods = [...document.querySelectorAll("[data-contact-popover] [data-contact-method]")].map((anchor) => ({
+      id: anchor.dataset.contactMethod,
+      fa: anchor.querySelector(".lang-fa")?.textContent.trim() || "",
+      en: anchor.querySelector(".lang-en")?.textContent.trim() || "",
+      href: anchor.getAttribute("href") || "",
+    }));
+    const fields = [];
+    for (const method of methods) {
+      const group = document.createElement("div");
+      group.className = "dev-contact-method";
+      const title = document.createElement("strong");
+      title.textContent = ({ phone: isEnglish ? "Phone" : "تماس تلفنی", sms: isEnglish ? "Text message" : "پیامک", whatsapp: "WhatsApp", telegram: "Telegram", email: "Email" })[method.id] || method.id;
+      group.append(title);
+      const methodFields = {};
+      for (const [key, labelText, value] of [["fa", "فارسی", method.fa], ["en", "English", method.en], ["href", isEnglish ? "Link / address" : "پیوند / نشانی", method.href]]) {
+        const label = document.createElement("label");
+        label.textContent = labelText;
+        const input = document.createElement("input");
+        input.type = key === "href" ? "text" : "text";
+        input.value = value;
+        input.required = true;
+        input.maxLength = key === "href" ? 300 : 100;
+        input.dir = key === "href" || key === "en" ? "ltr" : "rtl";
+        input.setAttribute("aria-label", `${title.textContent} · ${labelText}`);
+        label.append(input);
+        group.append(label);
+        methodFields[key] = input;
+      }
+      fields.push({ id: method.id, ...methodFields });
+      panel.append(group);
+    }
+    const note = document.createElement("p");
+    note.className = "dev-editor-form-note";
+    note.textContent = isEnglish
+      ? "Phone and SMS need an international number; WhatsApp uses wa.me and Telegram uses t.me."
+      : "شمارهٔ تماس و پیامک را با پیش‌شمارهٔ کشور وارد کن؛ واتساپ با wa.me و تلگرام با t.me کار می‌کند.";
+    const save = makeSettingsButton(isEnglish ? "Save contact methods" : "ذخیرهٔ راه‌های تماس", async (event) => {
+      const methodsToSave = fields.map(({ id, fa, en, href }) => ({ id, fa: fa.value, en: en.value, href: href.value }));
+      await saveProjectSetting({ type: "saveContact", methods: methodsToSave }, event.currentTarget);
+    });
+    panel.prepend(header);
+    panel.append(note, save);
+    document.body.append(panel);
+    placeSettings(panel, trigger);
+    fields[0]?.fa.focus();
   }
 
   function captureSocialRows() {
