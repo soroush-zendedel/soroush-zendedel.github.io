@@ -95,6 +95,16 @@ function renderAboutProject(project, language) {
   return `          <li><a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong><span data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span></a></li>`;
 }
 
+function renderSiteFooter(language) {
+  const credit = escapeHtml(profile.fields.footerCredit[language]);
+  const email = escapeHtml(profile.fields.footerEmail[language]);
+  return `  <footer class="site-footer" dir="ltr">
+    <p><span data-edit-field="profile.footerCredit.${language}">${credit}</span> © <span id="year"></span></p>
+    <a data-profile-link="contact" href="${escapeHtml(profile.links.contact)}"><span data-edit-field="profile.footerEmail.${language}">${email}</span></a>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>`;
+}
+
 function renderDirectoryProject(project, language) {
   const copy = project.home[language];
   const prefix = language === "en" ? "../img/" : "./img/";
@@ -289,7 +299,10 @@ function renderPersonPage(html, language, file) {
   html = html.replace(familyPattern, `$1${renderPersonFamily(language)}$2`);
   html = replaceRegion(html, "<!-- PERSON-PROFILES:START -->", "<!-- PERSON-PROFILES:END -->", renderPersonLinks(language), file);
   const socialLinksData = escapeHtml(JSON.stringify(socialData.socials));
-  html = html.replace(/(<nav\b[^>]*\bclass="links"[^>]*)>/, `$1 data-social-links="${socialLinksData}">`);
+  const socialNav = html.match(/<nav\b[^>]*\bclass="links"[^>]*>/);
+  if (!socialNav) throw new Error(`Social links navigation is missing in ${file}`);
+  const cleanSocialNav = socialNav[0].replace(/\sdata-social-links="[^"]*"/g, "");
+  html = html.replace(socialNav[0], `${cleanSocialNav.slice(0, -1)} data-social-links="${socialLinksData}">`);
   const personData = escapeHtml(JSON.stringify(person));
   html = html.replace(/(<main\b[^>]*\bclass="sheet")/, `$1 data-person-page="true" data-person-data="${personData}"`);
   return html;
@@ -417,6 +430,7 @@ for (const language of ["fa", "en"]) {
     throw new Error(`Project schema marker is missing or duplicated in ${file}`);
   }
   html = html.replace(schemaScript, `<script type="application/ld+json">${schemaJson}</script>`);
+  html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -426,6 +440,7 @@ for (const language of ["fa", "en"]) {
   let html = await readFile(path, "utf8");
   html = renderPersonPage(html, language, file);
   html = replaceRegion(html, "          <!-- ABOUT-PROJECTS:START -->", "          <!-- ABOUT-PROJECTS:END -->", orderedProjects.map((project) => renderAboutProject(project, language)).join("\n"), file);
+  html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 

@@ -43,11 +43,13 @@
     .project-breadcrumb{margin-top:3rem;padding-top:1.25rem;border-top:1px solid #1a1a1a1a;font-size:.875rem;color:#1a1a1a99}.project-breadcrumb a{color:inherit}.project-breadcrumb a:hover{color:#b91c1c}
     @media(max-width:420px){.top-navigation a{padding-inline:.7rem;font-size:.8rem}.project-list>a{padding:.75rem}.project-list-copy{padding-inline:.75rem}}
   </style>
+  <link rel="stylesheet" href="./assets/site-theme.css">
 </head>
 <body class="font-fa antialiased min-h-screen selection:bg-crimson selection:text-white p-4 md:p-8 lg:p-12">
   <nav class="top-navigation w-full max-w-5xl mx-auto mb-4" aria-label="پیمایش اصلی">
     <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./" rel="home">صفحه‌ی اصلی</a>
     <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">درباره‌ی من</a>
+    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./projects.html" aria-current="page">پروژه‌ها</a>
     <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson transition-all" href="./en/projects.html" hreflang="en" aria-label="English">EN</a>
   </nav>
   <main class="document-wrapper max-w-5xl mx-auto rounded-lg shadow-artistic border border-ink/5 overflow-hidden relative">
@@ -110,6 +112,13 @@
       </nav>
     </div>
   </main>
+  <!-- SITE-FOOTER:START -->
+  <footer class="site-footer" dir="ltr">
+    <p><span data-edit-field="profile.footerCredit.fa">CRAFTED WITH CODE &amp; CREATIVITY BY SOROUSH ZENDEDEL</span> © <span id="year"></span></p>
+    <a data-profile-link="contact" href="mailto:soroush_zendedel@Live.com"><span data-edit-field="profile.footerEmail.fa">soroush_zendedel@Live.com</span></a>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <!-- SITE-FOOTER:END -->
   <link rel="stylesheet" href="./assets/language-suggestion.css">
   <script src="./assets/language-suggestion.js" defer></script>
 </body>
