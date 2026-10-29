@@ -3,6 +3,16 @@
     "image": "me.webp",
     "alt": "Soroush Zendedel | سروش زنده‌دل"
   },
+  "links": {
+    "contact": "mailto:soroush_zendedel@Live.com",
+    "projects": "./projects.html"
+  },
+  "socials": [
+    { "id": "github", "fa": "GitHub", "en": "GitHub", "href": "https://github.com/soroush-zendedel" },
+    { "id": "linkedin", "fa": "LinkedIn", "en": "LinkedIn", "href": "https://www.linkedin.com/in/soroush-zendedel/" },
+    { "id": "youtube", "fa": "YouTube", "en": "YouTube", "href": "https://www.youtube.com/@SoroushZendedel" },
+    { "id": "email", "fa": "Email", "en": "Email", "href": "mailto:soroush_zendedel@Live.com" }
+  ],
   "fields": {
     "name": {
       "fa": "سروش زنده‌دل",
@@ -19,6 +29,18 @@
       "fa": "پیشه‌ام برنامه‌نویسی‌ست و به هنر علاقه‌مندم...",
       "en": "I work as a programmer and have a deep interest in art."
     },
+    "contactButton": {
+      "fa": "ارتباط با من",
+      "en": "Get in touch"
+    },
+    "footerEmail": {
+      "fa": "soroush_zendedel@Live.com",
+      "en": "soroush_zendedel@Live.com"
+    },
+    "bioLead": {
+      "fa": "گاهی هم فقط نگاه می‌کنم و با خودم می‌گم:",
+      "en": "Sometimes I just look and tell myself:"
+    },
     "intro": {
       "fa": "من؟ منم مثل همه بنده‌ی خدا.",
       "en": "Me? Like everyone else, I'm a servant of God."
@@ -28,8 +50,8 @@
       "en": "I walk the line between thought and emotion. Learning from technology and art, I try to take a small new step every day, make mistakes, learn, and move forward. I have many flaws, but I strive to walk my path more consciously and honestly, hoping my connections become more real and my presence comforting to those around me."
     },
     "quote": {
-      "fa": "ادامه دادنم شاید فعلا فایده‌ای نداشته باشه، ولی ضرری هم نداره!",
-      "en": "Continuing might not have a clear benefit right now, but it does no harm either!"
+      "fa": "\"ادامه دادنم شاید فعلا فایده‌ای نداشته باشه، ولی ضرری هم نداره!\"",
+      "en": "\"Continuing might not have a clear benefit right now, but it does no harm either!\""
     },
     "bioEnd": {
       "fa": "و همین برای برداشتن قدم بعدی کافیه.",
@@ -58,6 +80,18 @@
     "summary6": {
       "fa": "و باور دارم دنیای بهتر ساخته میشه، با خلاقیت، آگاهی، و فقط یک قدم رو به جلو در هر روز (و یا شب).",
       "en": "And I believe a better world is built with creativity, awareness, and just one step forward every day (or night)."
+    },
+    "projectsNav": {
+      "fa": "پروژه‌ها",
+      "en": "Projects"
+    },
+    "projectsTitle": {
+      "fa": "پروژه‌ها",
+      "en": "Projects"
+    },
+    "allProjectsButton": {
+      "fa": "مشاهدهٔ همهٔ پروژه‌ها",
+      "en": "View all projects"
     }
   }
 }

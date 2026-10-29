@@ -3,7 +3,7 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
     .dev-editor-undo{position:fixed;inset-inline-start:150px;bottom:18px;max-width:calc(100vw - 176px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
@@ -11,9 +11,9 @@
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
     .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled{opacity:.55;cursor:wait}
-    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
+    .dev-editor-add[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
-    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
@@ -22,6 +22,18 @@
     .dev-editor-handle:active{cursor:grabbing}
     .dev-editor-settings-button{position:absolute;top:7px;inset-inline-start:46px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
     .dev-profile-image-button{position:absolute;top:14px;inset-inline-end:14px;width:34px;height:34px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
+    .dev-link-settings-button{position:absolute;top:-9px;inset-inline-end:-10px;width:25px;height:25px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:13px;line-height:1}
+    .dev-editable-link{position:relative}
+    .dev-social-settings-button{width:28px;height:28px;border:1px solid #b91c1c55;border-radius:50%;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:14px;line-height:1}
+    .dev-social-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px 0;border-bottom:1px solid #29252418}
+    .dev-social-row .dev-social-url{grid-column:1/-1}
+    .dev-social-row label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
+    .dev-social-row input{box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524;font:inherit;font-size:13px}
+    .dev-social-row-actions{grid-column:1/-1;display:flex;align-items:center;gap:6px}
+    .dev-social-row-actions button{padding:5px 8px;border:0;border-radius:6px;background:#eee9e3;color:#292524;cursor:pointer}
+    .dev-social-row-actions button[data-delete]{margin-inline-start:auto;color:#7f1d1d}
+    body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button{pointer-events:auto}
+    .dev-link-settings-button[hidden],.dev-social-settings-button[hidden]{display:none!important}
     .dev-editor-settings{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(300px,calc(100vw - 32px));max-height:calc(100vh - 16px);overflow-y:auto;padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
     .dev-editor-settings-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
     .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
@@ -90,6 +102,32 @@
     profileImageButton.setAttribute("aria-label", profileImageButton.title);
     profileImageButton.addEventListener("click", openProfileImageSettings);
     avatarFrame.append(profileImageButton);
+  }
+  const profileLinkButtons = [];
+  document.querySelectorAll("a[data-profile-link]").forEach((link) => {
+    link.classList.add("dev-editable-link");
+    const button = document.createElement("button");
+    button.className = "dev-link-settings-button";
+    button.type = "button";
+    button.hidden = true;
+    button.textContent = "⚙";
+    button.title = isEnglish ? "Change link" : "تغییر نشانی";
+    button.setAttribute("aria-label", button.title);
+    button.addEventListener("click", () => openProfileLinkSettings(link, button));
+    link.append(button);
+    profileLinkButtons.push(button);
+  });
+  const socialContainer = document.querySelector("[data-social-links]");
+  const socialSettingsButton = socialContainer ? document.createElement("button") : null;
+  if (socialSettingsButton) {
+    socialSettingsButton.className = "dev-social-settings-button";
+    socialSettingsButton.type = "button";
+    socialSettingsButton.hidden = true;
+    socialSettingsButton.textContent = "⚙";
+    socialSettingsButton.title = isEnglish ? "Manage social links" : "مدیریت پیوندهای اجتماعی";
+    socialSettingsButton.setAttribute("aria-label", socialSettingsButton.title);
+    socialSettingsButton.addEventListener("click", openSocialSettingsModal);
+    socialContainer.append(socialSettingsButton);
   }
 
   const modalLayer = document.createElement("div");
@@ -328,6 +366,202 @@
     placeSettings(panel, profileImageButton);
   }
 
+  function openProfileLinkSettings(link, trigger) {
+    if (!enabled) return;
+    closeProjectSettings();
+    const key = link.dataset.profileLink;
+    const panel = document.createElement("div");
+    panel.className = "dev-editor-settings";
+    panel.dataset.projectId = `profile-link-${key}`;
+    panel._trigger = trigger;
+    panel.addEventListener("click", (event) => event.stopPropagation());
+    const header = document.createElement("div");
+    header.className = "dev-editor-settings-header";
+    const heading = document.createElement("span");
+    heading.textContent = key === "contact"
+      ? (isEnglish ? "Contact link" : "پیوند تماس")
+      : (isEnglish ? "Projects page link" : "پیوند صفحهٔ پروژه‌ها");
+    const close = document.createElement("button");
+    close.className = "dev-editor-settings-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.title = isEnglish ? "Close" : "بستن";
+    close.setAttribute("aria-label", close.title);
+    close.addEventListener("click", closeProjectSettings);
+    const label = document.createElement("label");
+    label.textContent = isEnglish ? "URL" : "نشانی";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = link.getAttribute("href") || "";
+    input.required = true;
+    input.maxLength = 2000;
+    input.setAttribute("aria-label", label.textContent);
+    header.append(heading, close);
+    const save = makeSettingsButton(isEnglish ? "Save link" : "ذخیرهٔ پیوند", async (event) => {
+      await saveProjectSetting({ type: "updateProfileLink", key, value: input.value }, event.currentTarget);
+    });
+    panel.append(header, label, input, save);
+    document.body.append(panel);
+    placeSettings(panel, trigger);
+    input.focus();
+  }
+
+  function captureSocialRows() {
+    if (!modal.querySelector(".dev-social-row")) return socialDraft;
+    return [...modal.querySelectorAll(".dev-social-row")].map((row) => ({
+      id: row.dataset.socialId,
+      fa: row.querySelector('[data-social-field="fa"]').value,
+      en: row.querySelector('[data-social-field="en"]').value,
+      href: row.querySelector('[data-social-field="href"]').value,
+    }));
+  }
+
+  function renderSocialRows(list) {
+    list.replaceChildren();
+    socialDraft.forEach((item, index) => {
+      const row = document.createElement("div");
+      row.className = "dev-social-row";
+      row.dataset.socialId = item.id;
+      for (const [key, labelText, value] of [
+        ["fa", "عنوان فارسی", item.fa],
+        ["en", "English label", item.en],
+        ["href", isEnglish ? "Link URL" : "نشانی پیوند", item.href],
+      ]) {
+        const wrapper = document.createElement("div");
+        if (key === "href") wrapper.className = "dev-social-url";
+        const label = document.createElement("label");
+        label.textContent = labelText;
+        const input = document.createElement("input");
+        input.type = "text";
+        input.required = true;
+        input.maxLength = key === "href" ? 2000 : 100;
+        input.value = value;
+        input.dataset.socialField = key;
+        input.id = `dev-social-${item.id}-${key}`;
+        input.setAttribute("aria-label", `${labelText} · ${index + 1}`);
+        if (key === "href") input.dir = "ltr";
+        label.htmlFor = input.id;
+        wrapper.append(label, input);
+        row.append(wrapper);
+      }
+      const actions = document.createElement("div");
+      actions.className = "dev-social-row-actions";
+      const moveUp = document.createElement("button");
+      moveUp.type = "button";
+      moveUp.textContent = "↑";
+      moveUp.title = isEnglish ? "Move up" : "انتقال به بالا";
+      moveUp.setAttribute("aria-label", moveUp.title);
+      moveUp.disabled = index === 0;
+      moveUp.addEventListener("click", () => {
+        socialDraft = captureSocialRows();
+        [socialDraft[index - 1], socialDraft[index]] = [socialDraft[index], socialDraft[index - 1]];
+        renderSocialRows(list);
+      });
+      const moveDown = document.createElement("button");
+      moveDown.type = "button";
+      moveDown.textContent = "↓";
+      moveDown.title = isEnglish ? "Move down" : "انتقال به پایین";
+      moveDown.setAttribute("aria-label", moveDown.title);
+      moveDown.disabled = index === socialDraft.length - 1;
+      moveDown.addEventListener("click", () => {
+        socialDraft = captureSocialRows();
+        [socialDraft[index], socialDraft[index + 1]] = [socialDraft[index + 1], socialDraft[index]];
+        renderSocialRows(list);
+      });
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.dataset.delete = "";
+      remove.textContent = isEnglish ? "Remove" : "حذف";
+      remove.addEventListener("click", () => {
+        socialDraft = captureSocialRows();
+        socialDraft.splice(index, 1);
+        renderSocialRows(list);
+      });
+      actions.append(moveUp, moveDown, remove);
+      row.append(actions);
+      list.append(row);
+    });
+  }
+
+  function openSocialSettingsModal() {
+    if (!enabled || !socialContainer) return;
+    try {
+      socialDraft = JSON.parse(socialContainer.dataset.socialLinks || "[]");
+    } catch {
+      socialDraft = [];
+    }
+    modal.replaceChildren();
+    modal.setAttribute("aria-labelledby", "dev-social-modal-title");
+    const header = document.createElement("header");
+    header.className = "dev-editor-modal-header";
+    const title = document.createElement("h2");
+    title.id = "dev-social-modal-title";
+    title.textContent = isEnglish ? "Social links" : "پیوندهای اجتماعی";
+    const close = document.createElement("button");
+    close.className = "dev-editor-modal-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.setAttribute("aria-label", isEnglish ? "Close" : "بستن");
+    close.addEventListener("click", closeAddProjectModal);
+    header.append(title, close);
+    const form = document.createElement("form");
+    form.className = "dev-editor-project-form";
+    const note = document.createElement("p");
+    note.className = "dev-editor-form-note";
+    note.textContent = isEnglish ? "Only the first four links appear on the page." : "در صفحه فقط چهار پیوند اول نمایش داده می‌شوند.";
+    const list = document.createElement("div");
+    renderSocialRows(list);
+    const add = document.createElement("button");
+    add.type = "button";
+    add.textContent = isEnglish ? "＋ Add link" : "＋ افزودن پیوند";
+    add.addEventListener("click", () => {
+      socialDraft = captureSocialRows();
+      let index = 1;
+      while (socialDraft.some((item) => item.id === `social-${index}`)) index += 1;
+      socialDraft.push({ id: `social-${index}`, fa: "", en: "", href: "" });
+      renderSocialRows(list);
+    });
+    const actions = document.createElement("div");
+    actions.className = "dev-editor-modal-actions";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = isEnglish ? "Cancel" : "لغو";
+    cancel.addEventListener("click", closeAddProjectModal);
+    const save = document.createElement("button");
+    save.type = "submit";
+    save.dataset.submit = "";
+    save.textContent = isEnglish ? "Save links" : "ذخیرهٔ پیوندها";
+    actions.append(cancel, save);
+    form.append(note, list, add, actions);
+    form.addEventListener("submit", (event) => saveSocialSettings(event, form, list, save));
+    modal.append(header, form);
+    modalLayer.hidden = false;
+    close.focus();
+  }
+
+  async function saveSocialSettings(event, form, list, button) {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    button.disabled = true;
+    const socials = captureSocialRows();
+    try {
+      const response = await fetch("/__dev/save", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify({ type: "saveSocials", socials }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "Social links could not be saved." : "ذخیرهٔ پیوندها انجام نشد."));
+      closeAddProjectModal();
+      if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
+      toast(isEnglish ? `Social links saved · commit ${result.commit}` : `پیوندها ذخیره شدند · کامیت ${result.commit}`);
+      setTimeout(() => location.reload(), 700);
+    } catch (error) {
+      button.disabled = false;
+      toast(error.message, true);
+    }
+  }
+
   async function saveProjectSetting(payload, button) {
     button.disabled = true;
     try {
@@ -360,6 +594,8 @@
     undoButton.hidden = !enabled || sessionCommitCount === 0;
     addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
     if (profileImageButton) profileImageButton.hidden = !enabled;
+    profileLinkButtons.forEach((button) => { button.hidden = !enabled; });
+    if (socialSettingsButton) socialSettingsButton.hidden = !enabled;
     if (enabled) wrapCards();
     else {
       if (editing) cancelEdit();
@@ -692,8 +928,8 @@
   undoButton.addEventListener("click", undoEditSession);
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
-    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button")) closeProjectSettings();
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -712,7 +948,7 @@
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -726,7 +962,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();

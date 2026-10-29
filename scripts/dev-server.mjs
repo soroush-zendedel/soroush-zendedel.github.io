@@ -124,6 +124,17 @@ function isLocalHost(request) {
   return request.headers.host === `localhost:${port}` || request.headers.host === `127.0.0.1:${port}`;
 }
 
+function isSafeProfileUrl(value, allowRelative = false) {
+  if (typeof value !== "string" || !value || value.length > 2_000 || /[\u0000-\u0020\\]/.test(value)) return false;
+  if (allowRelative && /^(?:\.\.?\/|\/)[^/\\]/.test(value)) return true;
+  try {
+    const parsed = new URL(value);
+    return ["http:", "https:", "mailto:"].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
+}
+
 async function saveChange(request, response) {
   if (!isAuthorized(request)) return send(response, 403, { error: "Editor request rejected." });
   if (saving) return send(response, 409, { error: "Another edit is being saved." });
@@ -161,6 +172,42 @@ async function saveChange(request, response) {
       dataToWrite = profile;
       target[key] = value;
       message = `content: update profile ${isAlt ? "image alt" : `${match[1]} ${match[2]}`}`;
+    } else if (payload.type === "updateProfileLink") {
+      const profile = JSON.parse(await readFile(profileFile, "utf8"));
+      if (!["contact", "projects"].includes(payload.key) || !isSafeProfileUrl(payload.value, payload.key === "projects")) {
+        return send(response, 400, { error: "Enter a safe http, https, mailto, or relative page link." });
+      }
+      if (profile.links[payload.key] === payload.value.trim()) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(profile, null, 2) + "\n";
+      contentFile = profileFile;
+      dataToWrite = profile;
+      profile.links[payload.key] = payload.value.trim();
+      message = `content: update profile link ${payload.key}`;
+    } else if (payload.type === "saveSocials") {
+      const profile = JSON.parse(await readFile(profileFile, "utf8"));
+      if (!Array.isArray(payload.socials) || payload.socials.length > 30) {
+        return send(response, 400, { error: "Add up to 30 social links." });
+      }
+      const ids = new Set();
+      for (const item of payload.socials) {
+        if (!item || typeof item.id !== "string" || item.id.length > 80 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.id) || ids.has(item.id)) {
+          return send(response, 400, { error: "Social link IDs must be unique English slugs." });
+        }
+        ids.add(item.id);
+        for (const language of ["fa", "en"]) {
+          if (typeof item[language] !== "string" || !item[language].trim() || item[language].trim().length > 100) {
+            return send(response, 400, { error: "Each social link needs Persian and English text under 100 characters." });
+          }
+        }
+        if (!isSafeProfileUrl(item.href)) return send(response, 400, { error: "Social links must use a safe http, https, or mailto URL." });
+      }
+      const socials = payload.socials.map((item) => ({ id: item.id, fa: item.fa.trim(), en: item.en.trim(), href: item.href.trim() }));
+      if (JSON.stringify(profile.socials) === JSON.stringify(socials)) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(profile, null, 2) + "\n";
+      contentFile = profileFile;
+      dataToWrite = profile;
+      profile.socials = socials;
+      message = "content: update social links";
     } else if (payload.type === "addProject") {
       const projectId = typeof payload.id === "string" ? payload.id.trim() : "";
       const faName = typeof payload.faName === "string" ? payload.faName.trim().replace(/\s+/g, " ") : "";

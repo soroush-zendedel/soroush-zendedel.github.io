@@ -101,6 +101,29 @@ function renderDirectoryProject(project, language) {
           </a>`;
 }
 
+function renderSocialLinks(items, language) {
+  return items.slice(0, 4).map((item) => {
+    const label = item[language];
+    const isExternal = /^https?:\/\//i.test(item.href);
+    const target = isExternal ? ' target="_blank" rel="noopener noreferrer"' : "";
+    return `                            <a data-social-id="${escapeHtml(item.id)}" data-social-fa="${escapeHtml(item.fa)}" data-social-en="${escapeHtml(item.en)}" href="${escapeHtml(item.href)}"${target} aria-label="${escapeHtml(label)}" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="${escapeHtml(label)}"><span class="font-en text-sm">${escapeHtml(label)}</span></a>`;
+  }).join("\n");
+}
+
+function renderProfileLinks(html) {
+  for (const [key, href] of Object.entries(profile.links)) {
+    const matcher = new RegExp(`(<a\\b(?=[^>]*\\bdata-profile-link="${key}")[^>]*\\bhref=")[^"]*(")`, "g");
+    let matches = 0;
+    html = html.replace(matcher, (_match, opening, closing) => {
+      matches += 1;
+      return `${opening}${escapeHtml(href)}${closing}`;
+    });
+    if (!matches) throw new Error(`No profile link found for ${key}`);
+  }
+  const socials = escapeHtml(JSON.stringify(profile.socials));
+  return html.replace(/(<div\b[^>]*\bdata-social-links=")[^"]*(")/, `$1${socials}$2`);
+}
+
 function replaceRegion(html, start, end, content, file) {
   const startIndex = html.indexOf(start);
   const endIndex = html.indexOf(end);
@@ -119,6 +142,8 @@ for (const language of ["fa", "en"]) {
   const path = join(root, file);
   let html = await readFile(path, "utf8");
   html = renderProfileFields(html, language, file);
+  html = renderProfileLinks(html);
+  html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(profile.socials, language), file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }

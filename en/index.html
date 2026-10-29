@@ -186,7 +186,7 @@
 
     <!-- Top Navigation outside the document wrapper -->
     <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4">
-        <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./projects.html">Projects</a>
+        <a data-profile-link="projects" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./projects.html"><span data-edit-field="profile.projectsNav.en">Projects</span></a>
         <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">About</a>
         <a id="langToggle" href="/" hreflang="fa" aria-label="مشاهده نسخه فارسی" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson transition-all flex items-center gap-2">
             <svg class="h-4 w-4 text-crimson/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
@@ -211,16 +211,14 @@
                         <img src="../img/me.webp" alt="Soroush Zendedel | سروش زنده‌دل" width="224" height="224" fetchpriority="high" decoding="async" onerror="this.src='https://placehold.co/240x240/1a1a1a/e8e6e1?text=Soroush'" class="art-avatar w-48 h-48 md:w-56 md:h-56 object-cover rounded-full border-4 border-canvas z-10 relative shadow-inner">
                     </div>
                     <div class="mt-6 text-center">
-                        <div class="flex items-center justify-center gap-5 text-ink/40">
+                        <div class="flex items-center justify-center gap-5 text-ink/40" data-social-links="[{&quot;id&quot;:&quot;github&quot;,&quot;fa&quot;:&quot;GitHub&quot;,&quot;en&quot;:&quot;GitHub&quot;,&quot;href&quot;:&quot;https://github.com/soroush-zendedel&quot;},{&quot;id&quot;:&quot;linkedin&quot;,&quot;fa&quot;:&quot;LinkedIn&quot;,&quot;en&quot;:&quot;LinkedIn&quot;,&quot;href&quot;:&quot;https://www.linkedin.com/in/soroush-zendedel/&quot;},{&quot;id&quot;:&quot;youtube&quot;,&quot;fa&quot;:&quot;YouTube&quot;,&quot;en&quot;:&quot;YouTube&quot;,&quot;href&quot;:&quot;https://www.youtube.com/@SoroushZendedel&quot;},{&quot;id&quot;:&quot;email&quot;,&quot;fa&quot;:&quot;Email&quot;,&quot;en&quot;:&quot;Email&quot;,&quot;href&quot;:&quot;mailto:soroush_zendedel@Live.com&quot;}]">
                             <div class="w-8 h-px bg-ink/20"></div>
-                            <a href="https://github.com/soroush-zendedel" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile (opens in a new tab)" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="GitHub Profile">
-                                <span class="font-en text-sm">GitHub</span>
-                            </a>
-                            <a href="https://www.linkedin.com/in/soroush-zendedel/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile (opens in a new tab)" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="LinkedIn Profile"><span class="font-en text-sm">LinkedIn</span></a>
-                            <a href="https://www.youtube.com/@SoroushZendedel" target="_blank" rel="noopener noreferrer" aria-label="YouTube channel (opens in a new tab)" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="YouTube Channel"><span class="font-en text-sm">YouTube</span></a>
-                            <a href="mailto:soroush_zendedel@Live.com" aria-label="Email Soroush" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="Contact via Email">
-                                <span class="font-en text-sm">Email</span>
-                            </a>
+                            <!-- SOCIAL-LINKS:START -->
+                            <a data-social-id="github" data-social-fa="GitHub" data-social-en="GitHub" href="https://github.com/soroush-zendedel" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="GitHub"><span class="font-en text-sm">GitHub</span></a>
+                            <a data-social-id="linkedin" data-social-fa="LinkedIn" data-social-en="LinkedIn" href="https://www.linkedin.com/in/soroush-zendedel/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="LinkedIn"><span class="font-en text-sm">LinkedIn</span></a>
+                            <a data-social-id="youtube" data-social-fa="YouTube" data-social-en="YouTube" href="https://www.youtube.com/@SoroushZendedel" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="YouTube"><span class="font-en text-sm">YouTube</span></a>
+                            <a data-social-id="email" data-social-fa="Email" data-social-en="Email" href="mailto:soroush_zendedel@Live.com" aria-label="Email" class="hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson transition-colors text-xl" title="Email"><span class="font-en text-sm">Email</span></a>
+                            <!-- SOCIAL-LINKS:END -->
                             <div class="w-8 h-px bg-ink/20"></div>
                         </div>
                     </div>
@@ -243,8 +241,8 @@
                         <span class="lang-fa" data-edit-field="profile.tagline.fa">پیشه‌ام برنامه‌نویسی‌ست و به هنر علاقه‌مندم...</span>
                         <span class="lang-en font-en" data-edit-field="profile.tagline.en">I work as a programmer and have a deep interest in art.</span>
                     </p>
-                    <a href="mailto:soroush_zendedel@Live.com" class="inline-flex items-center gap-2 rounded-full bg-crimson px-5 py-2 text-sm font-bold text-white hover:bg-crimsonHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson transition-colors">
-                        <span class="lang-fa">ارتباط با من</span><span class="lang-en font-en">Get in touch</span>
+                    <a data-profile-link="contact" href="mailto:soroush_zendedel@Live.com" class="inline-flex items-center gap-2 rounded-full bg-crimson px-5 py-2 text-sm font-bold text-white hover:bg-crimsonHover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson transition-colors">
+                        <span class="lang-fa" data-edit-field="profile.contactButton.fa">ارتباط با من</span><span class="lang-en font-en" data-edit-field="profile.contactButton.en">Get in touch</span>
                         <span aria-hidden="true">→</span>
                     </a>
 
@@ -259,7 +257,7 @@
                             <div class="lang-fa space-y-4">
                                 <p><strong class="font-bold text-ink" data-edit-field="profile.intro.fa">من؟ منم مثل همه بنده‌ی خدا.</strong></p>
                                 <p data-edit-field="profile.bio.fa">بین دنیای فکر و احساس قدم می‌زنم. از تکنولوژی و هنر یاد می‌گیرم، سعی می‌کنم هر روز دست به یک کار کوچیک جدید بزنم، اشتباه کنم، یاد بگیرم و قدم‌به‌قدم جلو برم. ایراد زیاد دارم، ولی تلاش می‌کنم مسیرم رو آگاهانه‌تر و صادقانه‌تر طی کنم، به امید اینکه ارتباط‌هام واقعی‌تر باشن و حضورم برای آدم‌هایی که باهاشون در ارتباطم، مفید یا دلگرم‌کننده باشه.</p>
-                                <p>گاهی هم فقط نگاه می‌کنم و با خودم می‌گم:
+                                <p><span data-edit-field="profile.bioLead.fa">گاهی هم فقط نگاه می‌کنم و با خودم می‌گم:</span>
                                     <br>
                                     <em class="brush-highlight" data-edit-field="profile.quote.fa">
                                         "ادامه دادنم شاید فعلا فایده‌ای نداشته باشه، ولی ضرری هم نداره!"
@@ -272,7 +270,7 @@
                             <div class="lang-en font-en space-y-4">
                                 <p><strong class="font-bold text-ink" data-edit-field="profile.intro.en">Me? Like everyone else, I&#39;m a servant of God.</strong></p>
                                 <p data-edit-field="profile.bio.en">I walk the line between thought and emotion. Learning from technology and art, I try to take a small new step every day, make mistakes, learn, and move forward. I have many flaws, but I strive to walk my path more consciously and honestly, hoping my connections become more real and my presence comforting to those around me.</p>
-                                <p>Sometimes I just look and tell myself: <em class="brush-highlight" data-edit-field="profile.quote.en">Continuing might not have a clear benefit right now, but it does no harm either!</em> <span data-edit-field="profile.bioEnd.en">... and that is enough to take the next step.</span></p>
+                                <p><span data-edit-field="profile.bioLead.en">Sometimes I just look and tell myself:</span> <em class="brush-highlight" data-edit-field="profile.quote.en">&quot;Continuing might not have a clear benefit right now, but it does no harm either!&quot;</em> <span data-edit-field="profile.bioEnd.en">... and that is enough to take the next step.</span></p>
                             </div>
                         </div>
                     </div>
@@ -310,8 +308,8 @@
                 <div class="flex items-center justify-center gap-6 mb-12">
                     <div class="h-px bg-ink/10 flex-1 max-w-[100px]"></div>
                     <h3 class="text-2xl md:text-3xl font-extrabold tracking-widest uppercase">
-                        <span class="lang-fa">پروژه‌ها</span>
-                        <span class="lang-en font-en">Projects</span>
+                        <span class="lang-fa" data-edit-field="profile.projectsTitle.fa">پروژه‌ها</span>
+                        <span class="lang-en font-en" data-edit-field="profile.projectsTitle.en">Projects</span>
                     </h3>
                     <div class="h-px bg-ink/10 flex-1 max-w-[100px]"></div>
                 </div>
@@ -393,8 +391,8 @@
                     <!-- PROJECT-CARDS:END -->
                 </div>
                 <div class="all-projects-cta">
-                    <a href="./projects.html">
-                        View all projects <span aria-hidden="true">→</span>
+                    <a data-profile-link="projects" href="./projects.html">
+                        <span class="lang-fa" data-edit-field="profile.allProjectsButton.fa">مشاهدهٔ همهٔ پروژه‌ها</span><span class="lang-en font-en" data-edit-field="profile.allProjectsButton.en">View all projects</span> <span aria-hidden="true">→</span>
                     </a>
                 </div>
             </section>
@@ -443,8 +441,8 @@
 
     <footer class="w-full text-center py-8 text-sm text-ink/40 font-en tracking-wide mt-4" dir="ltr">
         <p class="mb-3">CRAFTED WITH CODE & CREATIVITY BY SOROUSH ZENDEDEL &copy; <span id="year"></span></p>
-        <a href="mailto:soroush_zendedel@Live.com" class="inline-flex items-center justify-center gap-2 hover:text-crimson transition-colors w-full">
-            soroush_zendedel@Live.com
+        <a data-profile-link="contact" href="mailto:soroush_zendedel@Live.com" class="inline-flex items-center justify-center gap-2 hover:text-crimson transition-colors w-full">
+            <span class="lang-fa" data-edit-field="profile.footerEmail.fa">soroush_zendedel@Live.com</span><span class="lang-en" data-edit-field="profile.footerEmail.en">soroush_zendedel@Live.com</span>
         </a>
     </footer>
 
