@@ -6,6 +6,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projects = JSON.parse(await readFile(join(root, "content/projects.json"), "utf8"));
 const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "utf8"));
 const socialData = JSON.parse(await readFile(join(root, "content/social.json"), "utf8"));
+const contactData = JSON.parse(await readFile(join(root, "content/contact.json"), "utf8"));
 const blog = JSON.parse(await readFile(join(root, "content/blog.json"), "utf8"));
 const person = JSON.parse(await readFile(join(root, "content/person.json"), "utf8"));
 if (!/^[a-z0-9][a-z0-9-]{0,115}\.(?:jpe?g|png|webp|gif|avif|bmp)$/i.test(person.image.file)) {
@@ -133,6 +134,20 @@ function renderProfileLinks(html) {
   }
   const socials = escapeHtml(JSON.stringify(socialData.socials));
   return html.replace(/(<div\b[^>]*\bdata-social-links=")[^"]*(")/, `$1${socials}$2`);
+}
+
+function renderContactMenu(language) {
+  if (!Array.isArray(contactData.methods) || contactData.methods.length > 10) throw new Error("Contact methods must be a list of up to 10 items.");
+  const ids = new Set();
+  return contactData.methods.map((item) => {
+    if (!item || !/^(phone|sms|whatsapp|telegram|email)$/.test(item.id) || ids.has(item.id)) throw new Error(`Invalid or duplicate contact method: ${item?.id}`);
+    ids.add(item.id);
+    if (typeof item.fa !== "string" || typeof item.en !== "string" || typeof item.href !== "string") throw new Error(`Incomplete contact method: ${item.id}`);
+    const allowed = item.id === "phone" ? /^tel:\+[0-9]{8,15}$/ : item.id === "sms" ? /^sms:\+[0-9]{8,15}$/ : item.id === "whatsapp" ? /^https:\/\/wa\.me\/[0-9]{8,15}$/ : item.id === "telegram" ? /^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}$/ : /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+    if (!allowed.test(item.href)) throw new Error(`Unsafe URL for contact method: ${item.id}`);
+    const glyph = { phone: "☎", sms: "▤", whatsapp: "◉", telegram: "➤", email: "✉" }[item.id];
+    return `                    <a class="contact-method" href="${escapeHtml(item.href)}" data-contact-method="${item.id}"><span class="contact-method-icon" aria-hidden="true">${glyph}</span><span><span class="lang-fa">${escapeHtml(item.fa)}</span><span class="lang-en font-en">${escapeHtml(item.en)}</span></span><span class="contact-method-arrow" aria-hidden="true">↗</span></a>`;
+  }).join("\n");
 }
 
 function renderBlog(html, language, file) {
@@ -317,6 +332,7 @@ for (const language of ["fa", "en"]) {
   html = renderProfileFields(html, language, file);
   html = renderBlog(html, language, file);
   html = renderProfileLinks(html);
+  html = replaceRegion(html, "                    <!-- CONTACT-METHODS:START -->", "                    <!-- CONTACT-METHODS:END -->", renderContactMenu(language), file);
   html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(socialData.socials, language), file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
