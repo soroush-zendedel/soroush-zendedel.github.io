@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { execFile as execFileCallback } from "node:child_process";
-import { readFile, rename, writeFile } from "node:fs/promises";
+import { readFile, readdir, rename, unlink, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -50,7 +50,7 @@ async function readBody(request) {
   let body = "";
   for await (const chunk of request) {
     body += chunk;
-    if (body.length > 8_192) throw new Error("Request is too large.");
+    if (body.length > 7_000_000) throw new Error("Request is too large. Images must be 5 MB or smaller.");
   }
   return JSON.parse(body);
 }
@@ -76,6 +76,7 @@ async function saveChange(request, response) {
 
   let originalJson;
   let staged = false;
+  let uploadedFile;
   try {
     await requireCleanWorkingTree();
     const payload = await readBody(request);
@@ -97,6 +98,50 @@ async function saveChange(request, response) {
       if (project[section][language][key] === value) return send(response, 200, { unchanged: true });
       project[section][language][key] = value;
       message = `content: update ${project.id} ${language} ${key}`;
+    } else if (payload.type === "updateHref") {
+      if (typeof payload.projectId !== "string" || typeof payload.value !== "string") {
+        return send(response, 400, { error: "Invalid project link." });
+      }
+      const project = projects.find((item) => item.id === payload.projectId);
+      if (!project) return send(response, 404, { error: "Project not found." });
+      const value = payload.value.trim();
+      let parsed;
+      try { parsed = new URL(value); } catch { return send(response, 400, { error: "Enter a complete http or https URL." }); }
+      if (!["http:", "https:"].includes(parsed.protocol) || value.length > 2_000) {
+        return send(response, 400, { error: "Enter a complete http or https URL under 2,000 characters." });
+      }
+      if (project.href === value) return send(response, 200, { unchanged: true });
+      project.href = value;
+      message = `content: update ${project.id} link`;
+    } else if (payload.type === "uploadImage") {
+      if (typeof payload.projectId !== "string" || typeof payload.mime !== "string" || typeof payload.data !== "string") {
+        return send(response, 400, { error: "Invalid image upload." });
+      }
+      const project = projects.find((item) => item.id === payload.projectId);
+      if (!project) return send(response, 404, { error: "Project not found." });
+      const extensions = { "image/webp": "webp", "image/jpeg": "jpg", "image/png": "png" };
+      const extension = extensions[payload.mime];
+      if (!extension) return send(response, 400, { error: "Use a WebP, JPEG, or PNG image." });
+      const imageBytes = Buffer.from(payload.data, "base64");
+      if (!imageBytes.length || imageBytes.length > 5 * 1024 * 1024 || imageBytes.toString("base64") !== payload.data) {
+        return send(response, 400, { error: "Image must be valid and 5 MB or smaller." });
+      }
+      const validImage = extension === "webp"
+        ? imageBytes.length > 12 && imageBytes.toString("ascii", 0, 4) === "RIFF" && imageBytes.toString("ascii", 8, 12) === "WEBP"
+        : extension === "jpg"
+          ? imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9
+          : imageBytes.length > 8 && imageBytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+      if (!validImage) return send(response, 400, { error: "The file contents do not match the selected image type." });
+      const imageDirectory = join(root, "img");
+      const imageNames = await readdir(imageDirectory);
+      if (!/^[a-z0-9-]+$/.test(project.id)) return send(response, 400, { error: "This project has an unsupported id." });
+      const versionPattern = new RegExp(`^${project.id}-v(\\d+)\\.(?:webp|jpg|png)$`, "i");
+      const maxVersion = imageNames.reduce((max, name) => Math.max(max, Number(name.match(versionPattern)?.[1] || 1)), 1);
+      const filename = `${project.id}-v${maxVersion + 1}.${extension}`;
+      uploadedFile = join(imageDirectory, filename);
+      await writeFile(uploadedFile, imageBytes, { flag: "wx" });
+      project.image = filename;
+      message = `content: replace ${project.id} image`;
     } else if (payload.type === "reorder") {
       if (!Array.isArray(payload.projectIds) || payload.projectIds.length > projects.length || payload.projectIds.some((id) => typeof id !== "string")) {
         return send(response, 400, { error: "Invalid project order." });
@@ -125,14 +170,15 @@ async function saveChange(request, response) {
     await writeFile(temporaryFile, JSON.stringify(projects, null, 2) + "\n", "utf8");
     await rename(temporaryFile, projectFile);
     await execFile(process.execPath, [join(root, "scripts", "build-site.mjs")], { cwd: root, windowsHide: true });
-    await runGit(["add", "--", "content/projects.json", ...generatedFiles]);
+    const changedPaths = ["content/projects.json", ...generatedFiles, ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
+    await runGit(["add", "--", ...changedPaths]);
     staged = true;
     const { stdout } = await runGit(["commit", "-m", message]);
     const commit = stdout.match(/\[[^\]]+\s+([0-9a-f]+)\]/)?.[1] || "committed";
     send(response, 200, { commit, message });
   } catch (error) {
     if (staged) {
-      try { await runGit(["reset", "--", "content/projects.json", ...generatedFiles]); } catch {}
+      try { await runGit(["reset", "--", "content/projects.json", ...generatedFiles, ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])]); } catch {}
     }
     if (originalJson) {
       try {
@@ -141,6 +187,9 @@ async function saveChange(request, response) {
       } catch (rollbackError) {
         console.error("Editor rollback failed:", rollbackError);
       }
+    }
+    if (uploadedFile) {
+      try { await unlink(uploadedFile); } catch {}
     }
     send(response, 500, { error: error.message || "Could not save the edit." });
   } finally {

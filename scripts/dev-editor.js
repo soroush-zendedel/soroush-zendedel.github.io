@@ -3,17 +3,24 @@
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");
   style.textContent = `
-    .dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-toast{font:inherit;z-index:2147483000}
+    .dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
     .dev-editor-toggle{position:fixed;inset-inline-start:18px;bottom:18px;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700}
     .dev-editor-toggle[aria-pressed="true"]{background:#292524}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
-    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
+    body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
     .dev-project-wrap{position:relative;min-width:0}
     .dev-editor-handle{position:absolute;top:7px;inset-inline-start:7px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:grab;font-size:18px;line-height:1}
     .dev-editor-handle:active{cursor:grabbing}
+    .dev-editor-settings-button{position:absolute;top:7px;inset-inline-start:46px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
+    .dev-editor-settings{position:absolute;top:44px;inset-inline-start:7px;z-index:2147483000;width:min(300px,calc(100vw - 48px));padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
+    .dev-editor-settings label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
+    .dev-editor-settings input[type="url"]{box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524;direction:ltr}
+    .dev-editor-settings input[type="file"]{display:block;width:100%;margin:7px 0}
+    .dev-editor-settings button{margin-top:7px;padding:7px 10px;border:0;border-radius:6px;background:#b91c1c;color:#fff;cursor:pointer}
+    .dev-editor-settings hr{margin:12px 0;border:0;border-top:1px solid #29252422}
     .dev-project-wrap.dev-dragging{opacity:.45}
     .dev-project-wrap.dev-drop-target{outline:2px solid #b91c1c;outline-offset:3px;border-radius:10px}
     .dev-editor-tools{position:fixed;display:flex;gap:6px;padding:5px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;box-shadow:0 5px 20px #0002}
@@ -76,7 +83,96 @@
       handle.setAttribute("aria-label", isEnglish ? `Move ${link.dataset.projectId}` : `جابه‌جایی ${link.dataset.projectId}`);
       handle.textContent = "⠿";
       wrapper.append(handle);
+
+      const settingsButton = document.createElement("button");
+      settingsButton.className = "dev-editor-settings-button";
+      settingsButton.type = "button";
+      settingsButton.title = isEnglish ? "Project link and image" : "لینک و تصویر پروژه";
+      settingsButton.setAttribute("aria-label", settingsButton.title);
+      settingsButton.textContent = "⚙";
+      settingsButton.addEventListener("click", () => openProjectSettings(wrapper, link));
+      wrapper.append(settingsButton);
     });
+  }
+
+  function makeSettingsButton(label, handler) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = label;
+    button.addEventListener("click", handler);
+    return button;
+  }
+
+  function openProjectSettings(wrapper, link) {
+    document.querySelectorAll(".dev-editor-settings").forEach((panel) => panel.remove());
+    const projectId = wrapper.dataset.projectId;
+    const panel = document.createElement("div");
+    panel.className = "dev-editor-settings";
+    panel.addEventListener("click", (event) => event.stopPropagation());
+
+    const linkLabel = document.createElement("label");
+    linkLabel.textContent = isEnglish ? "Project URL" : "نشانی پروژه";
+    const linkInput = document.createElement("input");
+    linkInput.type = "url";
+    linkInput.value = link.href;
+    linkInput.required = true;
+    linkInput.setAttribute("aria-label", linkLabel.textContent);
+    const saveLink = makeSettingsButton(isEnglish ? "Save link" : "ذخیرهٔ لینک", async () => {
+      await saveProjectSetting({ type: "updateHref", projectId, value: linkInput.value }, saveLink);
+    });
+    panel.append(linkLabel, linkInput, saveLink);
+
+    const divider = document.createElement("hr");
+    const imageLabel = document.createElement("label");
+    imageLabel.textContent = isEnglish ? "Replace project image" : "جایگزینی تصویر پروژه";
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
+    fileInput.setAttribute("aria-label", imageLabel.textContent);
+    const replaceImage = makeSettingsButton(isEnglish ? "Upload and activate" : "بارگذاری و فعال‌سازی", async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return toast(isEnglish ? "Choose an image first." : "ابتدا یک تصویر انتخاب کنید.", true);
+      if (file.size > 5 * 1024 * 1024) return toast(isEnglish ? "Image must be 5 MB or smaller." : "حجم تصویر باید حداکثر ۵ مگابایت باشد.", true);
+      const accepted = ["image/webp", "image/jpeg", "image/png"];
+      if (!accepted.includes(file.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG image." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
+      replaceImage.disabled = true;
+      try {
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = () => reject(new Error(isEnglish ? "Could not read this image." : "خواندن تصویر ممکن نشد."));
+          reader.readAsDataURL(file);
+        });
+        const data = String(dataUrl).split(",")[1];
+        await saveProjectSetting({ type: "uploadImage", projectId, mime: file.type, data }, replaceImage);
+      } catch (error) {
+        replaceImage.disabled = false;
+        toast(error.message, true);
+      }
+    });
+    panel.append(divider, imageLabel, fileInput, replaceImage);
+    wrapper.append(panel);
+    linkInput.focus();
+  }
+
+  async function saveProjectSetting(payload, button) {
+    button.disabled = true;
+    try {
+      const response = await fetch("/__dev/save", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "Could not save." : "ذخیره انجام نشد."));
+      document.querySelectorAll(".dev-editor-settings").forEach((panel) => panel.remove());
+      if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
+      toast(isEnglish ? `Saved · commit ${result.commit}` : `ذخیره شد · کامیت ${result.commit}`);
+      setTimeout(() => location.reload(), 700);
+    } catch (error) {
+      button.disabled = false;
+      toast(error.message, true);
+    }
   }
 
   function setEnabled(value) {
@@ -197,7 +293,7 @@
 
   toggle.addEventListener("click", () => setEnabled(!enabled));
   document.addEventListener("pointerdown", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -208,7 +304,7 @@
   }, true);
 
   document.addEventListener("keydown", (event) => {
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -222,7 +318,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();
