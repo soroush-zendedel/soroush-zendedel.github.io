@@ -54,6 +54,10 @@
     });
   }
 
+  function clearTextSelection() {
+    window.getSelection()?.removeAllRanges();
+  }
+
   function wrapCards() {
     const grid = document.querySelector("[data-project-grid]");
     if (!grid) return;
@@ -101,6 +105,7 @@
     editing.target.contentEditable = "false";
     editing.tools.remove();
     editing = null;
+    clearTextSelection();
   }
 
   async function saveEdit() {
@@ -126,9 +131,11 @@
       editing.tools.remove();
       editing = null;
       if (result.unchanged) {
+        clearTextSelection();
         toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
         return;
       }
+      clearTextSelection();
       toast(isEnglish ? `Saved · commit ${result.commit}` : `ذخیره شد · کامیت ${result.commit}`);
       setTimeout(() => location.reload(), 700);
     } catch (error) {
