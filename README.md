@@ -18,11 +18,19 @@
 
 - `index.html` — صفحهٔ اصلی فارسی.
 - `en/index.html` — نسخهٔ انگلیسی.
+- `content/projects.json` — مرجع ترتیب، وضعیت نمایش، لینک و متن دوزبانهٔ پروژه‌ها.
+- `scripts/build-site.mjs` — ساخت فهرست پروژه‌ها در صفحهٔ اصلی و صفحهٔ درباره، برای هر دو زبان.
 - `assets/site.css` — استایل کامپایل‌شده و فشردهٔ Tailwind CSS.
 - `img/` — تصویرهای اصلی و نسخه‌های WebP مورد استفادهٔ سایت.
 - `robots.txt` و `sitemap.xml` — فایل‌های راهنمای خزنده‌های موتور جست‌وجو.
 
 ## توسعه
+
+برای تولید صفحه‌های HTML از فهرست پروژه‌ها، Node.js کافی است:
+
+```bash
+pnpm run build:site
+```
 
 برای بازسازی CSS به Node.js و pnpm نیاز است:
 
@@ -31,7 +39,7 @@ pnpm install
 pnpm run build:css
 ```
 
-فایل `assets/site.css` خروجیِ مورد استفادهٔ سایت است و باید همراه تغییرهای HTML پوش شود. سایت استاتیک است و برای انتشار به فرایند build در GitHub Pages نیاز ندارد، تا وقتی که CSS کامپایل‌شده به‌روز باشد.
+فایل‌های HTML تولیدشده و `assets/site.css` خروجی‌های مورد استفادهٔ سایت‌اند و باید همراه تغییرهای منبع پوش شوند. سایت استاتیک است و برای انتشار به فرایند build در GitHub Pages نیاز ندارد.
 
 ---
 
@@ -55,11 +63,19 @@ A bilingual personal portfolio featuring creative digital tools and projects aro
 
 - `index.html` — Persian home page.
 - `en/index.html` — English edition.
+- `content/projects.json` — source of truth for project order, visibility, links, and bilingual text.
+- `scripts/build-site.mjs` — generates project lists on both home and about pages in both languages.
 - `assets/site.css` — Minified, compiled Tailwind CSS.
 - `img/` — Original images and the WebP versions served by the site.
 - `robots.txt` and `sitemap.xml` — Search crawler guidance and sitemap.
 
 ## Development
+
+Use Node.js to generate the project lists from their data:
+
+```bash
+pnpm run build:site
+```
 
 Node.js and pnpm are required to rebuild the stylesheet:
 
@@ -68,4 +84,4 @@ pnpm install
 pnpm run build:css
 ```
 
-The site serves `assets/site.css`; include the rebuilt file with HTML changes. It is a static site and needs no GitHub Pages build step as long as the compiled stylesheet is up to date.
+The generated HTML and `assets/site.css` are the files served by GitHub Pages. Commit generated HTML with source-data changes; the site remains static and needs no GitHub Pages build step.
