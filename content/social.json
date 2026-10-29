@@ -1,8 +1,28 @@
 {
   "socials": [
-    { "id": "github", "fa": "GitHub", "en": "GitHub", "href": "https://github.com/soroush-zendedel" },
-    { "id": "linkedin", "fa": "LinkedIn", "en": "LinkedIn", "href": "https://www.linkedin.com/in/soroush-zendedel/" },
-    { "id": "youtube", "fa": "YouTube", "en": "YouTube", "href": "https://www.youtube.com/@SoroushZendedel" },
-    { "id": "email", "fa": "Email", "en": "Email", "href": "mailto:soroush_zendedel@Live.com" }
+    {
+      "id": "github",
+      "fa": "GitHub",
+      "en": "GitHub",
+      "href": "https://github.com/soroush-zendedel"
+    },
+    {
+      "id": "linkedin",
+      "fa": "LinkedIn",
+      "en": "LinkedIn",
+      "href": "https://www.linkedin.com/in/soroush-zendedel/"
+    },
+    {
+      "id": "youtube",
+      "fa": "Pinterest",
+      "en": "Pinterest",
+      "href": "https://pin.it/3CCiVZdkl"
+    },
+    {
+      "id": "email",
+      "fa": "YouTube",
+      "en": "YouTube",
+      "href": "https://www.youtube.com/@SoroushZendedel"
+    }
   ]
 }

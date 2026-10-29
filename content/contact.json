@@ -1,0 +1,39 @@
+{
+  "methods": [
+    {
+      "id": "phone",
+      "fa": "تماس تلفنی",
+      "en": "Phone call",
+      "href": "tel:+989150938139",
+      "icon": "phone"
+    },
+    {
+      "id": "sms",
+      "fa": "پیامک",
+      "en": "Text message",
+      "href": "sms:+989150938139",
+      "icon": "message"
+    },
+    {
+      "id": "whatsapp",
+      "fa": "واتساپ",
+      "en": "WhatsApp",
+      "href": "https://wa.me/989150938139",
+      "icon": "whatsapp"
+    },
+    {
+      "id": "telegram",
+      "fa": "تلگرام",
+      "en": "Telegram",
+      "href": "https://t.me/soroush_zendedel",
+      "icon": "telegram"
+    },
+    {
+      "id": "email",
+      "fa": "ایمیل",
+      "en": "Email",
+      "href": "mailto:soroush_zendedel@Live.com",
+      "icon": "email"
+    }
+  ]
+}

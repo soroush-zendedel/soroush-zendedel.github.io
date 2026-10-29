@@ -1,0 +1,57 @@
+.contact-popover {
+  position: fixed;
+  z-index: 80;
+  inset-block-start: auto;
+  inset-inline-start: auto;
+  width: min(19rem, calc(100vw - 2rem));
+  padding: 0.45rem;
+  border: 1px solid var(--home-line, #e4dfd6);
+  border-radius: 1rem;
+  background: var(--home-canvas, #fdfcfb);
+  box-shadow: 0 16px 36px -18px rgb(26 26 26 / 35%);
+  transform: none;
+  text-align: start;
+}
+
+.contact-popover[hidden] { display: none; }
+.contact-method {
+  display: flex;
+  min-height: 2.8rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 0.7rem;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.contact-method:hover,
+.contact-method:focus-visible {
+  background: var(--home-paper, #f6f2ea);
+  color: var(--home-crimson, #9b1c1c);
+  outline: none;
+}
+
+.contact-method-icon {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  place-items: center;
+  border: 1px solid var(--home-line, #e4dfd6);
+  border-radius: 50%;
+  color: var(--home-crimson, #9b1c1c);
+  font-size: 1rem;
+}
+
+.contact-method > span:nth-child(2) { flex: 1; }
+.contact-method .lang-fa,
+.contact-method .lang-en { display: block; }
+.contact-method-arrow { color: #8b857c; font-size: 0.8rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-method { transition: none; }
+}

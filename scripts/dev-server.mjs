@@ -11,6 +11,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projectFile = join(root, "content", "projects.json");
 const profileFile = join(root, "content", "profile.json");
 const socialFile = join(root, "content", "social.json");
+const contactFile = join(root, "content", "contact.json");
 const blogFile = join(root, "content", "blog.json");
 const personFile = join(root, "content", "person.json");
 const port = Number(process.env.PORT || 8082);
@@ -48,6 +49,26 @@ async function runGit(args) {
   return execFile("git", args, { cwd: root, windowsHide: true, maxBuffer: 1024 * 1024 });
 }
 
+async function ensureEditorBranch() {
+  await requireCleanWorkingTree();
+  const { stdout: currentBranch } = await runGit(["branch", "--show-current"]);
+  if (currentBranch.trim() === "edit-content") return;
+
+  const { stdout: localBranches } = await runGit(["branch", "--format=%(refname:short)"]);
+  if (localBranches.split(/\r?\n/).includes("edit-content")) {
+    await runGit(["switch", "edit-content"]);
+    return;
+  }
+
+  const { stdout: remoteBranches } = await runGit(["branch", "--remotes", "--format=%(refname:short)"]);
+  if (remoteBranches.split(/\r?\n/).includes("origin/edit-content")) {
+    await runGit(["switch", "--track", "origin/edit-content"]);
+    return;
+  }
+
+  await runGit(["switch", "-c", "edit-content"]);
+}
+
 async function requireCleanWorkingTree() {
   const { stdout } = await runGit(["status", "--porcelain"]);
   if (stdout.trim()) throw new Error("Working tree is not clean. Commit or discard other changes before using the editor.");
@@ -64,7 +85,7 @@ async function getEditorSession(base) {
   }
   const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
   const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
-  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/blog.json", "content/person.json", ...generatedFiles]);
+  const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/contact.json", "content/blog.json", "content/person.json", ...generatedFiles]);
   for (const commit of commits) {
     const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
       runGit(["show", "-s", "--format=%s", commit]),
@@ -89,7 +110,7 @@ async function handleEditSession(request, response) {
   try {
     const payload = await readBody(request);
     if (payload.action === "start") {
-      await requireCleanWorkingTree();
+      await ensureEditorBranch();
       const { stdout } = await runGit(["rev-parse", "HEAD"]);
       return send(response, 200, { base: stdout.trim(), count: 0 });
     }
@@ -102,6 +123,31 @@ async function handleEditSession(request, response) {
     return send(response, 200, { undone: commits.length });
   } catch (error) {
     return send(response, 409, { error: error.message || "Could not update the edit session." });
+  } finally {
+    saving = false;
+  }
+}
+
+async function handlePublish(request, response) {
+  if (!isAuthorized(request)) return send(response, 403, { error: "Editor request rejected." });
+  if (saving) return send(response, 409, { error: "Another edit is being saved." });
+  saving = true;
+  try {
+    const payload = await readBody(request);
+    await requireCleanWorkingTree();
+    const { stdout: branch } = await runGit(["branch", "--show-current"]);
+    if (branch.trim() !== "edit-content") throw new Error("Publish is only available from the edit-content branch.");
+    const commits = await getEditorSession(payload.base);
+    if (!commits.length) return send(response, 409, { error: "There are no new edits to publish." });
+    await runGit(["push", "--set-upstream", "origin", "edit-content"]);
+    const { stdout: head } = await runGit(["rev-parse", "HEAD"]);
+    return send(response, 200, {
+      base: head.trim(),
+      compareUrl: "https://github.com/soroush-zendedel/soroush-zendedel.github.io/compare/main...edit-content?expand=1",
+      count: commits.length,
+    });
+  } catch (error) {
+    return send(response, 409, { error: error.message || "Could not publish the edit branch." });
   } finally {
     saving = false;
   }
@@ -139,6 +185,16 @@ function isSafeProfileUrl(value, allowRelative = false) {
   } catch {
     return false;
   }
+}
+
+function isSafeContactHref(id, value) {
+  if (typeof value !== "string" || !value || value.length > 300 || /[\u0000-\u0020\\]/.test(value)) return false;
+  if (id === "phone") return /^tel:\+[0-9]{8,15}$/.test(value);
+  if (id === "sms") return /^sms:\+[0-9]{8,15}$/.test(value);
+  if (id === "whatsapp") return /^https:\/\/wa\.me\/[0-9]{8,15}$/.test(value);
+  if (id === "telegram") return /^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}$/.test(value);
+  if (id === "email") return /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(value);
+  return false;
 }
 
 async function saveChange(request, response) {
@@ -189,6 +245,30 @@ async function saveChange(request, response) {
       dataToWrite = profile;
       profile.links[payload.key] = payload.value.trim();
       message = `content: update profile link ${payload.key}`;
+    } else if (payload.type === "saveContact") {
+      const contact = JSON.parse(await readFile(contactFile, "utf8"));
+      const expectedIds = ["phone", "sms", "whatsapp", "telegram", "email"];
+      if (!Array.isArray(payload.methods) || payload.methods.length !== expectedIds.length) {
+        return send(response, 400, { error: "All five contact methods are required." });
+      }
+      const methods = payload.methods.map((item, index) => {
+        const id = expectedIds[index];
+        if (!item || item.id !== id) throw new Error("Contact methods are incomplete or out of order.");
+        const fa = typeof item.fa === "string" ? item.fa.trim() : "";
+        const en = typeof item.en === "string" ? item.en.trim() : "";
+        const href = typeof item.href === "string" ? item.href.trim() : "";
+        if (!fa || !en || fa.length > 100 || en.length > 100 || !isSafeContactHref(id, href)) {
+          throw new Error(`Enter valid Persian and English labels and a safe address for ${id}.`);
+        }
+        const current = contact.methods.find((method) => method.id === id);
+        return { ...current, id, fa, en, href };
+      });
+      if (JSON.stringify(contact.methods) === JSON.stringify(methods)) return send(response, 200, { unchanged: true });
+      originalJson = JSON.stringify(contact, null, 2) + "\n";
+      contentFile = contactFile;
+      dataToWrite = contact;
+      contact.methods = methods;
+      message = "content: update contact methods";
     } else if (payload.type === "saveSocials") {
       const socialData = JSON.parse(await readFile(socialFile, "utf8"));
       if (!Array.isArray(payload.socials) || payload.socials.length > 30) {
@@ -645,6 +725,7 @@ const server = createServer(async (request, response) => {
   }
   if (url.pathname === "/__dev/save" && request.method === "POST") return saveChange(request, response);
   if (url.pathname === "/__dev/session" && request.method === "POST") return handleEditSession(request, response);
+  if (url.pathname === "/__dev/publish" && request.method === "POST") return handlePublish(request, response);
   if (request.method !== "GET" && request.method !== "HEAD") return send(response, 405, "Method not allowed", "text/plain; charset=utf-8");
   return serveFile(request, response, url.pathname);
 });

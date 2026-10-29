@@ -1,0 +1,165 @@
+/* Home page layout and CTA refinements; shared colors and surfaces live in site-theme.css. */
+.document-wrapper > .h-1\.5 { opacity: 0.45; }
+
+.document-wrapper a[data-profile-link="contact"] {
+  min-height: 44px;
+  padding-block: 0;
+  border-radius: 999px;
+  background-color: var(--home-crimson);
+}
+
+.document-wrapper a[data-profile-link="contact"] > span[aria-hidden="true"] {
+  display: none;
+}
+
+.document-wrapper a[data-profile-link="contact"]:hover {
+  background-color: var(--home-crimson-deep);
+}
+
+body > footer {
+  color: var(--home-muted);
+}
+
+@media (min-width: 768px) {
+  .document-wrapper > div > header {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .document-wrapper > div > .profile-statement {
+    width: min(100%, 52rem);
+    margin-top: 1.5rem;
+    margin-inline: auto;
+    box-sizing: border-box;
+    padding: 2rem 1.5rem 1rem;
+  }
+
+  .document-wrapper > div > .profile-statement > .quote-mark {
+    top: 0.65rem;
+    right: 0.85rem;
+    left: auto;
+  }
+
+  .document-wrapper > div > .profile-statement > .quote-mark-mirror {
+    right: auto;
+    left: 0.85rem;
+  }
+
+  .document-wrapper > div > .profile-statement .lang-fa > p:has(> strong[data-edit-field="profile.intro.fa"]),
+  .document-wrapper > div > .profile-statement .lang-en > p:has(> strong[data-edit-field="profile.intro.en"]) {
+    text-align: center;
+  }
+
+  .document-wrapper > div > .profile-statement .lang-fa > p[data-edit-field="profile.bio.fa"],
+  .document-wrapper > div > .profile-statement .lang-en > p[data-edit-field="profile.bio.en"] {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .document-wrapper > div > .profile-statement .lang-fa > p:has(> em[data-edit-field="profile.quote.fa"]),
+  .document-wrapper > div > .profile-statement .lang-en > p:has(> em[data-edit-field="profile.quote.en"]) {
+    text-align: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .document-wrapper > div.px-6.py-12 {
+    padding: 2rem 1.25rem;
+  }
+
+  .document-wrapper > div > header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "name"
+      "role"
+      "tagline"
+      "contact"
+      "portrait"
+      "social";
+    justify-items: center;
+    align-items: start;
+    gap: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+    text-align: center;
+  }
+
+  .document-wrapper > div > header > .avatar-container,
+  .document-wrapper > div > header > .flex-1 {
+    display: contents;
+  }
+
+  .document-wrapper > div > header > .flex-1 > h1 {
+    grid-area: name;
+    margin: 0 0 0.35rem;
+    font-size: clamp(2rem, 8vw, 2.5rem);
+    line-height: 1.35;
+  }
+
+  .document-wrapper > div > header > .flex-1 > h2 {
+    grid-area: role;
+    margin: 0 0 0.85rem;
+    color: var(--home-crimson);
+    line-height: 1.7;
+  }
+
+  .document-wrapper > div > header > .flex-1 > p {
+    grid-area: tagline;
+    margin: 0 0 1.15rem;
+    color: var(--home-muted);
+  }
+
+  .document-wrapper > div > header > .flex-1 > a[data-profile-link="contact"] {
+    grid-area: contact;
+    justify-self: center;
+    margin: 0 0 1.75rem;
+  }
+
+  .document-wrapper > div > header .avatar-frame {
+    grid-area: portrait;
+    width: 13.5rem;
+    height: 13.5rem;
+    margin: 0;
+  }
+
+  .document-wrapper > div > header .avatar-frame > .art-avatar {
+    width: 100%;
+    height: 100%;
+  }
+
+  .document-wrapper > div > header > .avatar-container > .mt-6 {
+    grid-area: social;
+    margin-top: 1.25rem;
+  }
+
+  .document-wrapper > div > header [data-social-links] {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.35rem, 2.25vw, 0.75rem);
+  }
+
+  .document-wrapper > div > .profile-statement {
+    width: 100%;
+    margin: 1.5rem auto 0;
+    padding: 2.25rem 1rem 1rem;
+  }
+
+  .document-wrapper > div > .profile-statement .text-justify {
+    text-align: center;
+  }
+
+  .document-wrapper [data-project-grid] > a {
+    gap: 0.9rem;
+    padding: 0.75rem;
+  }
+
+  .document-wrapper [data-project-grid] > a > div {
+    padding-inline: 0.25rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .document-wrapper > div > header [data-social-links] > .w-8 { width: 1rem; }
+  .document-wrapper > div > header [data-social-links] > a > .font-en.text-sm { font-size: 0.75rem; }
+}

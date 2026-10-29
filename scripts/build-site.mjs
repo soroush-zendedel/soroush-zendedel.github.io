@@ -6,6 +6,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projects = JSON.parse(await readFile(join(root, "content/projects.json"), "utf8"));
 const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "utf8"));
 const socialData = JSON.parse(await readFile(join(root, "content/social.json"), "utf8"));
+const contactData = JSON.parse(await readFile(join(root, "content/contact.json"), "utf8"));
 const blog = JSON.parse(await readFile(join(root, "content/blog.json"), "utf8"));
 const person = JSON.parse(await readFile(join(root, "content/person.json"), "utf8"));
 if (!/^[a-z0-9][a-z0-9-]{0,115}\.(?:jpe?g|png|webp|gif|avif|bmp)$/i.test(person.image.file)) {
@@ -94,6 +95,38 @@ function renderAboutProject(project, language) {
   return `          <li><a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong><span data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span></a></li>`;
 }
 
+function renderSiteFooter(language) {
+  const credit = escapeHtml(profile.fields.footerCredit[language]);
+  const email = escapeHtml(profile.fields.footerEmail[language]);
+  return `  <footer class="site-footer" dir="ltr">
+    <p><span data-edit-field="profile.footerCredit.${language}">${credit}</span> © <span id="year"></span></p>
+    <a data-profile-link="contact" href="${escapeHtml(profile.links.contact)}"><span data-edit-field="profile.footerEmail.${language}">${email}</span></a>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>`;
+}
+
+function renderSiteNav(language, currentPage) {
+  const pagePaths = {
+    home: { fa: "/", en: "/en/" },
+    about: { fa: "/about.html", en: "/en/about.html" },
+    projects: { fa: "/projects.html", en: "/en/projects.html" },
+  };
+  const label = (page) => page === "home" ? (language === "fa" ? "خانه" : "Home")
+    : page === "about" ? (language === "fa" ? "درباره‌ی من" : "About")
+      : escapeHtml(profile.fields.projectsNav[language]);
+  const navLink = (page, href) => `<a${currentPage === page ? ' aria-current="page"' : ""}${page === "home" ? ' rel="home"' : page === "projects" ? ' data-profile-link="projects"' : ""} class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="${escapeHtml(href)}">${page === "projects" ? `<span data-edit-field="profile.projectsNav.${language}">${label(page)}</span>` : label(page)}</a>`;
+  const languageHref = pagePaths[currentPage][language === "fa" ? "en" : "fa"];
+  const languageLabel = language === "fa" ? "EN" : "فا";
+  const languageAria = language === "fa" ? "View English version" : "مشاهده نسخه فارسی";
+  const languageText = language === "fa" ? languageLabel : `<span class="font-fa">${languageLabel}</span>`;
+  return `  <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4" aria-label="${language === "fa" ? "پیمایش اصلی" : "Main navigation"}">
+    ${navLink("home", "./")}
+    ${navLink("about", "./about.html")}
+    ${navLink("projects", profile.links.projects)}
+    <a id="langToggle" href="${languageHref}" hreflang="${language === "fa" ? "en" : "fa"}" aria-label="${languageAria}" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest transition-all flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>${languageText}</a>
+  </nav>`;
+}
+
 function renderDirectoryProject(project, language) {
   const copy = project.home[language];
   const prefix = language === "en" ? "../img/" : "./img/";
@@ -133,6 +166,20 @@ function renderProfileLinks(html) {
   }
   const socials = escapeHtml(JSON.stringify(socialData.socials));
   return html.replace(/(<div\b[^>]*\bdata-social-links=")[^"]*(")/, `$1${socials}$2`);
+}
+
+function renderContactMenu(language) {
+  if (!Array.isArray(contactData.methods) || contactData.methods.length > 10) throw new Error("Contact methods must be a list of up to 10 items.");
+  const ids = new Set();
+  return contactData.methods.map((item) => {
+    if (!item || !/^(phone|sms|whatsapp|telegram|email)$/.test(item.id) || ids.has(item.id)) throw new Error(`Invalid or duplicate contact method: ${item?.id}`);
+    ids.add(item.id);
+    if (typeof item.fa !== "string" || typeof item.en !== "string" || typeof item.href !== "string") throw new Error(`Incomplete contact method: ${item.id}`);
+    const allowed = item.id === "phone" ? /^tel:\+[0-9]{8,15}$/ : item.id === "sms" ? /^sms:\+[0-9]{8,15}$/ : item.id === "whatsapp" ? /^https:\/\/wa\.me\/[0-9]{8,15}$/ : item.id === "telegram" ? /^https:\/\/t\.me\/[A-Za-z0-9_]{5,32}$/ : /^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+    if (!allowed.test(item.href)) throw new Error(`Unsafe URL for contact method: ${item.id}`);
+    const glyph = { phone: "☎", sms: "▤", whatsapp: "◉", telegram: "➤", email: "✉" }[item.id];
+    return `                    <a class="contact-method" href="${escapeHtml(item.href)}" data-contact-method="${item.id}"><span class="contact-method-icon" aria-hidden="true">${glyph}</span><span><span class="lang-fa">${escapeHtml(item.fa)}</span><span class="lang-en font-en">${escapeHtml(item.en)}</span></span><span class="contact-method-arrow" aria-hidden="true">↗</span></a>`;
+  }).join("\n");
 }
 
 function renderBlog(html, language, file) {
@@ -274,7 +321,10 @@ function renderPersonPage(html, language, file) {
   html = html.replace(familyPattern, `$1${renderPersonFamily(language)}$2`);
   html = replaceRegion(html, "<!-- PERSON-PROFILES:START -->", "<!-- PERSON-PROFILES:END -->", renderPersonLinks(language), file);
   const socialLinksData = escapeHtml(JSON.stringify(socialData.socials));
-  html = html.replace(/(<nav\b[^>]*\bclass="links"[^>]*)>/, `$1 data-social-links="${socialLinksData}">`);
+  const socialNav = html.match(/<nav\b[^>]*\bclass="links"[^>]*>/);
+  if (!socialNav) throw new Error(`Social links navigation is missing in ${file}`);
+  const cleanSocialNav = socialNav[0].replace(/\sdata-social-links="[^"]*"/g, "");
+  html = html.replace(socialNav[0], `${cleanSocialNav.slice(0, -1)} data-social-links="${socialLinksData}">`);
   const personData = escapeHtml(JSON.stringify(person));
   html = html.replace(/(<main\b[^>]*\bclass="sheet")/, `$1 data-person-page="true" data-person-data="${personData}"`);
   return html;
@@ -314,11 +364,14 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "index.html" : "en/index.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "<!-- SITE-NAV:START -->", "<!-- SITE-NAV:END -->", renderSiteNav(language, "home"), file);
   html = renderProfileFields(html, language, file);
   html = renderBlog(html, language, file);
   html = renderProfileLinks(html);
+  html = replaceRegion(html, "                    <!-- CONTACT-METHODS:START -->", "                    <!-- CONTACT-METHODS:END -->", renderContactMenu(language), file);
   html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(socialData.socials, language), file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
+  html = replaceRegion(html, "<!-- SITE-FOOTER:START -->", "<!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -326,6 +379,7 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "projects.html" : "en/projects.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "<!-- SITE-NAV:START -->", "<!-- SITE-NAV:END -->", renderSiteNav(language, "projects"), file);
   html = replaceRegion(html, "          <!-- PROJECT-DIRECTORY:START -->", "          <!-- PROJECT-DIRECTORY:END -->", orderedProjects.map((project) => renderDirectoryProject(project, language)).join("\n"), file);
   const pageUrl = language === "fa"
     ? "https://soroush-zendedel.github.io/projects.html"
@@ -401,6 +455,8 @@ for (const language of ["fa", "en"]) {
     throw new Error(`Project schema marker is missing or duplicated in ${file}`);
   }
   html = html.replace(schemaScript, `<script type="application/ld+json">${schemaJson}</script>`);
+  html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
+  html = renderProfileLinks(html);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -408,8 +464,11 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "about.html" : "en/about.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "<!-- SITE-NAV:START -->", "<!-- SITE-NAV:END -->", renderSiteNav(language, "about"), file);
   html = renderPersonPage(html, language, file);
   html = replaceRegion(html, "          <!-- ABOUT-PROJECTS:START -->", "          <!-- ABOUT-PROJECTS:END -->", orderedProjects.map((project) => renderAboutProject(project, language)).join("\n"), file);
+  html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
+  html = renderProfileLinks(html);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
