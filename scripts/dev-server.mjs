@@ -83,35 +83,38 @@ async function syncEditorBranch() {
   if (branch.trim() !== "edit-content") throw new Error("Switch to the edit-content branch before saving or publishing.");
 
   await runGit(["fetch", "origin"]);
-  const remoteRef = "refs/remotes/origin/edit-content";
-  let remoteHead;
-  try {
-    remoteHead = (await runGit(["rev-parse", "--verify", remoteRef])).stdout.trim();
-  } catch {
-    return;
-  }
-
+  const { stdout: remoteBranches } = await runGit(["branch", "--remotes", "--format=%(refname:short)"]);
+  const hasRemoteEditBranch = remoteBranches.split(/\r?\n/).includes("origin/edit-content");
   const { stdout: upstream } = await runGit(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]).catch(() => ({ stdout: "" }));
-  if (upstream.trim() !== "origin/edit-content") {
+  if (hasRemoteEditBranch && upstream.trim() !== "origin/edit-content") {
     await runGit(["branch", "--set-upstream-to=origin/edit-content", "edit-content"]);
   }
 
-  const { stdout: localHead } = await runGit(["rev-parse", "HEAD"]);
-  try {
-    await runGit(["merge-base", "--is-ancestor", remoteHead, localHead.trim()]);
-    return;
-  } catch {}
-  try {
-    await runGit(["merge-base", "--is-ancestor", localHead.trim(), remoteHead]);
-    await runGit(["merge", "--ff-only", remoteHead]);
-    return;
-  } catch {}
+  for (const ref of ["refs/remotes/origin/edit-content", "refs/remotes/origin/main"]) {
+    let remoteHead;
+    try {
+      remoteHead = (await runGit(["rev-parse", "--verify", ref])).stdout.trim();
+    } catch {
+      continue;
+    }
 
-  try {
-    await runGit(["rebase", remoteHead]);
-  } catch {
-    try { await runGit(["rebase", "--abort"]); } catch {}
-    throw new Error("GitHub has newer edits that overlap local changes. No new commit was made; resolve the overlap, then try again.");
+    const { stdout: localHead } = await runGit(["rev-parse", "HEAD"]);
+    try {
+      await runGit(["merge-base", "--is-ancestor", remoteHead, localHead.trim()]);
+      continue;
+    } catch {}
+    try {
+      await runGit(["merge-base", "--is-ancestor", localHead.trim(), remoteHead]);
+      await runGit(["merge", "--ff-only", remoteHead]);
+      continue;
+    } catch {}
+
+    try {
+      await runGit(["rebase", remoteHead]);
+    } catch {
+      try { await runGit(["rebase", "--abort"]); } catch {}
+      throw new Error(`GitHub has newer edits on ${ref.replace("refs/remotes/origin/", "origin/")} that overlap local changes. No new commit was made; resolve the overlap, then try again.`);
+    }
   }
 }
 
