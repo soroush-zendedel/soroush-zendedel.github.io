@@ -7,6 +7,11 @@ const projects = JSON.parse(await readFile(join(root, "content/projects.json"), 
 const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "utf8"));
 const socialData = JSON.parse(await readFile(join(root, "content/social.json"), "utf8"));
 const blog = JSON.parse(await readFile(join(root, "content/blog.json"), "utf8"));
+const blogIcons = {
+  book: '<svg data-blog-icon="book" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 7v14M3 5.5A2.5 2.5 0 0 1 5.5 3H12v18H5.5A2.5 2.5 0 0 0 3 23V5.5ZM21 5.5A2.5 2.5 0 0 0 18.5 3H12v18h6.5A2.5 2.5 0 0 1 21 23V5.5Z"/></svg>',
+  pen: '<svg data-blog-icon="pen" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m12 19 7-7 3 3-7 7-3-3ZM18 13l-7-7a3.5 3.5 0 0 0-5 0l-3 3 7 7M2 22l5-1-4-4-1 5Z"/><path d="m9 8 7 7"/></svg>',
+  page: '<svg data-blog-icon="page" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+};
 
 function validateProjects(items) {
   const ids = new Set();
@@ -128,6 +133,10 @@ function renderProfileLinks(html) {
 
 function renderBlog(html, language, file) {
   const card = blog.fields;
+  if (!blogIcons[blog.icon]) throw new Error(`Unsupported blog icon: ${blog.icon}`);
+  const iconMatcher = /<svg\b[^>]*\bdata-blog-icon="[a-z]+"[^>]*>[\s\S]*?<\/svg>/;
+  if (!iconMatcher.test(html)) throw new Error(`Blog icon marker is missing in ${file}`);
+  html = html.replace(iconMatcher, blogIcons[blog.icon]);
   const linkPattern = /(<a\b[^>]*\bdata-blog-card="true"[^>]*\bhref=")[^"]*("[^>]*>)/;
   if (!linkPattern.test(html)) throw new Error(`Blog card marker is missing in ${file}`);
   html = html.replace(linkPattern, `$1${escapeHtml(blog.href)}$2`);

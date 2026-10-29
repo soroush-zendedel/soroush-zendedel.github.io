@@ -213,7 +213,9 @@ async function saveChange(request, response) {
     } else if (payload.type === "saveBlog") {
       const currentBlog = JSON.parse(await readFile(blogFile, "utf8"));
       const href = typeof payload.blog?.href === "string" ? payload.blog.href.trim() : "";
+      const icon = payload.blog?.icon;
       if (!isSafeProfileUrl(href)) return send(response, 400, { error: "Enter a safe http, https, or mailto blog URL." });
+      if (!["book", "pen", "page"].includes(icon)) return send(response, 400, { error: "Choose one of the available blog icons." });
       const fields = {};
       for (const key of ["title", "subtitle", "description", "button"]) {
         fields[key] = {};
@@ -228,7 +230,7 @@ async function saveChange(request, response) {
           fields[key][language] = value;
         }
       }
-      const updatedBlog = { href, fields };
+      const updatedBlog = { href, icon, fields };
       if (JSON.stringify(currentBlog) === JSON.stringify(updatedBlog)) return send(response, 200, { unchanged: true });
       originalJson = JSON.stringify(currentBlog, null, 2) + "\n";
       contentFile = blogFile;

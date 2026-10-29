@@ -504,6 +504,24 @@
     hrefField.input.value = blogCard.getAttribute("href") || "";
     hrefField.input.dir = "ltr";
     grid.append(hrefField.wrapper);
+    const iconWrapper = document.createElement("div");
+    iconWrapper.className = "dev-editor-form-field";
+    iconWrapper.dataset.wide = "";
+    const iconLabel = document.createElement("label");
+    iconLabel.htmlFor = "blog-icon";
+    iconLabel.textContent = isEnglish ? "Card icon" : "آیکون کارت";
+    const iconSelect = document.createElement("select");
+    iconSelect.id = "blog-icon";
+    iconSelect.style.cssText = "box-sizing:border-box;width:100%;padding:9px 10px;border:1px solid #29252433;border-radius:7px;background:white;color:#292524;font:inherit;font-size:14px";
+    for (const [value, faLabel, enLabel] of [["book", "دفتر باز", "Open book"], ["page", "صفحهٔ نوشته", "Written page"], ["pen", "قلم", "Pen"]]) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = isEnglish ? enLabel : faLabel;
+      iconSelect.append(option);
+    }
+    iconSelect.value = blogCard.querySelector("[data-blog-icon]")?.dataset.blogIcon || "book";
+    iconWrapper.append(iconLabel, iconSelect);
+    grid.append(iconWrapper);
     const note = document.createElement("p");
     note.className = "dev-editor-form-note";
     note.textContent = isEnglish ? "The icon and layout stay the same." : "چیدمان و آیکون فعلی حفظ می‌شوند.";
@@ -520,17 +538,17 @@
     save.textContent = isEnglish ? "Save card" : "ذخیرهٔ کارت";
     actions.append(cancel, save);
     form.append(grid, actions);
-    form.addEventListener("submit", (event) => saveBlogSettings(event, form, fields, hrefField.input, save));
+    form.addEventListener("submit", (event) => saveBlogSettings(event, form, fields, hrefField.input, iconSelect, save));
     modal.append(header, form);
     modalLayer.hidden = false;
     close.focus();
   }
 
-  async function saveBlogSettings(event, form, fields, href, button) {
+  async function saveBlogSettings(event, form, fields, href, icon, button) {
     event.preventDefault();
     if (!form.reportValidity()) return;
     button.disabled = true;
-    const blog = { href: href.value, fields: {} };
+    const blog = { href: href.value, icon: icon.value, fields: {} };
     for (const [key, translations] of Object.entries(fields)) {
       blog.fields[key] = { fa: translations.fa.value, en: translations.en.value };
     }
