@@ -34,7 +34,20 @@ body > footer {
     padding-top: 0;
   }
 
-  .document-wrapper > div > header > .flex-1 > a[data-profile-link="contact"] {
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group {
+    align-self: flex-start;
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    flex-direction: column;
+  }
+
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group > p {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group > a[data-profile-link="contact"] {
     align-self: center;
     width: fit-content;
     max-width: 100%;
@@ -100,7 +113,8 @@ body > footer {
   }
 
   .document-wrapper > div > header > .avatar-container,
-  .document-wrapper > div > header > .flex-1 {
+  .document-wrapper > div > header > .flex-1,
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group {
     display: contents;
   }
 
@@ -118,13 +132,13 @@ body > footer {
     line-height: 1.7;
   }
 
-  .document-wrapper > div > header > .flex-1 > p {
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group > p {
     grid-area: tagline;
     margin: 0 0 1.15rem;
     color: var(--home-muted);
   }
 
-  .document-wrapper > div > header > .flex-1 > a[data-profile-link="contact"] {
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group > a[data-profile-link="contact"] {
     grid-area: contact;
     justify-self: center;
     margin: 0 0 1.75rem;
