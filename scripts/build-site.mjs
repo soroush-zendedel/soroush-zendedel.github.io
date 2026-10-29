@@ -59,6 +59,24 @@ function renderAboutProject(project, language) {
   return `          <li><a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong><span data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span></a></li>`;
 }
 
+function renderDirectoryProject(project, language) {
+  const copy = project.home[language];
+  const prefix = language === "en" ? "../img/" : "./img/";
+  const alt = project.home.alt ? `alt="${escapeHtml(project.home.alt)}"` : 'alt="" aria-hidden="true"';
+  const fallback = encodeURIComponent(project.imageFallback);
+  const image = `<img src="${prefix}${escapeHtml(project.image)}" ${alt} onerror="this.src='https://placehold.co/100x100/fdfcfb/b91c1c?text=${fallback}'" width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">`;
+  const name = language === "fa"
+    ? `<span data-edit-field="home.fa.name">${escapeHtml(copy.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| ${escapeHtml(project.home.en.name)}</span>`
+    : `<span data-edit-field="home.en.name">${escapeHtml(copy.name)}</span>`;
+  return `          <a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson text-start">
+            ${image}
+            <div class="project-list-copy">
+              <h2 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">${name}</h2>
+              <p data-edit-field="home.${language}.description" class="text-sm text-ink/70 leading-relaxed">${escapeHtml(copy.description)}</p>
+            </div>
+          </a>`;
+}
+
 function replaceRegion(html, start, end, content, file) {
   const startIndex = html.indexOf(start);
   const endIndex = html.indexOf(end);
@@ -80,6 +98,34 @@ for (const language of ["fa", "en"]) {
 }
 
 for (const language of ["fa", "en"]) {
+  const file = language === "fa" ? "projects.html" : "en/projects.html";
+  const path = join(root, file);
+  let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "          <!-- PROJECT-DIRECTORY:START -->", "          <!-- PROJECT-DIRECTORY:END -->", orderedProjects.map((project) => renderDirectoryProject(project, language)).join("\n"), file);
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: language === "fa" ? "پروژه‌های سروش زنده‌دل" : "Projects by Soroush Zendedel",
+    numberOfItems: orderedProjects.length,
+    itemListElement: orderedProjects.map((project, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: project.home[language].name,
+      url: project.href,
+      description: project.home[language].description,
+      image: `https://soroush-zendedel.github.io/img/${project.image}`,
+    })),
+  };
+  const schemaJson = JSON.stringify(schema).replace(/</g, "\\u003c");
+  const schemaScript = /<script type="application\/ld\+json">[\s\S]*?<\/script>/;
+  if (!schemaScript.test(html)) {
+    throw new Error(`Project schema marker is missing or duplicated in ${file}`);
+  }
+  html = html.replace(schemaScript, `<script type="application/ld+json">${schemaJson}</script>`);
+  await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
+}
+
+for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "about.html" : "en/about.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
@@ -87,4 +133,4 @@ for (const language of ["fa", "en"]) {
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
-console.log(`Generated project lists for ${orderedProjects.length} visible projects.`);
+console.log(`Generated bilingual project lists for ${orderedProjects.length} visible projects.`);

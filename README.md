@@ -18,8 +18,9 @@
 
 - `index.html` — صفحهٔ اصلی فارسی.
 - `en/index.html` — نسخهٔ انگلیسی.
+- `projects.html` و `en/projects.html` — فهرست کامل و تک‌ستونهٔ پروژه‌ها به فارسی و انگلیسی؛ هر دو صفحه از `content/projects.json` تولید می‌شوند.
 - `content/projects.json` — مرجع ترتیب، وضعیت نمایش، لینک و متن دوزبانهٔ پروژه‌ها.
-- `scripts/build-site.mjs` — ساخت فهرست پروژه‌ها در صفحهٔ اصلی و صفحهٔ درباره، برای هر دو زبان.
+- `scripts/build-site.mjs` — ساخت فهرست پروژه‌ها در صفحهٔ اصلی، صفحهٔ پروژه‌ها و صفحهٔ درباره، برای هر دو زبان.
 - `assets/site.css` — استایل کامپایل‌شده و فشردهٔ Tailwind CSS.
 - `img/` — تصویرهای اصلی و نسخه‌های WebP مورد استفادهٔ سایت.
 - `robots.txt` و `sitemap.xml` — فایل‌های راهنمای خزنده‌های موتور جست‌وجو.
@@ -75,7 +76,7 @@ A bilingual personal portfolio featuring creative digital tools and projects aro
 - `index.html` — Persian home page.
 - `en/index.html` — English edition.
 - `content/projects.json` — source of truth for project order, visibility, links, and bilingual text.
-- `scripts/build-site.mjs` — generates project lists on both home and about pages in both languages.
+- `scripts/build-site.mjs` — generates project lists on the home, project-directory, and about pages in both languages.
 - `assets/site.css` — Minified, compiled Tailwind CSS.
 - `img/` — Original images and the WebP versions served by the site.
 - `robots.txt` and `sitemap.xml` — Search crawler guidance and sitemap.

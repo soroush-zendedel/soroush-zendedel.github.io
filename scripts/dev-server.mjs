@@ -11,7 +11,7 @@ const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const projectFile = join(root, "content", "projects.json");
 const port = Number(process.env.PORT || 8082);
 const token = randomBytes(24).toString("hex");
-const generatedFiles = ["index.html", "en/index.html", "about.html", "en/about.html"];
+const generatedFiles = ["index.html", "en/index.html", "about.html", "en/about.html", "projects.html", "en/projects.html"];
 const editableFields = new Set([
   "home.fa.name", "home.fa.description", "home.en.name", "home.en.description",
   "about.fa.name", "about.fa.description", "about.en.name", "about.en.description",

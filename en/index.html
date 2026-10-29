@@ -66,6 +66,9 @@
 
     <style>
         .top-navigation { display: flex; justify-content: space-between; }
+        .all-projects-cta { display:flex;justify-content:center;margin-top:2rem; }
+        .all-projects-cta a { display:inline-flex;align-items:center;gap:.5rem;border:1px solid rgba(26,26,26,.15);border-radius:999px;background:rgba(255,255,255,.7);padding:.5rem 1.25rem;font-size:.875rem;font-weight:700;color:#1a1a1a;transition:all .2s; }
+        .all-projects-cta a:hover { border-color:#b91c1c;color:#b91c1c;text-decoration:none; }
         body {
             background-color: #ffffff;
             color: #1a1a1a;
@@ -183,6 +186,7 @@
 
     <!-- Top Navigation outside the document wrapper -->
     <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4">
+        <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./projects.html">Projects</a>
         <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">About</a>
         <a id="langToggle" href="/" hreflang="fa" aria-label="مشاهده نسخه فارسی" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-crimson transition-all flex items-center gap-2">
             <svg class="h-4 w-4 text-crimson/70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
@@ -387,6 +391,11 @@
                         </div>
                     </a>
                     <!-- PROJECT-CARDS:END -->
+                </div>
+                <div class="all-projects-cta">
+                    <a href="./projects.html">
+                        View all projects <span aria-hidden="true">→</span>
+                    </a>
                 </div>
             </section>
 
