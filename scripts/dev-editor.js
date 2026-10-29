@@ -1128,8 +1128,8 @@
     toggle.textContent = enabled
       ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
       : (isEnglish ? "✎ Edit" : "✎ ویرایش");
-    undoButton.hidden = !enabled || sessionCommitCount === 0;
-    publishButton.hidden = !enabled || sessionCommitCount === 0;
+    undoButton.hidden = sessionCommitCount === 0;
+    publishButton.hidden = sessionCommitCount === 0;
     addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
     if (profileImageButton) profileImageButton.hidden = !enabled;
     profileLinkButtons.forEach((button) => { button.hidden = !enabled; });
@@ -1336,6 +1336,8 @@
       if (sessionBase) {
         try {
           result = await requestEditSession("status", sessionBase);
+          sessionBase = result.base || sessionBase;
+          sessionStorage.setItem("dev-editor-session-base", sessionBase);
         } catch (error) {
           sessionStorage.removeItem("dev-editor-session-base");
           sessionBase = "";
@@ -1487,9 +1489,6 @@
 
   toggle.addEventListener("click", () => {
     if (enabled) {
-      sessionStorage.removeItem("dev-editor-session-base");
-      sessionBase = "";
-      sessionCommitCount = 0;
       setEnabled(false);
     } else {
       enterEditMode();
@@ -1594,17 +1593,31 @@
     saveOrder(ids);
   });
 
-  if (sessionBase && sessionStorage.getItem("dev-editor-session-active") === "1") {
+  if (sessionBase) {
+    const wasEnabled = sessionStorage.getItem("dev-editor-session-active") === "1";
     requestEditSession("status", sessionBase).then((result) => {
+      sessionBase = result.base || sessionBase;
+      sessionStorage.setItem("dev-editor-session-base", sessionBase);
       sessionCommitCount = result.count || 0;
-      setEnabled(true);
-    }).catch((error) => {
+      setEnabled(wasEnabled);
+    }).catch(async (error) => {
       sessionStorage.removeItem("dev-editor-session-active");
       sessionStorage.removeItem("dev-editor-session-base");
       sessionBase = "";
       sessionCommitCount = 0;
       setEnabled(false);
-      toast(error.message, true);
+      try {
+        const freshSession = await requestEditSession("start");
+        sessionBase = freshSession.base;
+        sessionCommitCount = freshSession.count || 0;
+        sessionStorage.setItem("dev-editor-session-base", sessionBase);
+        setEnabled(false);
+        toast(isEnglish
+          ? "The old session was refreshed. Unpushed edits are still available."
+          : "نوبت قبلی تازه شد؛ تغییرهای ارسال‌نشده حفظ شده‌اند.");
+      } catch (restartError) {
+        toast(restartError.message || error.message, true);
+      }
     });
   }
 })();

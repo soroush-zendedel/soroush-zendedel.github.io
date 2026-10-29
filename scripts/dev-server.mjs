@@ -89,6 +89,8 @@ async function getEditorSession(base) {
   const { stdout } = await runGit(["rev-list", "--reverse", `${base}..HEAD`]);
   const commits = stdout.trim() ? stdout.trim().split(/\r?\n/) : [];
   const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/contact.json", "content/blog.json", "content/person.json", ...generatedFiles]);
+  let effectiveBase = base;
+  let pendingCommits = [];
   for (const commit of commits) {
     const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
       runGit(["show", "-s", "--format=%s", commit]),
@@ -96,14 +98,19 @@ async function getEditorSession(base) {
     ]);
     const { stdout: remoteRefs } = await runGit(["branch", "--remotes", "--contains", commit]);
     const files = changedFiles.trim().split(/\r?\n/).filter(Boolean);
-    if (remoteRefs.trim()) throw new Error("This session contains a commit already pushed to a remote; nothing was undone.");
     if (!subject.startsWith("content:") || !files.length || files.some((file) =>
       !allowedFiles.has(file) && !/^img\/[a-z0-9-]+(?:-v\d+)?\.(?:webp|jpg|jpeg|png)$/i.test(file)
     )) {
       throw new Error("This session includes commits outside the project editor; nothing was undone.");
     }
+    if (remoteRefs.trim()) {
+      effectiveBase = commit;
+      pendingCommits = [];
+    } else {
+      pendingCommits.push(commit);
+    }
   }
-  return commits;
+  return { base: effectiveBase, commits: pendingCommits };
 }
 
 async function handleEditSession(request, response) {
@@ -114,16 +121,24 @@ async function handleEditSession(request, response) {
     const payload = await readBody(request);
     if (payload.action === "start") {
       await ensureEditorBranch();
-      const { stdout } = await runGit(["rev-parse", "HEAD"]);
-      return send(response, 200, { base: stdout.trim(), count: 0 });
+      let { stdout: base } = await runGit(["rev-parse", "HEAD"]);
+      try {
+        const { stdout: upstream } = await runGit(["rev-parse", "--verify", "@{u}"]);
+        await runGit(["merge-base", "--is-ancestor", upstream.trim(), "HEAD"]);
+        base = upstream;
+      } catch (error) {
+        if (error.message?.includes("ancestor")) throw error;
+      }
+      const session = await getEditorSession(base.trim());
+      return send(response, 200, { base: session.base, count: session.commits.length });
     }
-    const commits = await getEditorSession(payload.base);
-    if (payload.action === "status") return send(response, 200, { base: payload.base, count: commits.length });
+    const session = await getEditorSession(payload.base);
+    if (payload.action === "status") return send(response, 200, { base: session.base, count: session.commits.length });
     if (payload.action !== "undo") return send(response, 400, { error: "Unsupported session action." });
     await requireCleanWorkingTree();
-    if (!commits.length) return send(response, 200, { unchanged: true, count: 0 });
-    await runGit(["reset", "--hard", payload.base]);
-    return send(response, 200, { undone: commits.length });
+    if (!session.commits.length) return send(response, 200, { unchanged: true, count: 0 });
+    await runGit(["reset", "--hard", session.base]);
+    return send(response, 200, { undone: session.commits.length });
   } catch (error) {
     return send(response, 409, { error: error.message || "Could not update the edit session." });
   } finally {
@@ -140,8 +155,8 @@ async function handlePublish(request, response) {
     await requireCleanWorkingTree();
     const { stdout: branch } = await runGit(["branch", "--show-current"]);
     if (branch.trim() !== "edit-content") throw new Error("Publish is only available from the edit-content branch.");
-    const commits = await getEditorSession(payload.base);
-    if (!commits.length) return send(response, 409, { error: "There are no new edits to publish." });
+    const session = await getEditorSession(payload.base);
+    if (!session.commits.length) return send(response, 409, { error: "There are no new edits to publish." });
     const styleRef = "origin/style/homepage-hybrid-desktop-mobile";
     let targetBranch = "style/homepage-hybrid-desktop-mobile";
     try {
@@ -163,7 +178,7 @@ async function handlePublish(request, response) {
     return send(response, 200, {
       base: head.trim(),
       compareUrl: `https://github.com/soroush-zendedel/soroush-zendedel.github.io/compare/${targetBranch}...edit-content?expand=1`,
-      count: commits.length,
+      count: session.commits.length,
     });
   } catch (error) {
     return send(response, 409, { error: error.message || "Could not publish the edit branch." });
