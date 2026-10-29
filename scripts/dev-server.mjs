@@ -77,6 +77,7 @@ async function saveChange(request, response) {
   let originalJson;
   let staged = false;
   let uploadedFile;
+  const archivedImages = [];
   try {
     await requireCleanWorkingTree();
     const payload = await readBody(request);
@@ -135,9 +136,31 @@ async function saveChange(request, response) {
       const imageDirectory = join(root, "img");
       const imageNames = await readdir(imageDirectory);
       if (!/^[a-z0-9-]+$/.test(project.id)) return send(response, 400, { error: "This project has an unsupported id." });
-      const versionPattern = new RegExp(`^${project.id}-v(\\d+)\\.(?:webp|jpg|png)$`, "i");
-      const maxVersion = imageNames.reduce((max, name) => Math.max(max, Number(name.match(versionPattern)?.[1] || 1)), 1);
-      const filename = `${project.id}-v${maxVersion + 1}.${extension}`;
+      if (!/^[a-zA-Z0-9_-]+\.(?:webp|jpe?g|png)$/i.test(project.image) || !imageNames.includes(project.image)) {
+        return send(response, 400, { error: "The current project image could not be archived safely." });
+      }
+      const imageNameSet = new Set(imageNames);
+      let nextArchiveVersion = imageNames.reduce((max, name) => {
+        const match = name.match(new RegExp(`^${project.id}-v(\\d+)\\.(?:webp|jpg|jpeg|png)$`, "i"));
+        return Math.max(max, Number(match?.[1] || 0));
+      }, 0);
+      const archiveImage = async (filename) => {
+        const oldExtension = extname(filename).slice(1).toLowerCase();
+        let archiveName;
+        do {
+          archiveName = `${project.id}-v${++nextArchiveVersion}.${oldExtension}`;
+        } while (imageNameSet.has(archiveName));
+        const from = join(imageDirectory, filename);
+        const to = join(imageDirectory, archiveName);
+        await rename(from, to);
+        imageNameSet.delete(filename);
+        imageNameSet.add(archiveName);
+        archivedImages.push({ from, to, filename, archiveName });
+      };
+      const filename = `${project.id}.${extension}`;
+      const previousImage = project.image;
+      if (previousImage !== filename) await archiveImage(previousImage);
+      if (imageNameSet.has(filename)) await archiveImage(filename);
       uploadedFile = join(imageDirectory, filename);
       await writeFile(uploadedFile, imageBytes, { flag: "wx" });
       project.image = filename;
@@ -170,7 +193,8 @@ async function saveChange(request, response) {
     await writeFile(temporaryFile, JSON.stringify(projects, null, 2) + "\n", "utf8");
     await rename(temporaryFile, projectFile);
     await execFile(process.execPath, [join(root, "scripts", "build-site.mjs")], { cwd: root, windowsHide: true });
-    const changedPaths = ["content/projects.json", ...generatedFiles, ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
+    const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
+    const changedPaths = ["content/projects.json", ...generatedFiles, ...imagePaths];
     await runGit(["add", "--", ...changedPaths]);
     staged = true;
     const { stdout } = await runGit(["commit", "-m", message]);
@@ -178,7 +202,8 @@ async function saveChange(request, response) {
     send(response, 200, { commit, message });
   } catch (error) {
     if (staged) {
-      try { await runGit(["reset", "--", "content/projects.json", ...generatedFiles, ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])]); } catch {}
+      const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
+      try { await runGit(["reset", "--", "content/projects.json", ...generatedFiles, ...imagePaths]); } catch {}
     }
     if (originalJson) {
       try {
@@ -190,6 +215,9 @@ async function saveChange(request, response) {
     }
     if (uploadedFile) {
       try { await unlink(uploadedFile); } catch {}
+    }
+    for (const image of archivedImages.toReversed()) {
+      try { await rename(image.to, image.from); } catch {}
     }
     send(response, 500, { error: error.message || "Could not save the edit." });
   } finally {

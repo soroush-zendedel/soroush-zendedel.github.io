@@ -15,7 +15,9 @@
     .dev-editor-handle{position:absolute;top:7px;inset-inline-start:7px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:grab;font-size:18px;line-height:1}
     .dev-editor-handle:active{cursor:grabbing}
     .dev-editor-settings-button{position:absolute;top:7px;inset-inline-start:46px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
-    .dev-editor-settings{position:absolute;top:44px;inset-inline-start:7px;z-index:2147483000;width:min(300px,calc(100vw - 48px));padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
+    .dev-editor-settings{position:fixed;z-index:2147483000;box-sizing:border-box;width:min(300px,calc(100vw - 32px));max-height:calc(100vh - 16px);overflow-y:auto;padding:12px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;color:#292524;box-shadow:0 8px 28px #0003;text-align:start;font-size:13px}
+    .dev-editor-settings-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-weight:700}
+    .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
     .dev-editor-settings label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
     .dev-editor-settings input[type="url"]{box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524;direction:ltr}
     .dev-editor-settings input[type="file"]{display:block;width:100%;margin:7px 0}
@@ -90,7 +92,7 @@
       settingsButton.title = isEnglish ? "Project link and image" : "لینک و تصویر پروژه";
       settingsButton.setAttribute("aria-label", settingsButton.title);
       settingsButton.textContent = "⚙";
-      settingsButton.addEventListener("click", () => openProjectSettings(wrapper, link));
+      settingsButton.addEventListener("click", () => openProjectSettings(wrapper, link, settingsButton));
       wrapper.append(settingsButton);
     });
   }
@@ -103,12 +105,48 @@
     return button;
   }
 
-  function openProjectSettings(wrapper, link) {
-    document.querySelectorAll(".dev-editor-settings").forEach((panel) => panel.remove());
+  function placeSettings(panel, button) {
+    const rect = button.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const left = Math.max(8, Math.min(window.innerWidth - panelRect.width - 8, rect.left));
+    const below = rect.bottom + 8;
+    const top = below + panelRect.height <= window.innerHeight - 8
+      ? below
+      : Math.max(8, rect.top - panelRect.height - 8);
+    panel.style.left = `${left}px`;
+    panel.style.top = `${top}px`;
+  }
+
+  function closeProjectSettings() {
+    document.querySelector(".dev-editor-settings")?.remove();
+  }
+
+  function openProjectSettings(wrapper, link, trigger) {
+    const existing = document.querySelector(".dev-editor-settings");
+    if (existing?.dataset.projectId === wrapper.dataset.projectId) {
+      existing.remove();
+      return;
+    }
+    closeProjectSettings();
     const projectId = wrapper.dataset.projectId;
     const panel = document.createElement("div");
     panel.className = "dev-editor-settings";
+    panel.dataset.projectId = projectId;
+    panel._trigger = trigger;
     panel.addEventListener("click", (event) => event.stopPropagation());
+
+    const header = document.createElement("div");
+    header.className = "dev-editor-settings-header";
+    const heading = document.createElement("span");
+    heading.textContent = isEnglish ? "Project settings" : "تنظیمات پروژه";
+    const close = document.createElement("button");
+    close.className = "dev-editor-settings-close";
+    close.type = "button";
+    close.textContent = "×";
+    close.title = isEnglish ? "Close" : "بستن";
+    close.setAttribute("aria-label", close.title);
+    close.addEventListener("click", closeProjectSettings);
+    header.append(heading, close);
 
     const linkLabel = document.createElement("label");
     linkLabel.textContent = isEnglish ? "Project URL" : "نشانی پروژه";
@@ -120,7 +158,7 @@
     const saveLink = makeSettingsButton(isEnglish ? "Save link" : "ذخیرهٔ لینک", async () => {
       await saveProjectSetting({ type: "updateHref", projectId, value: linkInput.value }, saveLink);
     });
-    panel.append(linkLabel, linkInput, saveLink);
+    panel.append(header, linkLabel, linkInput, saveLink);
 
     const divider = document.createElement("hr");
     const imageLabel = document.createElement("label");
@@ -151,7 +189,8 @@
       }
     });
     panel.append(divider, imageLabel, fileInput, replaceImage);
-    wrapper.append(panel);
+    document.body.append(panel);
+    placeSettings(panel, trigger);
     linkInput.focus();
   }
 
@@ -293,6 +332,8 @@
 
   toggle.addEventListener("click", () => setEnabled(!enabled));
   document.addEventListener("pointerdown", (event) => {
+    const panel = document.querySelector(".dev-editor-settings");
+    if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button")) closeProjectSettings();
     if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
@@ -304,6 +345,10 @@
   }, true);
 
   document.addEventListener("keydown", (event) => {
+    if (enabled && event.key === "Escape" && document.querySelector(".dev-editor-settings")) {
+      closeProjectSettings();
+      return;
+    }
     if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
@@ -324,8 +369,18 @@
     event.preventDefault();
     event.stopPropagation();
   }, true);
-  window.addEventListener("resize", () => { if (editing) placeTools(editing.target, editing.tools); });
-  window.addEventListener("scroll", () => { if (editing) placeTools(editing.target, editing.tools); }, true);
+  function repositionSettings() {
+    const panel = document.querySelector(".dev-editor-settings");
+    if (panel?._trigger?.isConnected) placeSettings(panel, panel._trigger);
+  }
+  window.addEventListener("resize", () => {
+    if (editing) placeTools(editing.target, editing.tools);
+    repositionSettings();
+  });
+  window.addEventListener("scroll", () => {
+    if (editing) placeTools(editing.target, editing.tools);
+    repositionSettings();
+  }, true);
 
   document.addEventListener("dragstart", (event) => {
     const handle = event.target.closest(".dev-editor-handle");
