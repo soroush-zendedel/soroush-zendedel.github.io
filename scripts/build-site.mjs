@@ -326,7 +326,12 @@ function renderPersonPage(html, language, file) {
   const cleanSocialNav = socialNav[0].replace(/\sdata-social-links="[^"]*"/g, "");
   html = html.replace(socialNav[0], `${cleanSocialNav.slice(0, -1)} data-social-links="${socialLinksData}">`);
   const personData = escapeHtml(JSON.stringify(person));
-  html = html.replace(/(<main\b[^>]*\bclass="sheet")/, `$1 data-person-page="true" data-person-data="${personData}"`);
+  const mainTag = html.match(/<main\b[^>]*\bclass="sheet"[^>]*>/);
+  if (!mainTag) throw new Error(`Person page main element is missing in ${file}`);
+  const cleanMainTag = mainTag[0]
+    .replace(/\sdata-person-page="[^"]*"/g, "")
+    .replace(/\sdata-person-data="[^"]*"/g, "");
+  html = html.replace(mainTag[0], cleanMainTag.replace(/>$/, ` data-person-page="true" data-person-data="${personData}">`));
   return html;
 }
 
