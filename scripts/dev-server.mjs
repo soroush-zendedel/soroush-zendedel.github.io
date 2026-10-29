@@ -46,7 +46,10 @@ function send(response, status, body, type = "application/json; charset=utf-8") 
 }
 
 async function runGit(args) {
-  return execFile("git", args, { cwd: root, windowsHide: true, maxBuffer: 1024 * 1024 });
+  const env = process.platform === "win32"
+    ? { ...process.env, GIT_SSH_COMMAND: "C:/Windows/System32/OpenSSH/ssh.exe -o BatchMode=yes -o ConnectTimeout=10" }
+    : process.env;
+  return execFile("git", args, { cwd: root, env, windowsHide: true, maxBuffer: 1024 * 1024 });
 }
 
 async function ensureEditorBranch() {
@@ -139,11 +142,27 @@ async function handlePublish(request, response) {
     if (branch.trim() !== "edit-content") throw new Error("Publish is only available from the edit-content branch.");
     const commits = await getEditorSession(payload.base);
     if (!commits.length) return send(response, 409, { error: "There are no new edits to publish." });
+    const styleRef = "origin/style/homepage-hybrid-desktop-mobile";
+    let targetBranch = "style/homepage-hybrid-desktop-mobile";
+    try {
+      await runGit(["merge-base", "--is-ancestor", styleRef, "origin/main"]);
+      targetBranch = "main";
+    } catch {
+      try {
+        const [{ stdout: mainTree }, { stdout: styleTree }] = await Promise.all([
+          runGit(["rev-parse", "origin/main^{tree}"]),
+          runGit(["rev-parse", `${styleRef}^{tree}`]),
+        ]);
+        if (mainTree.trim() === styleTree.trim()) targetBranch = "main";
+      } catch {
+        throw new Error("Could not determine the current GitHub review branch. Fetch the latest branches and try again.");
+      }
+    }
     await runGit(["push", "--set-upstream", "origin", "edit-content"]);
     const { stdout: head } = await runGit(["rev-parse", "HEAD"]);
     return send(response, 200, {
       base: head.trim(),
-      compareUrl: "https://github.com/soroush-zendedel/soroush-zendedel.github.io/compare/main...edit-content?expand=1",
+      compareUrl: `https://github.com/soroush-zendedel/soroush-zendedel.github.io/compare/${targetBranch}...edit-content?expand=1`,
       count: commits.length,
     });
   } catch (error) {

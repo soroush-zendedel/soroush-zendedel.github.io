@@ -1303,7 +1303,6 @@
 
   async function publishEditSession() {
     if (!sessionBase || !sessionCommitCount) return;
-    const reviewTab = window.open("about:blank", "_blank");
     publishButton.disabled = true;
     toggle.disabled = true;
     try {
@@ -1317,16 +1316,12 @@
       sessionBase = result.base;
       sessionCommitCount = 0;
       sessionStorage.setItem("dev-editor-session-base", sessionBase);
-      if (reviewTab) {
-        reviewTab.opener = null;
-        reviewTab.location = result.compareUrl;
-      }
       setEnabled(true);
       toast(isEnglish
         ? "Edits pushed. Review and merge the pull request to publish the site."
         : "تغییرات ارسال شد؛ برای انتشار سایت، درخواست ادغام را بررسی و در main ادغام کنید.");
+      window.setTimeout(() => window.location.assign(result.compareUrl), 450);
     } catch (error) {
-      reviewTab?.close();
       toast(error.message, true);
     } finally {
       publishButton.disabled = false;
