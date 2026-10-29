@@ -320,7 +320,7 @@ async function saveChange(request, response) {
       }
       const imageDirectory = join(root, "img");
       const imageNames = await readdir(imageDirectory);
-      if (currentPerson.image.file !== "soroush-zendedel.jpg" || !imageNames.includes(currentPerson.image.file)) {
+      if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(currentPerson.image.file) || !imageNames.includes(currentPerson.image.file)) {
         return send(response, 400, { error: "The current person portrait could not be found safely." });
       }
       if (payload.imageUpload) {
@@ -330,9 +330,11 @@ async function saveChange(request, response) {
         if (!imageBytes.length || imageBytes.length > 5 * 1024 * 1024 || imageBytes.toString("base64") !== encoded) return send(response, 400, { error: "Portrait must be valid and 5 MB or smaller." });
         const validImage = imageBytes.length > 4 && imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes.at(-2) === 0xff && imageBytes.at(-1) === 0xd9;
         if (!validImage) return send(response, 400, { error: "The file contents do not match the selected image type." });
-        const baseName = "soroush-zendedel";
-        const fileName = "soroush-zendedel.jpg";
+        const fileName = typeof submitted.image?.file === "string" ? submitted.image.file.trim() : "";
+        if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(fileName)) return send(response, 400, { error: "Use a safe English .jpg portrait filename." });
         const imageNameSet = new Set(imageNames);
+        if (fileName !== currentPerson.image.file && imageNameSet.has(fileName)) return send(response, 409, { error: `The image file img/${fileName} already exists; choose a different filename.` });
+        const baseName = currentPerson.image.file.replace(/\.jpg$/i, "");
         let version = imageNames.reduce((max, name) => Math.max(max, Number(name.match(new RegExp(`^${baseName}-v(\\d+)\\.jpg$`, "i"))?.[1] || 0)), 0);
         const archive = async (name) => {
           let archiveName;
@@ -344,11 +346,11 @@ async function saveChange(request, response) {
           imageNameSet.add(archiveName);
           archivedImages.push({ from, to, filename: name, archiveName });
         };
-        if (imageNameSet.has(currentPerson.image.file)) await archive(currentPerson.image.file);
-        if (imageNameSet.has(fileName)) await archive(fileName);
+        if (fileName === currentPerson.image.file && imageNameSet.has(currentPerson.image.file)) await archive(currentPerson.image.file);
         uploadedFile = join(imageDirectory, fileName);
         await writeFile(uploadedFile, imageBytes, { flag: "wx" });
         uploadedFileCreated = true;
+        updatedPerson.image.file = fileName;
       }
       if (JSON.stringify(currentPerson) === JSON.stringify(updatedPerson) && !payload.imageUpload) return send(response, 200, { unchanged: true });
       originalJson = JSON.stringify(currentPerson, null, 2) + "\n";

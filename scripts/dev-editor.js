@@ -693,10 +693,22 @@
       label: isEnglish ? "Replace portrait · current file: " + personData.image.file : "جایگزینی تصویر · فایل فعلی: " + personData.image.file,
       type: "file",
       wide: true,
-      note: isEnglish ? "WebP, JPEG, or PNG · converted to the stable .jpg address. The previous image is retained." : "WebP، JPEG یا PNG · با نشانی ثابت ‎.jpg ذخیره می‌شود. تصویر قبلی نگه داشته می‌شود.",
+      note: isEnglish ? "WebP, JPEG, or PNG · converted to JPEG. The current filename stays in use unless you change it below." : "WebP، JPEG یا PNG · به JPEG تبدیل می‌شود. نام فعلی حفظ می‌شود مگر اینکه در کادر زیر آن را تغییر بدهی.",
     });
     imageField.input.accept = "image/webp,image/jpeg,image/png,.webp,.jpg,.jpeg,.png";
     identity.append(imageField.wrapper);
+    const imageNameField = makeFormField({
+      id: "person-image-name",
+      label: isEnglish ? "Portrait filename (.jpg)" : "نام فایل عکس (.jpg)",
+      type: "text",
+      required: true,
+      maxLength: 120,
+      wide: true,
+      note: isEnglish ? "Keeping the current name is best for SEO. If changed, the old image remains in the repository and available at its old URL; the new URL will be used in page metadata and Person structured data." : "برای سئو بهتر است نام فعلی حفظ شود. اگر نام را عوض کنی، عکس قبلی در مخزن و نشانی قبلی باقی می‌ماند؛ نشانی جدید در اطلاعات صفحه و دادهٔ ساختاریافتهٔ Person قرار می‌گیرد.",
+    });
+    imageNameField.input.value = personData.image.file;
+    imageNameField.input.dir = "ltr";
+    identity.append(imageNameField.wrapper);
 
     const career = addGroup(isEnglish ? "Professional experience and education" : "مسیر حرفه‌ای و تحصیلات");
     addPair(career, "careerTitle", isEnglish ? "Experience heading" : "عنوان مسیر حرفه‌ای", "text", 150, true);
@@ -769,7 +781,7 @@
     save.textContent = isEnglish ? "Save About page" : "ذخیرهٔ صفحهٔ درباره";
     actions.append(cancel, save);
     form.append(actions);
-    form.addEventListener("submit", (event) => savePersonSettings(event, { pairs, arrays, bookInputs, schemaLists, fullName: fullName.input, image: imageField.input, save }));
+    form.addEventListener("submit", (event) => savePersonSettings(event, { pairs, arrays, bookInputs, schemaLists, fullName: fullName.input, image: imageField.input, imageName: imageNameField.input, save }));
     modal.append(header, form);
     modalLayer.hidden = false;
     close.focus();
@@ -777,7 +789,7 @@
 
   async function savePersonSettings(event, controls) {
     event.preventDefault();
-    const { pairs, arrays, bookInputs, schemaLists, fullName, image, save } = controls;
+    const { pairs, arrays, bookInputs, schemaLists, fullName, image, imageName, save } = controls;
     const form = modal.querySelector("form");
     if (!form.reportValidity()) return;
     const updated = JSON.parse(JSON.stringify(personData));
@@ -806,6 +818,16 @@
       book.href = inputSet.href.value.trim();
     }
     const selectedImage = image.files?.[0];
+    const requestedImageName = imageName.value.trim();
+    if (!/^[a-z0-9][a-z0-9-]{0,115}\.jpg$/i.test(requestedImageName)) return toast(isEnglish ? "Use an English filename with letters, numbers, and hyphens, ending in .jpg." : "نام انگلیسی شامل حروف، عدد و خط تیره وارد کن که به ‎.jpg ختم شود.", true);
+    if (!selectedImage && requestedImageName !== personData.image.file) return toast(isEnglish ? "Choose a new portrait before changing its filename." : "برای تغییر نام فایل، ابتدا عکس جدید را انتخاب کن.", true);
+    if (selectedImage && requestedImageName !== personData.image.file) {
+      const confirmed = window.confirm(isEnglish
+        ? `Changing the portrait URL may affect SEO. The old image will remain available at img/${personData.image.file}; the new image will use img/${requestedImageName}, and page metadata and Person structured data will be updated. Continue?`
+        : `تغییر نشانی عکس ممکن است بر سئو اثر بگذارد. عکس قبلی در نشانی img/${personData.image.file} باقی می‌ماند؛ عکس جدید از نشانی img/${requestedImageName} استفاده می‌کند و اطلاعات صفحه و دادهٔ ساختاریافتهٔ Person به‌روز می‌شوند. ادامه می‌دهی؟`);
+      if (!confirmed) return;
+      updated.image.file = requestedImageName;
+    }
     if (selectedImage && selectedImage.size > 20 * 1024 * 1024) return toast(isEnglish ? "Choose a portrait under 20 MB." : "تصویر باید کمتر از ۲۰ مگابایت باشد.", true);
     if (selectedImage && !["image/webp", "image/jpeg", "image/png"].includes(selectedImage.type)) return toast(isEnglish ? "Use a WebP, JPEG, or PNG portrait." : "تصویر باید WebP، JPEG یا PNG باشد.", true);
     let imageUpload;
