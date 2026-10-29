@@ -129,19 +129,36 @@ body.font-en { font-family: Lora, serif; }
 .sheet a:hover { text-decoration: none; }
 .quote-mark-mirror { transform: scaleX(-1); }
 
+.summary-leaves {
+  width: min(100%, 28rem);
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgb(155 28 28 / 30%);
+}
+.summary-leaves svg { width: 2rem; height: 2rem; flex: 0 0 2rem; }
+.summary-leaf-mirror { transform: scaleX(-1); }
+
 .site-footer {
   width: min(100%, 64rem);
   margin: 1rem auto 0;
   padding: 2rem 0;
   color: var(--home-muted);
   font-family: Lora, serif;
-  font-size: 0.875rem;
-  letter-spacing: 0.025em;
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
   line-height: 1.25rem;
   text-align: center;
 }
 
-.site-footer p { margin: 0 0 0.75rem; white-space: nowrap; }
+.site-footer p {
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 0.75rem;
+  white-space: nowrap;
+  text-align: center;
+}
 .site-footer a { color: inherit; text-decoration: none; }
 .site-footer a:hover { color: var(--home-crimson); }
 
@@ -152,7 +169,7 @@ body.font-en { font-family: Lora, serif; }
 
 @media (max-width: 520px) {
   .site-footer p {
-    font-size: clamp(0.5rem, calc((100vw - 32px) * 0.0295), 0.875rem);
+    font-size: clamp(0.5rem, calc((100vw - 32px) * 0.027), 0.75rem);
     letter-spacing: 0;
   }
 }
