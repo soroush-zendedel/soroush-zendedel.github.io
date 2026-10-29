@@ -46,12 +46,14 @@
   <link rel="stylesheet" href="../assets/site-theme.css">
 </head>
 <body class="font-en antialiased min-h-screen selection:bg-crimson selection:text-white p-4 md:p-8 lg:p-12">
-  <nav class="top-navigation w-full max-w-5xl mx-auto mb-4" aria-label="Main navigation">
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./" rel="home">Home</a>
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">About</a>
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./projects.html" aria-current="page">Projects</a>
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson transition-all" href="../projects.html" hreflang="fa" aria-label="فارسی">فا</a>
+  <!-- SITE-NAV:START -->
+  <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4" aria-label="Main navigation">
+    <a rel="home" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="./">Home</a>
+    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="./about.html">About</a>
+    <a aria-current="page" data-profile-link="projects" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="./projects.html"><span data-edit-field="profile.projectsNav.en">Projects</span></a>
+    <a id="langToggle" href="/projects.html" hreflang="fa" aria-label="مشاهده نسخه فارسی" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest transition-all flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span class="font-fa">فا</span></a>
   </nav>
+<!-- SITE-NAV:END -->
   <main class="document-wrapper max-w-5xl mx-auto rounded-lg shadow-artistic border border-ink/5 overflow-hidden relative">
     <div class="h-1.5 w-full bg-gradient-to-r from-transparent via-crimson to-transparent opacity-80" aria-hidden="true"></div>
     <div class="px-6 py-12 md:px-16 md:py-20">

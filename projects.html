@@ -46,12 +46,14 @@
   <link rel="stylesheet" href="./assets/site-theme.css">
 </head>
 <body class="font-fa antialiased min-h-screen selection:bg-crimson selection:text-white p-4 md:p-8 lg:p-12">
-  <nav class="top-navigation w-full max-w-5xl mx-auto mb-4" aria-label="پیمایش اصلی">
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./" rel="home">صفحه‌ی اصلی</a>
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./about.html">درباره‌ی من</a>
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold hover:border-crimson hover:text-crimson transition-all" href="./projects.html" aria-current="page">پروژه‌ها</a>
-    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest hover:border-crimson hover:text-crimson transition-all" href="./en/projects.html" hreflang="en" aria-label="English">EN</a>
+  <!-- SITE-NAV:START -->
+  <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4" aria-label="پیمایش اصلی">
+    <a rel="home" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="./">خانه</a>
+    <a class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="./about.html">درباره‌ی من</a>
+    <a aria-current="page" data-profile-link="projects" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="./projects.html"><span data-edit-field="profile.projectsNav.fa">پروژه‌ها</span></a>
+    <a id="langToggle" href="/en/projects.html" hreflang="en" aria-label="View English version" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest transition-all flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>EN</a>
   </nav>
+<!-- SITE-NAV:END -->
   <main class="document-wrapper max-w-5xl mx-auto rounded-lg shadow-artistic border border-ink/5 overflow-hidden relative">
     <div class="h-1.5 w-full bg-gradient-to-r from-transparent via-crimson to-transparent opacity-80" aria-hidden="true"></div>
     <div class="px-6 py-12 md:px-16 md:py-20">

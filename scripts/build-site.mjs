@@ -105,6 +105,28 @@ function renderSiteFooter(language) {
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>`;
 }
 
+function renderSiteNav(language, currentPage) {
+  const pagePaths = {
+    home: { fa: "/", en: "/en/" },
+    about: { fa: "/about.html", en: "/en/about.html" },
+    projects: { fa: "/projects.html", en: "/en/projects.html" },
+  };
+  const label = (page) => page === "home" ? (language === "fa" ? "خانه" : "Home")
+    : page === "about" ? (language === "fa" ? "درباره‌ی من" : "About")
+      : escapeHtml(profile.fields.projectsNav[language]);
+  const navLink = (page, href) => `<a${currentPage === page ? ' aria-current="page"' : ""}${page === "home" ? ' rel="home"' : page === "projects" ? ' data-profile-link="projects"' : ""} class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold transition-all" href="${escapeHtml(href)}">${page === "projects" ? `<span data-edit-field="profile.projectsNav.${language}">${label(page)}</span>` : label(page)}</a>`;
+  const languageHref = pagePaths[currentPage][language === "fa" ? "en" : "fa"];
+  const languageLabel = language === "fa" ? "EN" : "فا";
+  const languageAria = language === "fa" ? "View English version" : "مشاهده نسخه فارسی";
+  const languageText = language === "fa" ? languageLabel : `<span class="font-fa">${languageLabel}</span>`;
+  return `  <nav class="top-navigation w-full max-w-5xl mx-auto items-center mb-4" aria-label="${language === "fa" ? "پیمایش اصلی" : "Main navigation"}">
+    ${navLink("home", "./")}
+    ${navLink("about", "./about.html")}
+    ${navLink("projects", profile.links.projects)}
+    <a id="langToggle" href="${languageHref}" hreflang="${language === "fa" ? "en" : "fa"}" aria-label="${languageAria}" class="bg-canvas border border-ink/20 shadow-sm rounded-full px-5 py-1.5 text-sm font-bold tracking-widest transition-all flex items-center gap-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>${languageText}</a>
+  </nav>`;
+}
+
 function renderDirectoryProject(project, language) {
   const copy = project.home[language];
   const prefix = language === "en" ? "../img/" : "./img/";
@@ -342,12 +364,14 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "index.html" : "en/index.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "<!-- SITE-NAV:START -->", "<!-- SITE-NAV:END -->", renderSiteNav(language, "home"), file);
   html = renderProfileFields(html, language, file);
   html = renderBlog(html, language, file);
   html = renderProfileLinks(html);
   html = replaceRegion(html, "                    <!-- CONTACT-METHODS:START -->", "                    <!-- CONTACT-METHODS:END -->", renderContactMenu(language), file);
   html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(socialData.socials, language), file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
+  html = replaceRegion(html, "<!-- SITE-FOOTER:START -->", "<!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -355,6 +379,7 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "projects.html" : "en/projects.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "<!-- SITE-NAV:START -->", "<!-- SITE-NAV:END -->", renderSiteNav(language, "projects"), file);
   html = replaceRegion(html, "          <!-- PROJECT-DIRECTORY:START -->", "          <!-- PROJECT-DIRECTORY:END -->", orderedProjects.map((project) => renderDirectoryProject(project, language)).join("\n"), file);
   const pageUrl = language === "fa"
     ? "https://soroush-zendedel.github.io/projects.html"
@@ -431,6 +456,7 @@ for (const language of ["fa", "en"]) {
   }
   html = html.replace(schemaScript, `<script type="application/ld+json">${schemaJson}</script>`);
   html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
+  html = renderProfileLinks(html);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -438,9 +464,11 @@ for (const language of ["fa", "en"]) {
   const file = language === "fa" ? "about.html" : "en/about.html";
   const path = join(root, file);
   let html = await readFile(path, "utf8");
+  html = replaceRegion(html, "<!-- SITE-NAV:START -->", "<!-- SITE-NAV:END -->", renderSiteNav(language, "about"), file);
   html = renderPersonPage(html, language, file);
   html = replaceRegion(html, "          <!-- ABOUT-PROJECTS:START -->", "          <!-- ABOUT-PROJECTS:END -->", orderedProjects.map((project) => renderAboutProject(project, language)).join("\n"), file);
   html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
+  html = renderProfileLinks(html);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
