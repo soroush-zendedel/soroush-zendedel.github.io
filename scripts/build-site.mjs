@@ -103,19 +103,73 @@ for (const language of ["fa", "en"]) {
   const path = join(root, file);
   let html = await readFile(path, "utf8");
   html = replaceRegion(html, "          <!-- PROJECT-DIRECTORY:START -->", "          <!-- PROJECT-DIRECTORY:END -->", orderedProjects.map((project) => renderDirectoryProject(project, language)).join("\n"), file);
+  const pageUrl = language === "fa"
+    ? "https://soroush-zendedel.github.io/projects.html"
+    : "https://soroush-zendedel.github.io/en/projects.html";
+  const homeUrl = language === "fa"
+    ? "https://soroush-zendedel.github.io/"
+    : "https://soroush-zendedel.github.io/en/";
+  const pageName = language === "fa" ? "پروژه‌ها | سروش زنده‌دل" : "Projects | Soroush Zendedel";
   const schema = {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: language === "fa" ? "پروژه‌های سروش زنده‌دل" : "Projects by Soroush Zendedel",
-    numberOfItems: orderedProjects.length,
-    itemListElement: orderedProjects.map((project, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: project.home[language].name,
-      url: project.href,
-      description: project.home[language].description,
-      image: `https://soroush-zendedel.github.io/img/${project.image}`,
-    })),
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: pageName,
+        description: language === "fa"
+          ? "فهرست پروژه‌ها و ابزارهای دیجیتال سروش زنده‌دل در زمینهٔ موسیقی، نوشتن، طراحی و فناوری."
+          : "A directory of Soroush Zendedel’s digital projects and tools for music, writing, design, and technology.",
+        inLanguage: language === "fa" ? "fa-IR" : "en",
+        isPartOf: { "@id": `${homeUrl}#website` },
+        breadcrumb: { "@id": `${pageUrl}#breadcrumb` },
+        mainEntity: { "@id": `${pageUrl}#project-list` },
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${homeUrl}#website`,
+        url: homeUrl,
+        name: "Soroush Zendedel | سروش زنده‌دل",
+        inLanguage: ["fa-IR", "en"],
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: language === "fa" ? "خانه" : "Home",
+            item: homeUrl,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: language === "fa" ? "پروژه‌ها" : "Projects",
+            item: pageUrl,
+          },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${pageUrl}#project-list`,
+        name: language === "fa" ? "پروژه‌های سروش زنده‌دل" : "Projects by Soroush Zendedel",
+        numberOfItems: orderedProjects.length,
+        itemListElement: orderedProjects.map((project, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "CreativeWork",
+            name: project.home[language].name,
+            url: project.href,
+            description: project.home[language].description,
+            image: `https://soroush-zendedel.github.io/img/${project.image}`,
+            identifier: project.id,
+          },
+        })),
+      },
+    ],
   };
   const schemaJson = JSON.stringify(schema).replace(/</g, "\\u003c");
   const schemaScript = /<script type="application\/ld\+json">[\s\S]*?<\/script>/;
