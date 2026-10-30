@@ -209,53 +209,8 @@
     }
   },
   {
-    "id": "notella",
-    "order": 6,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/notella/",
-    "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/notella/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/notella"
-      }
-    ],
-    "image": "notella.webp",
-    "imageFallback": "N",
-    "home": {
-      "fa": {
-        "name": "نوتلا",
-        "description": "یادداشت‌برداری از راه وب یا خط فرمان، با ذخیرهٔ محلی نوشته‌ها."
-      },
-      "en": {
-        "name": "Notella",
-        "description": "A local-first note-taking app with web and command-line interfaces."
-      },
-      "alt": "Notella - Note Taking App"
-    },
-    "about": {
-      "fa": {
-        "name": "نوتلا (Notella)",
-        "description": "یادداشت‌هایت را با رابط وب یا خط فرمان بنویس؛ نوشته‌ها به‌صورت محلی ذخیره می‌شوند."
-      },
-      "en": {
-        "name": "Notella",
-        "description": "A note-taking app with web and command-line interfaces and local storage."
-      }
-    }
-  },
-  {
     "id": "silk-road",
-    "order": 7,
+    "order": 6,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/silk-road/",
     "links": [
@@ -295,6 +250,51 @@
       "en": {
         "name": "Silk Road",
         "description": "A digital project about the words and stories of the Silk Road."
+      }
+    }
+  },
+  {
+    "id": "notella",
+    "order": 7,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/notella/",
+    "links": [
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/notella/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/notella"
+      }
+    ],
+    "image": "notella.webp",
+    "imageFallback": "N",
+    "home": {
+      "fa": {
+        "name": "نوتلا",
+        "description": "یادداشت‌برداری از راه وب یا خط فرمان، با ذخیرهٔ محلی نوشته‌ها."
+      },
+      "en": {
+        "name": "Notella",
+        "description": "A local-first note-taking app with web and command-line interfaces."
+      },
+      "alt": "Notella - Note Taking App"
+    },
+    "about": {
+      "fa": {
+        "name": "نوتلا (Notella)",
+        "description": "یادداشت‌هایت را با رابط وب یا خط فرمان بنویس؛ نوشته‌ها به‌صورت محلی ذخیره می‌شوند."
+      },
+      "en": {
+        "name": "Notella",
+        "description": "A note-taking app with web and command-line interfaces and local storage."
       }
     }
   }
