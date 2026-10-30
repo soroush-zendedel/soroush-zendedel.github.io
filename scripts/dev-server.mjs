@@ -78,6 +78,7 @@ async function requireCleanWorkingTree() {
 }
 
 async function syncEditorBranch() {
+  const { stdout: initialHead } = await runGit(["rev-parse", "HEAD"]);
   await ensureEditorBranch();
   await requireCleanWorkingTree();
   const { stdout: branch } = await runGit(["branch", "--show-current"]);
@@ -117,6 +118,9 @@ async function syncEditorBranch() {
       throw new Error(`GitHub has newer edits on ${ref.replace("refs/remotes/origin/", "origin/")} that overlap local changes. No new commit was made; resolve the overlap, then try again.`);
     }
   }
+
+  const { stdout: finalHead } = await runGit(["rev-parse", "HEAD"]);
+  return { updated: initialHead.trim() !== finalHead.trim() };
 }
 
 async function getEditorSession(base) {
@@ -161,7 +165,10 @@ async function handleEditSession(request, response) {
   saving = true;
   try {
     const payload = await readBody(request);
-    await syncEditorBranch();
+    const syncResult = await syncEditorBranch();
+    if (syncResult.updated && ["start", "status"].includes(payload.action)) {
+      return send(response, 200, { updated: true });
+    }
     if (payload.action === "start") {
       let { stdout: base } = await runGit(["rev-parse", "HEAD"]);
       try {

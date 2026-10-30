@@ -1337,6 +1337,10 @@
       if (sessionBase) {
         try {
           result = await requestEditSession("status", sessionBase);
+          if (result.updated) {
+            reloadAfterEditorSync();
+            return;
+          }
           sessionBase = result.base || sessionBase;
           sessionStorage.setItem("dev-editor-session-base", sessionBase);
         } catch (error) {
@@ -1349,16 +1353,32 @@
       }
       if (!result) {
         result = await requestEditSession("start");
+        if (result.updated) {
+          reloadAfterEditorSync();
+          return;
+        }
         sessionBase = result.base;
         sessionStorage.setItem("dev-editor-session-base", sessionBase);
       }
       sessionCommitCount = result.count || 0;
       setEnabled(true);
+      if (sessionStorage.getItem("dev-editor-synced-from-main") === "1") {
+        sessionStorage.removeItem("dev-editor-synced-from-main");
+        toast(isEnglish
+          ? "Project updated from main. Editing is ready."
+          : "پروژه از main به‌روز شد؛ ویرایش آماده است.");
+      }
     } catch (error) {
       toast(error.message, true);
     } finally {
       toggle.disabled = false;
     }
+  }
+
+  function reloadAfterEditorSync() {
+    sessionStorage.setItem("dev-editor-resume-after-sync", "1");
+    sessionStorage.setItem("dev-editor-synced-from-main", "1");
+    window.location.reload();
   }
 
   async function undoEditSession() {
@@ -1594,9 +1614,16 @@
     saveOrder(ids);
   });
 
-  if (sessionBase) {
+  if (sessionStorage.getItem("dev-editor-resume-after-sync") === "1") {
+    sessionStorage.removeItem("dev-editor-resume-after-sync");
+    window.setTimeout(enterEditMode, 0);
+  } else if (sessionBase) {
     const wasEnabled = sessionStorage.getItem("dev-editor-session-active") === "1";
     requestEditSession("status", sessionBase).then((result) => {
+      if (result.updated) {
+        reloadAfterEditorSync();
+        return;
+      }
       sessionBase = result.base || sessionBase;
       sessionStorage.setItem("dev-editor-session-base", sessionBase);
       sessionCommitCount = result.count || 0;
