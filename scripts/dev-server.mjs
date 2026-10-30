@@ -279,6 +279,7 @@ async function saveChange(request, response) {
   let uploadedFile;
   let uploadedFileCreated = false;
   const archivedImages = [];
+  const deletedFiles = [];
   try {
     await syncEditorBranch();
     const payload = await readBody(request);
@@ -589,6 +590,20 @@ async function saveChange(request, response) {
       await writeFile(uploadedFile, imageBytes, { flag: "wx" });
       uploadedFileCreated = true;
       message = `content: add ${projectId} project`;
+    } else if (payload.type === "deleteProject") {
+      if (typeof payload.projectId !== "string") return send(response, 400, { error: "Invalid project ID." });
+      const projectIndex = projects.findIndex((project) => project.id === payload.projectId);
+      if (projectIndex < 0) return send(response, 404, { error: "Project not found." });
+      const [project] = projects.splice(projectIndex, 1);
+      const profile = JSON.parse(await readFile(profileFile, "utf8"));
+      const imageIsStillUsed = projects.some((item) => item.image === project.image) || profile.avatar?.image === project.image;
+      if (!imageIsStillUsed && /^[a-zA-Z0-9_-]+\.(?:webp|jpe?g|png)$/i.test(project.image)) {
+        const imagePath = join(root, "img", project.image);
+        const imageBytes = await readFile(imagePath);
+        await unlink(imagePath);
+        deletedFiles.push({ filename: project.image, bytes: imageBytes });
+      }
+      message = `content: delete ${project.id} project`;
     } else if (payload.type === "update") {
       if (typeof payload.projectId !== "string" || !editableFields.has(payload.field) || typeof payload.value !== "string") {
         return send(response, 400, { error: "Unsupported project field." });
@@ -618,6 +633,28 @@ async function saveChange(request, response) {
       if (project.href === value) return send(response, 200, { unchanged: true });
       project.href = value;
       message = `content: update ${project.id} link`;
+    } else if (payload.type === "updateProjectLinks") {
+      if (typeof payload.projectId !== "string" || !Array.isArray(payload.links) || payload.links.length > 12) {
+        return send(response, 400, { error: "A project can have up to 12 links." });
+      }
+      const project = projects.find((item) => item.id === payload.projectId);
+      if (!project) return send(response, 404, { error: "Project not found." });
+      const links = [];
+      for (const item of payload.links) {
+        const fa = typeof item?.label?.fa === "string" ? item.label.fa.trim().replace(/\s+/g, " ") : "";
+        const en = typeof item?.label?.en === "string" ? item.label.en.trim().replace(/\s+/g, " ") : "";
+        const href = typeof item?.href === "string" ? item.href.trim() : "";
+        let parsed;
+        try { parsed = new URL(href); } catch { return send(response, 400, { error: "Enter a complete URL for every project link." }); }
+        if (!fa || !en || fa.length > 80 || en.length > 80 || !["http:", "https:"].includes(parsed.protocol) || href.length > 2_000) {
+          return send(response, 400, { error: "Each project link needs Persian and English labels and an http or https URL." });
+        }
+        links.push({ label: { fa, en }, href });
+      }
+      if (JSON.stringify(project.links || []) === JSON.stringify(links)) return send(response, 200, { unchanged: true });
+      project.links = links;
+      if (links.length) project.href = links[0].href;
+      message = `content: update ${project.id} project links`;
     } else if (payload.type === "uploadImage" || payload.type === "uploadProfileImage") {
       const isProfileImage = payload.type === "uploadProfileImage";
       if (typeof payload.projectId !== "string" || typeof payload.mime !== "string" || typeof payload.data !== "string") {
@@ -725,7 +762,7 @@ async function saveChange(request, response) {
     await writeFile(temporaryFile, JSON.stringify(dataToWrite, null, 2) + "\n", "utf8");
     await rename(temporaryFile, contentFile);
     await execFile(process.execPath, [join(root, "scripts", "build-site.mjs")], { cwd: root, windowsHide: true });
-    const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
+    const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : []), ...deletedFiles.map(({ filename }) => `img/${filename}`)];
     const changedPaths = [relative(root, contentFile).split(sep).join("/"), ...generatedFiles, ...imagePaths];
     await runGit(["add", "--", ...changedPaths]);
     staged = true;
@@ -734,7 +771,7 @@ async function saveChange(request, response) {
     send(response, 200, { commit, message });
   } catch (error) {
     if (staged) {
-      const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : [])];
+      const imagePaths = [...archivedImages.map(({ filename, archiveName }) => [`img/${filename}`, `img/${archiveName}`]).flat(), ...(uploadedFile ? [`img/${uploadedFile.split(sep).at(-1)}`] : []), ...deletedFiles.map(({ filename }) => `img/${filename}`)];
       try { await runGit(["reset", "--", relative(root, contentFile).split(sep).join("/"), ...generatedFiles, ...imagePaths]); } catch {}
     }
     if (originalJson) {
@@ -752,6 +789,9 @@ async function saveChange(request, response) {
     }
     for (const image of archivedImages.toReversed()) {
       try { await rename(image.to, image.from); } catch {}
+    }
+    for (const file of deletedFiles) {
+      try { await writeFile(join(root, "img", file.filename), file.bytes, { flag: "wx" }); } catch {}
     }
     send(response, 500, { error: error.message || "Could not save the edit." });
   } finally {

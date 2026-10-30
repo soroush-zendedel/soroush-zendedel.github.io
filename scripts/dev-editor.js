@@ -21,7 +21,9 @@
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
     body.dev-editor-on [data-edit-field]:hover{background:#b91c1c12}
     [data-edit-field][contenteditable="true"]{outline:2px solid #b91c1c;background:#fffdf8;cursor:text}
-    .dev-project-wrap{position:relative;min-width:0}
+    .dev-project-editable{position:relative;min-width:0}
+    .dev-project-sortable.dev-dragging{opacity:.45}
+    .dev-project-sortable.dev-drop-target{outline:2px solid #b91c1c;outline-offset:3px;border-radius:10px}
     .dev-editor-handle{position:absolute;top:7px;inset-inline-start:7px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:grab;font-size:18px;line-height:1}
     .dev-editor-handle:active{cursor:grabbing}
     .dev-editor-settings-button{position:absolute;top:7px;inset-inline-start:46px;width:32px;height:32px;border:1px solid #b91c1c55;border-radius:8px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 2px 8px #0002;cursor:pointer;font-size:16px}
@@ -47,6 +49,10 @@
     .dev-editor-settings-close{width:30px;height:30px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px;line-height:1}
     .dev-editor-settings label{display:block;margin:0 0 5px;font-size:12px;font-weight:700}
     .dev-editor-settings input[type="url"],.dev-editor-settings input[type="text"]{box-sizing:border-box;width:100%;padding:8px;border:1px solid #29252433;border-radius:6px;background:white;color:#292524;direction:ltr}
+    .dev-project-link-row{display:grid;grid-template-columns:1fr auto;gap:6px;margin:8px 0;padding:8px;border:1px solid #2925241c;border-radius:8px;background:#fff}
+    .dev-project-link-row label{grid-column:1/-1;margin:0!important}
+    .dev-project-link-row input{grid-column:1/-1}
+    .dev-project-link-row button[data-danger],.dev-editor-settings button[data-danger]{background:#7f1d1d}
     .dev-contact-method{margin:10px 0;padding:9px 0;border-bottom:1px solid #29252418}
     .dev-contact-method strong{display:block;margin-bottom:6px}
     .dev-editor-settings input[type="file"]{display:block;width:100%;margin:7px 0}
@@ -69,8 +75,6 @@
     .dev-editor-modal-actions button{padding:9px 14px;border:0;border-radius:8px;background:#eee9e3;color:#292524;cursor:pointer;font:inherit;font-size:13px;font-weight:700}
     .dev-editor-modal-actions button[data-submit]{background:#b91c1c;color:white}
     @media(max-width:520px){.dev-editor-form-grid{grid-template-columns:1fr}.dev-editor-form-field[data-wide]{grid-column:auto}.dev-editor-modal-layer{padding:10px}.dev-editor-project-form{padding:14px}}
-    .dev-project-wrap.dev-dragging{opacity:.45}
-    .dev-project-wrap.dev-drop-target{outline:2px solid #b91c1c;outline-offset:3px;border-radius:10px}
     .dev-editor-tools{position:fixed;display:flex;gap:6px;padding:5px;border:1px solid #1a1a1a18;border-radius:10px;background:#fdfcfb;box-shadow:0 5px 20px #0002}
     .dev-editor-tools button{width:34px;height:32px;border:0;border-radius:7px;background:#eee9e3;color:#292524;cursor:pointer;font-size:20px}
     .dev-editor-tools button[data-save]{background:#b91c1c;color:white}
@@ -211,10 +215,9 @@
   }
 
   function unwrapCards() {
-    document.querySelectorAll(".dev-project-wrap").forEach((wrapper) => {
-      const link = wrapper.querySelector(":scope > a[data-project-id]");
-      if (link) wrapper.parentNode.insertBefore(link, wrapper);
-      wrapper.remove();
+    document.querySelectorAll(".dev-project-editable").forEach((card) => {
+      card.querySelectorAll(":scope > .dev-editor-handle,:scope > .dev-editor-settings-button").forEach((button) => button.remove());
+      card.classList.remove("dev-project-editable", "dev-project-sortable", "dev-dragging", "dev-drop-target");
     });
   }
 
@@ -223,32 +226,29 @@
   }
 
   function wrapCards() {
-    const grid = document.querySelector("[data-project-grid]");
-    if (!grid) return;
-    [...grid.querySelectorAll(":scope > a[data-project-id]")].forEach((link) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "dev-project-wrap";
-      wrapper.dataset.projectId = link.dataset.projectId;
-      grid.insertBefore(wrapper, link);
-      wrapper.append(link);
-
-      const handle = document.createElement("button");
-      handle.className = "dev-editor-handle";
-      handle.type = "button";
-      handle.draggable = true;
-      handle.title = isEnglish ? "Drag to reorder" : "برای جابه‌جایی پروژه بکشید";
-      handle.setAttribute("aria-label", isEnglish ? `Move ${link.dataset.projectId}` : `جابه‌جایی ${link.dataset.projectId}`);
-      handle.textContent = "⠿";
-      wrapper.append(handle);
-
+    [...document.querySelectorAll("[data-project-id][data-project-links]")].forEach((card) => {
+      if (card.querySelector(":scope > .dev-editor-settings-button")) return;
+      card.classList.add("dev-project-editable");
+      const sortable = card.parentElement?.matches("[data-project-grid]");
+      card.classList.toggle("dev-project-sortable", Boolean(sortable));
+      if (sortable) {
+        const handle = document.createElement("button");
+        handle.className = "dev-editor-handle";
+        handle.type = "button";
+        handle.draggable = true;
+        handle.title = isEnglish ? "Drag to reorder" : "برای جابه‌جایی پروژه بکشید";
+        handle.setAttribute("aria-label", isEnglish ? `Move ${card.dataset.projectId}` : `جابه‌جایی ${card.dataset.projectId}`);
+        handle.textContent = "⠿";
+        card.append(handle);
+      }
       const settingsButton = document.createElement("button");
       settingsButton.className = "dev-editor-settings-button";
       settingsButton.type = "button";
-      settingsButton.title = isEnglish ? "Project link and image" : "لینک و تصویر پروژه";
+      settingsButton.title = isEnglish ? "Project links, image, or delete" : "پیوندها، تصویر یا حذف پروژه";
       settingsButton.setAttribute("aria-label", settingsButton.title);
       settingsButton.textContent = "⚙";
-      settingsButton.addEventListener("click", () => openProjectSettings(wrapper, link, settingsButton));
-      wrapper.append(settingsButton);
+      settingsButton.addEventListener("click", () => openProjectSettings(card, settingsButton));
+      card.append(settingsButton);
     });
   }
 
@@ -309,17 +309,18 @@
     }
   }
 
-  function openProjectSettings(wrapper, link, trigger) {
+  function openProjectSettings(card, trigger) {
     const existing = document.querySelector(".dev-editor-settings");
-    if (existing?.dataset.projectId === wrapper.dataset.projectId) {
+    if (existing?.dataset.projectId === card.dataset.projectId) {
       existing.remove();
       return;
     }
     closeProjectSettings();
-    const projectId = wrapper.dataset.projectId;
+    const projectId = card.dataset.projectId;
     const panel = document.createElement("div");
     panel.className = "dev-editor-settings";
     panel.dataset.projectId = projectId;
+    panel.style.width = "min(420px,calc(100vw - 32px))";
     panel._trigger = trigger;
     panel.addEventListener("click", (event) => event.stopPropagation());
 
@@ -336,17 +337,70 @@
     close.addEventListener("click", closeProjectSettings);
     header.append(heading, close);
 
-    const linkLabel = document.createElement("label");
-    linkLabel.textContent = isEnglish ? "Project URL" : "نشانی پروژه";
-    const linkInput = document.createElement("input");
-    linkInput.type = "url";
-    linkInput.value = link.href;
-    linkInput.required = true;
-    linkInput.setAttribute("aria-label", linkLabel.textContent);
-    const saveLink = makeSettingsButton(isEnglish ? "Save link" : "ذخیرهٔ لینک", async () => {
-      await saveProjectSetting({ type: "updateHref", projectId, value: linkInput.value }, saveLink);
+    const linksHeading = document.createElement("strong");
+    linksHeading.textContent = isEnglish ? "Project links" : "پیوندهای پروژه";
+    const linksNote = document.createElement("p");
+    linksNote.textContent = isEnglish ? "Add up to 12 links with separate Persian and English labels." : "تا ۱۲ پیوند با برچسب جداگانهٔ فارسی و انگلیسی اضافه کنید.";
+    const linksList = document.createElement("div");
+    let links = [];
+    try { links = JSON.parse(card.dataset.projectLinks || "[]"); } catch {}
+    if (!Array.isArray(links)) links = [];
+    const renderLinkRows = () => {
+      linksList.replaceChildren();
+      links.forEach((link, index) => {
+        const row = document.createElement("div");
+        row.className = "dev-project-link-row";
+        const makeLinkInput = (labelText, type, value, placeholder) => {
+          const label = document.createElement("label");
+          label.textContent = labelText;
+          const input = document.createElement("input");
+          input.type = type;
+          input.value = value || "";
+          input.required = true;
+          input.maxLength = type === "url" ? 2000 : 80;
+          input.placeholder = placeholder;
+          input.setAttribute("aria-label", labelText);
+          row.append(label, input);
+          return input;
+        };
+        link.label ||= {};
+        link.label.fa ||= "";
+        link.label.en ||= "";
+        link._faInput = makeLinkInput(isEnglish ? "Persian label" : "برچسب فارسی", "text", link.label.fa, isEnglish ? "For example: نسخهٔ وب" : "مثلاً: نسخهٔ وب");
+        link._enInput = makeLinkInput(isEnglish ? "English label" : "برچسب انگلیسی", "text", link.label.en, "Web version");
+        link._hrefInput = makeLinkInput(isEnglish ? "URL" : "نشانی پیوند", "url", link.href, "https://example.com");
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.dataset.danger = "";
+        remove.textContent = isEnglish ? "Remove link" : "حذف پیوند";
+        remove.addEventListener("click", () => { syncLinkRows(); links.splice(index, 1); renderLinkRows(); });
+        row.append(remove);
+        linksList.append(row);
+      });
+    };
+    const syncLinkRows = () => links.forEach((link) => {
+      if (!link._faInput) return;
+      link.label.fa = link._faInput.value;
+      link.label.en = link._enInput.value;
+      link.href = link._hrefInput.value;
     });
-    panel.append(header, linkLabel, linkInput, saveLink);
+    const addLink = makeSettingsButton(isEnglish ? "+ Add link" : "+ افزودن پیوند", () => {
+      if (links.length >= 12) return toast(isEnglish ? "A project can have up to 12 links." : "هر پروژه حداکثر ۱۲ پیوند می‌تواند داشته باشد.", true);
+      syncLinkRows();
+      links.push({ label: { fa: "", en: "" }, href: "" });
+      renderLinkRows();
+    });
+    const saveLinks = makeSettingsButton(isEnglish ? "Save links" : "ذخیرهٔ پیوندها", async () => {
+      const nextLinks = links.map((link) => ({
+        label: { fa: link._faInput.value.trim(), en: link._enInput.value.trim() },
+        href: link._hrefInput.value.trim(),
+      }));
+      const invalid = links.some((link) => !link._faInput.reportValidity() || !link._enInput.reportValidity() || !link._hrefInput.reportValidity());
+      if (invalid) return;
+      await saveProjectSetting({ type: "updateProjectLinks", projectId, links: nextLinks }, saveLinks);
+    });
+    renderLinkRows();
+    panel.append(header, linksHeading, linksNote, linksList, addLink, saveLinks);
 
     const divider = document.createElement("hr");
     const imageLabel = document.createElement("label");
@@ -376,10 +430,17 @@
         toast(error.message, true);
       }
     });
-    panel.append(divider, imageLabel, fileInput, replaceImage);
+    const deleteProject = makeSettingsButton(isEnglish ? "Delete project" : "حذف پروژه", async () => {
+      const confirmed = window.confirm(isEnglish
+        ? `Delete “${projectId}” and remove it from all pages?`
+        : `پروژهٔ «${projectId}» از همهٔ صفحه‌ها حذف شود؟`);
+      if (!confirmed) return;
+      await saveProjectSetting({ type: "deleteProject", projectId }, deleteProject);
+    });
+    deleteProject.dataset.danger = "";
+    panel.append(divider, imageLabel, fileInput, replaceImage, deleteProject);
     document.body.append(panel);
     placeSettings(panel, trigger);
-    linkInput.focus();
   }
 
   function openProfileImageSettings() {
@@ -1580,26 +1641,27 @@
   document.addEventListener("dragstart", (event) => {
     const handle = event.target.closest(".dev-editor-handle");
     if (!enabled || !handle) return;
-    const wrapper = handle.closest(".dev-project-wrap");
-    event.dataTransfer.setData("text/plain", wrapper.dataset.projectId);
+    const card = handle.closest(".dev-project-sortable");
+    if (!card) return;
+    event.dataTransfer.setData("text/plain", card.dataset.projectId);
     event.dataTransfer.effectAllowed = "move";
-    wrapper.classList.add("dev-dragging");
+    card.classList.add("dev-dragging");
   });
   document.addEventListener("dragend", (event) => {
-    event.target.closest(".dev-editor-handle")?.closest(".dev-project-wrap")?.classList.remove("dev-dragging");
+    event.target.closest(".dev-editor-handle")?.closest(".dev-project-sortable")?.classList.remove("dev-dragging");
     document.querySelectorAll(".dev-drop-target").forEach((item) => item.classList.remove("dev-drop-target"));
   });
   document.addEventListener("dragover", (event) => {
-    const wrapper = event.target.closest(".dev-project-wrap");
-    if (!enabled || !wrapper || !document.querySelector(".dev-dragging")) return;
+    const card = event.target.closest(".dev-project-sortable");
+    if (!enabled || !card || !document.querySelector(".dev-project-sortable.dev-dragging")) return;
     event.preventDefault();
-    wrapper.classList.add("dev-drop-target");
+    card.classList.add("dev-drop-target");
   });
-  document.addEventListener("dragleave", (event) => event.target.closest(".dev-project-wrap")?.classList.remove("dev-drop-target"));
+  document.addEventListener("dragleave", (event) => event.target.closest(".dev-project-sortable")?.classList.remove("dev-drop-target"));
   document.addEventListener("drop", (event) => {
-    const target = event.target.closest(".dev-project-wrap");
-    const moving = document.querySelector(".dev-project-wrap.dev-dragging");
-    if (!enabled || !target || !moving || target === moving) return;
+    const target = event.target.closest(".dev-project-sortable");
+    const moving = document.querySelector(".dev-project-sortable.dev-dragging");
+    if (!enabled || !target || !moving || target === moving || target.parentNode !== moving.parentNode) return;
     event.preventDefault();
     const rect = target.getBoundingClientRect();
     const sameRow = Math.abs(event.clientY - (rect.top + rect.height / 2)) < rect.height / 2;
@@ -1609,7 +1671,7 @@
       : event.clientY > rect.top + rect.height / 2;
     target.parentNode.insertBefore(moving, after ? target.nextSibling : target);
     target.classList.remove("dev-drop-target");
-    const ids = [...target.parentNode.querySelectorAll(":scope > .dev-project-wrap")].map((item) => item.dataset.projectId);
+    const ids = [...target.parentNode.querySelectorAll(":scope > .dev-project-sortable")].map((item) => item.dataset.projectId);
     saveOrder(ids);
   });
 

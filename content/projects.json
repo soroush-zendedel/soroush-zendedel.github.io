@@ -4,6 +4,10 @@
     "order": 1,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/shenobin/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/shenobin/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/shenobin" }
+    ],
     "image": "shenobin.webp",
     "imageFallback": "S",
     "home": {
@@ -33,6 +37,10 @@
     "order": 2,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/khater/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/khater/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/khater" }
+    ],
     "image": "khater.webp",
     "imageFallback": "K",
     "home": {
@@ -62,6 +70,10 @@
     "order": 3,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/tara/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/tara/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/tara" }
+    ],
     "image": "tara.webp",
     "imageFallback": "T",
     "home": {
@@ -90,7 +102,11 @@
     "id": "notella",
     "order": 4,
     "visible": true,
-    "href": "https://github.com/soroush-zendedel/notella",
+    "href": "https://soroush-zendedel.github.io/notella/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/notella/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/notella" }
+    ],
     "image": "notella.webp",
     "imageFallback": "N",
     "home": {
@@ -120,6 +136,10 @@
     "order": 5,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/countdown/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/countdown/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/countdown" }
+    ],
     "image": "countdown.webp",
     "imageFallback": "C",
     "home": {
@@ -149,6 +169,10 @@
     "order": 6,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/silk-road/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/silk-road/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/silk-road" }
+    ],
     "image": "silkroad.webp",
     "imageFallback": "SR",
     "home": {

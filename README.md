@@ -64,7 +64,7 @@ $env:PORT=8083; pnpm dev
 
 ۱. پیش از شروع، تغییرات قبلی را commit کنید یا کنار بگذارید تا مخزن تمیز باشد. ویرایشگر تغییرهای نامرتبط را وارد commitهای محتوایی نمی‌کند.
 
-۲. در پیش‌نمایش، «ویرایش» را روشن کنید و روی بخش موردنظر یا دکمهٔ تنظیمات آن بزنید. متن‌های فارسی و انگلیسی، لینک‌ها، تصویرها، پروژه‌ها، ترتیب و نمایش پروژه‌ها، شبکه‌های اجتماعی، اطلاعات تماس، کارت بلاگ و اطلاعات صفحهٔ درباره از همین رابط قابل تغییرند.
+۲. در پیش‌نمایش، «ویرایش» را روشن کنید و روی بخش موردنظر یا دکمهٔ تنظیمات آن بزنید. متن‌های فارسی و انگلیسی، افزودن و حذف پروژه، ترتیب پروژه‌ها، تصویر و پیوندهای هر پروژه (با برچسب دلخواه فارسی و انگلیسی)، شبکه‌های اجتماعی، اطلاعات تماس، کارت بلاگ و صفحهٔ درباره از همین رابط قابل تغییرند.
 
 ۳. هر بار که یک تغییر را تأیید می‌کنید، ویرایشگر داده و صفحه‌های HTML تولیدشده را ذخیره می‌کند و یک commit جداگانه روی شاخهٔ پیش‌فرض مخزن محلی می‌سازد.
 
@@ -204,7 +204,7 @@ Personas available to everyone are listed in `personas/catalog.json`. **Night En
 The visual editor is available only through the local preview; it is not shown on the live website.
 
 1. Start with a clean working tree. Commit or set aside unrelated changes first.
-2. Enable **Edit** in the preview and open the settings for the section you want to change. The editor supports bilingual text, links, images, projects, project order and visibility, social links, contact methods, the blog card, and About-page details.
+2. Enable **Edit** in the preview and open the settings for the section you want to change. The editor supports bilingual text, adding and deleting projects, project order, project images, and multiple project links with custom Persian and English labels, plus social links, contact methods, the blog card, and About-page details.
 3. Each confirmed change updates its data and generated HTML, then creates a separate commit on the repository's default branch.
 4. When the edits are ready, click **Push changes**. The editor pushes those commits to the default branch of the repository you cloned. If you cloned your fork, only your fork is updated.
 5. Pushing to the original repository's `main` updates its live site. To publish a fork as a website, its owner must enable GitHub Pages in that fork's settings.

@@ -79,6 +79,17 @@ function validateProjects(items) {
     if (!project.href || !project.image || !project.imageFallback || !project.home?.fa || !project.home?.en || !project.about?.fa || !project.about?.en) {
       throw new Error(`Project data is incomplete: ${project.id}`);
     }
+    if (project.links !== undefined) {
+      if (!Array.isArray(project.links) || project.links.length > 12) throw new Error(`Project links must be a list of up to 12 items: ${project.id}`);
+      for (const link of project.links) {
+        if (!link?.label || typeof link.label.fa !== "string" || typeof link.label.en !== "string" || !link.label.fa.trim() || !link.label.en.trim() || link.label.fa.length > 80 || link.label.en.length > 80) {
+          throw new Error(`Project link labels must include Persian and English text: ${project.id}`);
+        }
+        let url;
+        try { url = new URL(link.href); } catch { throw new Error(`Project link must be an absolute URL: ${project.id}`); }
+        if (!["http:", "https:"].includes(url.protocol) || link.href.length > 2_000) throw new Error(`Project link must use http or https: ${project.id}`);
+      }
+    }
     ids.add(project.id);
     orders.add(project.order);
   }
@@ -124,6 +135,7 @@ function renderHomeImage(project, language) {
 }
 
 function getProjectLinks(project) {
+  if (Array.isArray(project.links)) return project.links;
   const projectUrl = new URL(project.href);
   const host = projectUrl.hostname.toLowerCase();
   let owner = "";
@@ -146,20 +158,17 @@ function getProjectLinks(project) {
   const sourceHref = safeSegment.test(owner) && safeSegment.test(repository)
     ? `https://github.com/${owner}/${repository}`
     : "";
-  return { webHref, sourceHref };
+  const links = [{ href: webHref, label: { fa: "نسخهٔ وب ↗", en: "Web version ↗" } }];
+  if (sourceHref) links.push({ href: sourceHref, label: { fa: "کد منبع ↗", en: "Source code ↗" } });
+  return links;
 }
 
 function renderProjectActions(project, language, name = project.home[language].name) {
-  const { webHref, sourceHref } = getProjectLinks(project);
-  const webLabel = language === "en" ? "Web version ↗" : "نسخهٔ وب ↗";
-  const sourceLabel = language === "en" ? "Source code ↗" : "کد منبع ↗";
-  const webAction = webHref
-    ? `<a class="project-action" data-project-action="web" href="${escapeHtml(webHref)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(`${webLabel} ${name}`)}">${webLabel}</a>`
-    : "";
-  const sourceAction = sourceHref
-    ? `<a class="project-action" data-project-action="source" href="${escapeHtml(sourceHref)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(`${sourceLabel} ${name}`)}">${sourceLabel}</a>`
-    : "";
-  return `<span class="project-actions">${webAction}${sourceAction}</span>`;
+  const actions = getProjectLinks(project).map((link, index) => {
+    const label = link.label[language];
+    return `<a class="project-action" data-project-action="${index}" href="${escapeHtml(link.href)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(`${label} ${name}`)}">${escapeHtml(label)}</a>`;
+  }).join("");
+  return `<span class="project-actions">${actions}</span>`;
 }
 
 function renderHomeProject(project, language) {
@@ -167,7 +176,7 @@ function renderHomeProject(project, language) {
   const en = project.home.en;
   const actions = renderProjectActions(project, language);
   return `                    <!-- ${escapeHtml(project.id)} -->
-                    <article data-project-id="${escapeHtml(project.id)}" class="project-card flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+                    <article data-project-id="${escapeHtml(project.id)}" data-project-links="${escapeHtml(JSON.stringify(getProjectLinks(project)))}" class="project-card flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
                         ${renderHomeImage(project, language)}
                         <div class="flex-1 px-5">
                             <div class="project-heading">
@@ -185,7 +194,7 @@ function renderHomeProject(project, language) {
 function renderAboutProject(project, language) {
   const copy = project.about[language];
   const actions = renderProjectActions(project, language, copy.name);
-  return `          <li class="project-card project-about" data-project-id="${escapeHtml(project.id)}"><div class="project-heading"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong></div><span class="project-about-description" data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span>${actions}</li>`;
+  return `          <li class="project-card project-about" data-project-id="${escapeHtml(project.id)}" data-project-links="${escapeHtml(JSON.stringify(getProjectLinks(project)))}"><div class="project-heading"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong></div><span class="project-about-description" data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span>${actions}</li>`;
 }
 
 function renderSiteFooter(language) {
@@ -232,7 +241,7 @@ function renderDirectoryProject(project, language) {
   const name = language === "fa"
     ? `<span data-edit-field="home.fa.name">${escapeHtml(copy.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| ${escapeHtml(project.home.en.name)}</span>`
     : `<span data-edit-field="home.en.name">${escapeHtml(copy.name)}</span>`;
-  return `          <article data-project-id="${escapeHtml(project.id)}" class="project-card flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
+  return `          <article data-project-id="${escapeHtml(project.id)}" data-project-links="${escapeHtml(JSON.stringify(getProjectLinks(project)))}" class="project-card flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
             ${image}
             <div class="project-list-copy">
               <div class="project-heading"><h2 class="project-title text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">${name}</h2></div>
