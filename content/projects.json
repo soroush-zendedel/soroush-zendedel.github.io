@@ -164,53 +164,8 @@
     }
   },
   {
-    "id": "notella",
-    "order": 5,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/notella/",
-    "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/notella/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/notella"
-      }
-    ],
-    "image": "notella.webp",
-    "imageFallback": "N",
-    "home": {
-      "fa": {
-        "name": "نوتلا",
-        "description": "یادداشت‌برداری از راه وب یا خط فرمان، با ذخیرهٔ محلی نوشته‌ها."
-      },
-      "en": {
-        "name": "Notella",
-        "description": "A local-first note-taking app with web and command-line interfaces."
-      },
-      "alt": "Notella - Note Taking App"
-    },
-    "about": {
-      "fa": {
-        "name": "نوتلا (Notella)",
-        "description": "یادداشت‌هایت را با رابط وب یا خط فرمان بنویس؛ نوشته‌ها به‌صورت محلی ذخیره می‌شوند."
-      },
-      "en": {
-        "name": "Notella",
-        "description": "A note-taking app with web and command-line interfaces and local storage."
-      }
-    }
-  },
-  {
     "id": "countdown",
-    "order": 6,
+    "order": 5,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/countdown/",
     "links": [
@@ -250,6 +205,51 @@
       "en": {
         "name": "Countdown",
         "description": "A project that makes the passage of time visible and explores the history of numbers."
+      }
+    }
+  },
+  {
+    "id": "notella",
+    "order": 6,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/notella/",
+    "links": [
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/notella/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/notella"
+      }
+    ],
+    "image": "notella.webp",
+    "imageFallback": "N",
+    "home": {
+      "fa": {
+        "name": "نوتلا",
+        "description": "یادداشت‌برداری از راه وب یا خط فرمان، با ذخیرهٔ محلی نوشته‌ها."
+      },
+      "en": {
+        "name": "Notella",
+        "description": "A local-first note-taking app with web and command-line interfaces."
+      },
+      "alt": "Notella - Note Taking App"
+    },
+    "about": {
+      "fa": {
+        "name": "نوتلا (Notella)",
+        "description": "یادداشت‌هایت را با رابط وب یا خط فرمان بنویس؛ نوشته‌ها به‌صورت محلی ذخیره می‌شوند."
+      },
+      "en": {
+        "name": "Notella",
+        "description": "A note-taking app with web and command-line interfaces and local storage."
       }
     }
   },
