@@ -13,7 +13,7 @@
       "en": "Night Engineer"
     },
     "role": {
-      "fa": "مهندس نرم‌افزار در روز؛ سازنده در شب",
+      "fa": "در روشنایی پنهانم؛ با موسیقی و تاریکی، می‌سازم.",
       "en": "Software engineer by day; maker by night"
     },
     "roleEnglishPage": {
@@ -24,7 +24,7 @@
       "en": "When the city quiets down, ideas shine brighter."
     },
     "contactButton": {
-      "fa": "گفت‌وگو با من",
+      "fa": "چت یا تماس تلفنی",
       "en": "Let’s talk"
     },
     "footerEmail": {
@@ -40,11 +40,11 @@
       "en": "A note after dark:"
     },
     "intro": {
-      "fa": "روزها نرم‌افزار می‌سازم؛ شب‌ها برای موسیقی و طراحی ابزار می‌سازم.",
+      "fa": "ایده‌های‌ام از قلب‌ام می‌آید؛ مغزم تولید می کند.",
       "en": "By day I build software; by night I make tools for music and design."
     },
     "bio": {
-      "fa": "وقتی رفت‌وآمد کمتر می‌شود، تمرکزم را روی ایده‌هایی می‌گذارم که روزمره را کمی ساده‌تر و زیباتر می‌کنند. روی ابزارهای موسیقی و طراحی کار می‌کنم؛ با چند پنجرهٔ باز روی مانیتور، فنجانی کنار دستم و نور آرامی که از پنجره می‌آید. این ساعت‌ها بیشتر می‌شنوم، می‌سازم و یاد می‌گیرم.",
+      "fa": "وقتی رفت‌وآمد کمتر می‌شود، تمرکزم را روی ایده‌هایی می‌گذارم که روزمره را کمی ساده‌تر و زیباتر می‌کنند. روی ابزارهای موسیقی و طراحی کار می‌کنم؛ با چند پنجرهٔ باز روی مانیتور، فنجانی کنار دستم و چراغی با نورِ کم. این ساعت‌ها بیشتر می‌شنوم، می‌سازم و یاد می‌گیرم.",
       "en": "When the city quiets down, I focus on ideas that can make everyday life a little simpler and more expressive. I work on tools for music and design, with a few windows open on my monitor, a cup nearby, and the soft light of the night outside. These are hours for listening, building, and learning."
     },
     "quote": {
