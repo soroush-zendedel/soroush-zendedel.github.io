@@ -12,8 +12,9 @@
   const assetBase = new URL("./", currentScript.src);
   const isEnglish = document.documentElement.lang === "en";
   const copy = isEnglish
-    ? { title: "Persona", narrator: "Narrator (default)", upload: "Upload persona ZIP", choose: "Choose a persona", close: "Close", localNote: "Uploaded personas stay in this browser.", badZip: "This ZIP is invalid or does not match the persona package format.", saved: "Persona saved in this browser.", replace: "A persona with this ID is already stored in this browser. Replace it? The current version will be overwritten.", unsupportedZip: "This browser cannot unpack this ZIP format. Try a standard ZIP using Deflate compression.", remove: "Remove this uploaded persona" }
-    : { title: "پرسونا", narrator: "راوی (پیش‌فرض)", upload: "بارگذاری فایل ZIP پرسونا", choose: "یک پرسونا انتخاب کنید", close: "بستن", localNote: "پرسوناهای بارگذاری‌شده در همین مرورگر می‌مانند.", badZip: "ساختار فایل ZIP معتبر نیست یا با قالب بستهٔ پرسونا سازگار نیست.", saved: "پرسونا در همین مرورگر ذخیره شد.", replace: "پرسونایی با این شناسه در این مرورگر ذخیره شده است. جایگزین شود؟ نسخهٔ فعلی بازنویسی می‌شود.", unsupportedZip: "مرورگر نتوانست این نوع ZIP را باز کند. از ZIP معمولی با فشرده‌سازی Deflate استفاده کنید.", remove: "حذف این پرسونا از مرورگر" };
+    ? { title: "Persona", narrator: "Narrator (default)", upload: "Upload persona ZIP", choose: "Choose a persona", close: "Close", localNote: "Uploaded personas stay in this browser. Built-in personas download from this site when selected.", badZip: "This ZIP is invalid or does not match the persona package format.", saved: "Persona saved in this browser.", unavailable: "This persona is not available right now. Try again or upload its ZIP.", replace: "A persona with this ID is already stored in this browser. Replace it? The current version will be overwritten.", unsupportedZip: "This browser cannot unpack this ZIP format. Try a standard ZIP using Deflate compression.", remove: "Remove this persona from this browser" }
+    : { title: "پرسونا", narrator: "راوی (پیش‌فرض)", upload: "بارگذاری فایل ZIP پرسونا", choose: "یک پرسونا انتخاب کنید", close: "بستن", localNote: "پرسوناهای بارگذاری‌شده در همین مرورگر می‌مانند؛ پرسوناهای آماده هنگام انتخاب از همین سایت دریافت می‌شوند.", badZip: "ساختار فایل ZIP معتبر نیست یا با قالب بستهٔ پرسونا سازگار نیست.", saved: "پرسونا در همین مرورگر ذخیره شد.", unavailable: "این پرسونا در حال حاضر در دسترس نیست. دوباره تلاش کنید یا ZIP آن را بارگذاری کنید.", replace: "پرسونایی با این شناسه در این مرورگر ذخیره شده است. جایگزین شود؟ نسخهٔ فعلی بازنویسی می‌شود.", unsupportedZip: "مرورگر نتوانست این نوع ZIP را باز کند. از ZIP معمولی با فشرده‌سازی Deflate استفاده کنید.", remove: "حذف این پرسونا از همین مرورگر" };
+  let builtInPersonas = [];
 
   function openDatabase() {
     return new Promise((resolve, reject) => {
@@ -143,6 +144,28 @@
 
   function assertText(value, maxLength = 12000) {
     if (typeof value !== "string" || value.length > maxLength) throw new Error("Invalid persona text");
+  }
+
+  async function loadBuiltinCatalog() {
+    const catalogUrl = new URL("../personas/catalog.json", assetBase);
+    const response = await fetch(catalogUrl, { credentials: "same-origin" });
+    if (!response.ok) throw new Error("Persona catalog unavailable");
+    const catalog = await response.json();
+    if (catalog?.schemaVersion !== 1 || !Array.isArray(catalog.personas) || catalog.personas.length > 50) throw new Error("Invalid persona catalog");
+    const siteRoot = new URL("../", assetBase);
+    const ids = new Set();
+    return catalog.personas.map((entry) => {
+      if (!entry || !ID_PATTERN.test(entry.id) || entry.id === "narrator" || ids.has(entry.id)) throw new Error("Invalid catalog persona ID");
+      ids.add(entry.id);
+      if (!entry.label || typeof entry.label !== "object") throw new Error("Invalid catalog persona label");
+      assertText(entry.label.fa, 80);
+      assertText(entry.label.en, 80);
+      assertText(entry.version, 40);
+      assertText(entry.package, 200);
+      const packageUrl = new URL(entry.package, catalogUrl);
+      if (packageUrl.origin !== location.origin || !packageUrl.pathname.startsWith(siteRoot.pathname) || packageUrl.search || packageUrl.hash || !/\.zip$/i.test(packageUrl.pathname)) throw new Error("Invalid catalog package URL");
+      return { id: entry.id, label: entry.label, version: entry.version, packageUrl: packageUrl.href };
+    });
   }
 
   function validatePackage(files) {
@@ -294,9 +317,25 @@
     if (!ID_PATTERN.test(id)) return null;
     const record = await dbRequest("readonly", "getAll");
     const item = record.find((entry) => entry.id === id);
-    if (!item) return null;
-    const files = await unzip(item.archive);
-    const validated = validatePackage(files);
+    const builtin = builtInPersonas.find((entry) => entry.id === id);
+    let archive = item?.archive;
+    let files = null;
+    let validated = null;
+    if (!item || (builtin && item.source === "builtin" && item.version !== builtin.version)) {
+      if (!builtin) return null;
+      const response = await fetch(builtin.packageUrl, { credentials: "same-origin" });
+      if (!response.ok) throw new Error("Built-in persona download failed");
+      archive = await response.arrayBuffer();
+      if (archive.byteLength > MAX_ARCHIVE_SIZE) throw new Error("Built-in persona archive too large");
+      files = await unzip(archive);
+      validated = validatePackage(files);
+      if (validated.manifest.id !== id) throw new Error("Built-in persona ID mismatch");
+      await dbRequest("readwrite", "put", { id, label: builtin.label, archive, source: "builtin", version: builtin.version });
+    }
+    if (!validated) {
+      files = await unzip(archive);
+      validated = validatePackage(files);
+    }
     if (validated.manifest.id !== id) return null;
     if (validated.manifest.kind === "styled" && validated.manifest.styleMode === "isolated") removeNarratorStyles();
     applyProfile(validated.profile, files);
@@ -350,13 +389,23 @@
     defaults.value = "narrator";
     defaults.textContent = copy.narrator;
     select.append(defaults);
+    const optionIds = new Set([defaults.value]);
+    for (const persona of builtInPersonas) {
+      const option = document.createElement("option");
+      option.value = persona.id;
+      option.textContent = persona.label[isEnglish ? "en" : "fa"];
+      select.append(option);
+      optionIds.add(persona.id);
+    }
     for (const upload of uploads) {
+      if (optionIds.has(upload.id)) continue;
       const option = document.createElement("option");
       option.value = upload.id;
       option.textContent = upload.label?.[isEnglish ? "en" : "fa"] || upload.id;
       select.append(option);
+      optionIds.add(upload.id);
     }
-    select.value = uploads.some((item) => item.id === activeId) ? activeId : "narrator";
+    select.value = optionIds.has(activeId) ? activeId : "narrator";
     select.addEventListener("change", () => setPersonaInUrl(select.value));
     panel.append(select);
 
@@ -431,6 +480,11 @@
   }
 
   async function init() {
+    try {
+      builtInPersonas = await loadBuiltinCatalog();
+    } catch {
+      builtInPersonas = [];
+    }
     const pendingNotice = sessionStorage.getItem("persona-notice");
     if (pendingNotice) {
       sessionStorage.removeItem("persona-notice");
@@ -445,6 +499,7 @@
         const url = new URL(location.href);
         url.searchParams.delete("persona");
         history.replaceState(null, "", url.href);
+        showNotice(copy.unavailable, true);
       }
     } catch {
       showNotice(copy.badZip, true);

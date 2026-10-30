@@ -54,6 +54,8 @@ $env:PORT=8083; pnpm dev
 
 با دکمهٔ شناور «پرسونا» می‌توانید فایل ZIP بارگذاری کنید. بسته‌های نسخهٔ ۱ داده و آواتار می‌گیرند؛ نسخهٔ ۲ علاوه بر آن CSS و دارایی‌های تصویری و فونت محلی می‌پذیرد. در حالت `isolated`، CSS پرسونا جایگزین همهٔ استایل‌های سایت می‌شود و باید ظاهر کامل صفحه را تعریف کند. ZIP فقط در همان مرورگر ذخیره می‌شود. قالب در [راهنمای بستهٔ پرسونا](PERSONA-PACKAGE.md) آمده است.
 
+فهرست پرسوناهای آماده برای همه در `personas/catalog.json` تعریف می‌شود. «مهندس شب» از ابتدا در این فهرست است؛ بسته‌اش هنگام انتخاب از سایت دریافت و در همان مرورگر ذخیره می‌شود.
+
 ## ویرایش محتوا در سایت
 
 ویرایشگر بصری فقط با سرور محلی بالا فعال است و در نسخهٔ زنده نمایش داده نمی‌شود.
@@ -207,6 +209,8 @@ $env:PORT=8083; pnpm dev
 ```
 
 Use the floating **Persona** button to upload a ZIP. Version 1 accepts profile data and an avatar; version 2 also accepts CSS plus local image and font assets. In `isolated` mode, the persona stylesheet replaces all site styles and must define the complete page appearance. The ZIP stays in that browser. See the [persona package guide](PERSONA-PACKAGE.md) for the archive formats.
+
+Personas available to everyone are listed in `personas/catalog.json`. **Night Engineer** is included by default; its ZIP downloads from the site when selected and is cached in that browser.
 
 ## Edit website content
 

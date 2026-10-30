@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "personas": [
+    {
+      "id": "night-engineer",
+      "label": {
+        "fa": "مهندس شب",
+        "en": "Night Engineer"
+      },
+      "version": "1.0.0",
+      "package": "../night-engineer-persona-template.zip"
+    }
+  ]
+}
