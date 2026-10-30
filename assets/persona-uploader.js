@@ -148,7 +148,7 @@
 
   async function loadBuiltinCatalog() {
     const catalogUrl = new URL("../personas/catalog.json", assetBase);
-    const response = await fetch(catalogUrl, { credentials: "same-origin" });
+    const response = await fetch(catalogUrl, { credentials: "same-origin", cache: "no-cache" });
     if (!response.ok) throw new Error("Persona catalog unavailable");
     const catalog = await response.json();
     if (catalog?.schemaVersion !== 1 || !Array.isArray(catalog.personas) || catalog.personas.length > 50) throw new Error("Invalid persona catalog");
@@ -323,7 +323,7 @@
     let validated = null;
     if (!item || (builtin && item.source === "builtin" && item.version !== builtin.version)) {
       if (!builtin) return null;
-      const response = await fetch(builtin.packageUrl, { credentials: "same-origin" });
+      const response = await fetch(builtin.packageUrl, { credentials: "same-origin", cache: "no-cache" });
       if (!response.ok) throw new Error("Built-in persona download failed");
       archive = await response.arrayBuffer();
       if (archive.byteLength > MAX_ARCHIVE_SIZE) throw new Error("Built-in persona archive too large");
