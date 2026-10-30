@@ -1,6 +1,10 @@
 node_modules/
 .pnpm-store/
 
+# Legacy fan-test packages; keep them local, out of public releases.
+batman-persona-*.zip
+personas/batman/
+
 # Package manager logs
 npm-debug.log*
 pnpm-debug.log*

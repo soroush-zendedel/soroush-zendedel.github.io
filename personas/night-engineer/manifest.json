@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 2,
+  "kind": "styled",
+  "id": "night-engineer",
+  "label": { "fa": "مهندس شب — پوستهٔ مستقل", "en": "Night Engineer — isolated theme" },
+  "profileFile": "profile.json",
+  "stylesheet": "styles/night-engineer.css",
+  "styleMode": "isolated"
+}

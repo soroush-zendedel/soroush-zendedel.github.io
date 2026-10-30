@@ -1,0 +1,95 @@
+{
+  "avatar": {
+    "image": "images/avatar.jpg",
+    "alt": "سروش زنده‌دل در فضایی آرام زیر نور ماه"
+  },
+  "links": {
+    "contact": "mailto:soroush_zendedel@Live.com",
+    "projects": "./projects.html"
+  },
+  "fields": {
+    "name": {
+      "fa": "سروش زنده‌دل | مهندس شب",
+      "en": "Soroush Zendedel — Night Engineer"
+    },
+    "role": {
+      "fa": "مهندس نرم‌افزار در روز؛ سازنده در شب",
+      "en": "Software engineer by day; maker by night"
+    },
+    "roleEnglishPage": {
+      "en": "A software engineer working under moonlight"
+    },
+    "tagline": {
+      "fa": "وقتی شهر آرام می‌گیرد، ایده‌ها روشن‌تر می‌شوند.",
+      "en": "When the city quiets down, ideas shine brighter."
+    },
+    "contactButton": {
+      "fa": "گفت‌وگو با من",
+      "en": "Let’s talk"
+    },
+    "footerEmail": {
+      "fa": "soroush_zendedel@Live.com",
+      "en": "soroush_zendedel@Live.com"
+    },
+    "footerCredit": {
+      "fa": "CRAFTED WITH CODE & CREATIVITY BY SOROUSH ZENDEDEL",
+      "en": "CRAFTED WITH CODE & CREATIVITY BY SOROUSH ZENDEDEL"
+    },
+    "bioLead": {
+      "fa": "یادداشت شبانه:",
+      "en": "A note after dark:"
+    },
+    "intro": {
+      "fa": "روزها نرم‌افزار می‌سازم؛ شب‌ها برای موسیقی و طراحی ابزار می‌سازم.",
+      "en": "By day I build software; by night I make tools for music and design."
+    },
+    "bio": {
+      "fa": "وقتی رفت‌وآمد کمتر می‌شود، تمرکزم را روی ایده‌هایی می‌گذارم که روزمره را کمی ساده‌تر و زیباتر می‌کنند. روی ابزارهای موسیقی و طراحی کار می‌کنم؛ با چند پنجرهٔ باز روی مانیتور، فنجانی کنار دستم و نور آرامی که از پنجره می‌آید. این ساعت‌ها بیشتر می‌شنوم، می‌سازم و یاد می‌گیرم.",
+      "en": "When the city quiets down, I focus on ideas that can make everyday life a little simpler and more expressive. I work on tools for music and design, with a few windows open on my monitor, a cup nearby, and the soft light of the night outside. These are hours for listening, building, and learning."
+    },
+    "quote": {
+      "fa": "«اگر راهی روشن نیست، آرام‌تر برو و نشانه‌ها را دوباره ببین.»",
+      "en": "“When the way is unclear, slow down and read the signs again.”"
+    },
+    "bioEnd": {
+      "fa": "گاهی همین مکث، قدم بعدی را پیدا می‌کند.",
+      "en": "Sometimes a pause is how the next step appears."
+    },
+    "summary1": {
+      "fa": "نام این فضا: مهندس شب؛ قلمرو: کد، موسیقی و ایده‌ها.",
+      "en": "Night Engineer. A workspace for code, music, and ideas."
+    },
+    "summary2": {
+      "fa": "ابزار موسیقی می‌سازم؛ چون ایده‌ها دوست دارند شنیده شوند.",
+      "en": "I build music tools so ideas have a way to be heard."
+    },
+    "summary3": {
+      "fa": "دانش‌آموختهٔ مهندسی فناوری اطلاعات؛ کنجکاو دربارهٔ طراحی و فناوری.",
+      "en": "IT engineering graduate, curious about design and technology."
+    },
+    "summary4": {
+      "fa": "بین کد و کلمات، دنبال راه‌حل‌های ساده و معنادار می‌گردم.",
+      "en": "Between code and words, I look for clear and meaningful solutions."
+    },
+    "summary5": {
+      "fa": "پذیرای گفت‌وگو دربارهٔ هنر، موسیقی، فناوری و ایده‌های تازه.",
+      "en": "Always happy to talk about art, music, technology, and new ideas."
+    },
+    "summary6": {
+      "fa": "شب آرام می‌گذرد؛ ایده‌ها روشن می‌مانند.",
+      "en": "The night grows quiet; ideas stay bright."
+    },
+    "projectsNav": {
+      "fa": "پروژه‌ها",
+      "en": "Projects"
+    },
+    "projectsTitle": {
+      "fa": "پروژه‌ها",
+      "en": "Projects"
+    },
+    "allProjectsButton": {
+      "fa": "مشاهدهٔ همهٔ پروژه‌ها",
+      "en": "View all projects"
+    }
+  }
+}

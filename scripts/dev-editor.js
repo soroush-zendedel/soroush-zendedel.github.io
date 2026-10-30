@@ -1,4 +1,5 @@
 (() => {
+  if (document.documentElement.dataset.personaRequested) return;
   const token = "__EDITOR_TOKEN__";
   const isEnglish = document.documentElement.lang === "en";
   const style = document.createElement("style");

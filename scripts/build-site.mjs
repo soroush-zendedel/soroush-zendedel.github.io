@@ -178,6 +178,18 @@ function renderProfileLinks(html) {
   return html.replace(/(<div\b[^>]*\bdata-social-links=")[^"]*(")/, `$1${socials}$2`);
 }
 
+function addPersonaUploader(html, language, file) {
+  const src = language === "en" ? "../assets/persona-uploader.js" : "./assets/persona-uploader.js";
+  const boot = `<script data-persona-boot>(function(){var id=new URLSearchParams(location.search).get("persona");if(id&&id!=="narrator"){document.documentElement.dataset.personaRequested="true";document.documentElement.style.visibility="hidden";}})();</script>`;
+  if (!html.includes("data-persona-boot")) {
+    if (!/<meta\s+charset=["']?[^"'\s>]+["']?\s*>/i.test(html)) throw new Error(`Charset meta tag is missing in ${file}`);
+    html = html.replace(/(<meta\s+charset=["']?[^"'\s>]+["']?\s*>)/i, `$1\n  ${boot}`);
+  }
+  if (html.includes("persona-uploader.js")) return html;
+  if (!html.includes("</body>")) throw new Error(`Body closing tag is missing in ${file}`);
+  return html.replace("</body>", `  <script src="${src}" defer></script>\n</body>`);
+}
+
 function renderContactMenu(language) {
   if (!Array.isArray(contactData.methods) || contactData.methods.length > 10) throw new Error("Contact methods must be a list of up to 10 items.");
   const ids = new Set();
@@ -386,6 +398,7 @@ for (const language of ["fa", "en"]) {
   html = replaceRegion(html, "                            <!-- SOCIAL-LINKS:START -->", "                            <!-- SOCIAL-LINKS:END -->", renderSocialLinks(socialData.socials, language), file);
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   html = replaceRegion(html, "<!-- SITE-FOOTER:START -->", "<!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
+  html = addPersonaUploader(html, language, file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -471,6 +484,7 @@ for (const language of ["fa", "en"]) {
   html = html.replace(schemaScript, `<script type="application/ld+json">${schemaJson}</script>`);
   html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   html = renderProfileLinks(html);
+  html = addPersonaUploader(html, language, file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -483,6 +497,7 @@ for (const language of ["fa", "en"]) {
   html = replaceRegion(html, "          <!-- ABOUT-PROJECTS:START -->", "          <!-- ABOUT-PROJECTS:END -->", orderedProjects.map((project) => renderAboutProject(project, language)).join("\n"), file);
   html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   html = renderProfileLinks(html);
+  html = addPersonaUploader(html, language, file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
