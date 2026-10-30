@@ -5,20 +5,8 @@
     "visible": true,
     "href": "https://soroush-zendedel.github.io/shenobin/",
     "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/shenobin/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/shenobin"
-      }
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/shenobin/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/shenobin" }
     ],
     "image": "shenobin.webp",
     "imageFallback": "S",
@@ -45,70 +33,13 @@
     }
   },
   {
-    "id": "tara",
-    "order": 2,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/tara/",
-    "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/tara/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/tara"
-      }
-    ],
-    "image": "tara.webp",
-    "imageFallback": "T",
-    "home": {
-      "fa": {
-        "name": "تارا",
-        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
-      },
-      "en": {
-        "name": "Tara",
-        "description": "A visual tool for learning and practicing music theory."
-      },
-      "alt": "Tara - Music Theory Application"
-    },
-    "about": {
-      "fa": {
-        "name": "تارا",
-        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
-      },
-      "en": {
-        "name": "Tara",
-        "description": "A visual tool for learning and practicing music theory."
-      }
-    }
-  },
-  {
     "id": "khater",
-    "order": 3,
+    "order": 2,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/khater/",
     "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/khater/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/khater"
-      }
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/khater/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/khater" }
     ],
     "image": "khater.webp",
     "imageFallback": "K",
@@ -135,25 +66,46 @@
     }
   },
   {
+    "id": "tara",
+    "order": 3,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/tara/",
+    "links": [
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/tara/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/tara" }
+    ],
+    "image": "tara.webp",
+    "imageFallback": "T",
+    "home": {
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
+      },
+      "alt": "Tara - Music Theory Application"
+    },
+    "about": {
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
+      }
+    }
+  },
+  {
     "id": "notella",
     "order": 4,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/notella/",
     "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/notella/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/notella"
-      }
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/notella/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/notella" }
     ],
     "image": "notella.webp",
     "imageFallback": "N",
@@ -185,20 +137,8 @@
     "visible": true,
     "href": "https://soroush-zendedel.github.io/countdown/",
     "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/countdown/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/countdown"
-      }
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/countdown/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/countdown" }
     ],
     "image": "countdown.webp",
     "imageFallback": "C",
@@ -230,20 +170,8 @@
     "visible": true,
     "href": "https://soroush-zendedel.github.io/silk-road/",
     "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/silk-road/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/silk-road"
-      }
+      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/silk-road/" },
+      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/silk-road" }
     ],
     "image": "silkroad.webp",
     "imageFallback": "SR",
