@@ -1,8 +1,49 @@
+import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const assetVersions = new Map();
+
+async function versionLocalAssets(html, file) {
+  const pattern = /(?:src|href)="((?:\.\.\/|\.\/)?assets\/[^?"#]+)(?:\?[^"#]*)?"/g;
+  const references = new Set([...html.matchAll(pattern)].map((match) => match[1]));
+  const versions = new Map();
+  for (const reference of references) {
+    const assetPath = resolve(root, dirname(file), reference);
+    const relativeAsset = relative(root, assetPath);
+    if (relativeAsset === ".." || relativeAsset.startsWith(`..${sep}`)) throw new Error(`Asset path escapes the project: ${reference}`);
+    let version = assetVersions.get(assetPath);
+    if (!version) {
+      version = createHash("sha256").update(await readFile(assetPath)).digest("hex").slice(0, 16);
+      assetVersions.set(assetPath, version);
+    }
+    versions.set(reference, version);
+  }
+  return html.replace(/((?:src|href)=")((?:\.\.\/|\.\/)?assets\/[^?"#]+)(?:\?[^"#]*)?(")/g, (_match, before, reference, after) => `${before}${reference}?v=${versions.get(reference)}${after}`);
+}
+
+async function versionPersonaPackages() {
+  const catalogPath = join(root, "personas", "catalog.json");
+  const personasRoot = join(root, "personas");
+  const catalog = JSON.parse(await readFile(catalogPath, "utf8"));
+  for (const persona of catalog.personas || []) {
+    if (typeof persona.package !== "string" || persona.package.includes("\\") || persona.package.includes("?")) {
+      throw new Error(`Invalid built-in persona package path: ${persona.id}`);
+    }
+    const packagePath = resolve(personasRoot, persona.package);
+    const relativePackage = relative(personasRoot, packagePath);
+    if (!relativePackage || relativePackage === ".." || relativePackage.startsWith(`..${sep}`)) {
+      throw new Error(`Built-in persona package path escapes personas/: ${persona.id}`);
+    }
+    const archive = await readFile(packagePath);
+    persona.version = createHash("sha256").update(archive).digest("hex").slice(0, 24);
+  }
+  await writeFile(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`, "utf8");
+}
+
+await versionPersonaPackages();
 const projects = JSON.parse(await readFile(join(root, "content/projects.json"), "utf8"));
 const profile = JSON.parse(await readFile(join(root, "content/profile.json"), "utf8"));
 const socialData = JSON.parse(await readFile(join(root, "content/social.json"), "utf8"));
@@ -445,6 +486,7 @@ for (const language of ["fa", "en"]) {
   html = replaceRegion(html, "                    <!-- PROJECT-CARDS:START -->", "                    <!-- PROJECT-CARDS:END -->", featuredProjects.map((project) => renderHomeProject(project, language)).join("\n\n"), file);
   html = replaceRegion(html, "<!-- SITE-FOOTER:START -->", "<!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   html = addPersonaUploader(html, language, file);
+  html = await versionLocalAssets(html, file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -531,6 +573,7 @@ for (const language of ["fa", "en"]) {
   html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   html = renderProfileLinks(html);
   html = addPersonaUploader(html, language, file);
+  html = await versionLocalAssets(html, file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 
@@ -544,6 +587,7 @@ for (const language of ["fa", "en"]) {
   html = replaceRegion(html, "  <!-- SITE-FOOTER:START -->", "  <!-- SITE-FOOTER:END -->", renderSiteFooter(language), file);
   html = renderProfileLinks(html);
   html = addPersonaUploader(html, language, file);
+  html = await versionLocalAssets(html, file);
   await writeFile(path, html.replace(/\r?\n/g, "\r\n"));
 }
 

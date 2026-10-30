@@ -148,7 +148,7 @@
 
   async function loadBuiltinCatalog() {
     const catalogUrl = new URL("../personas/catalog.json", assetBase);
-    const response = await fetch(catalogUrl, { credentials: "same-origin", cache: "no-cache" });
+    const response = await fetch(catalogUrl, { credentials: "same-origin", cache: "no-store" });
     if (!response.ok) throw new Error("Persona catalog unavailable");
     const catalog = await response.json();
     if (catalog?.schemaVersion !== 1 || !Array.isArray(catalog.personas) || catalog.personas.length > 50) throw new Error("Invalid persona catalog");
@@ -164,6 +164,7 @@
       assertText(entry.package, 200);
       const packageUrl = new URL(entry.package, catalogUrl);
       if (packageUrl.origin !== location.origin || !packageUrl.pathname.startsWith(siteRoot.pathname) || packageUrl.search || packageUrl.hash || !/\.zip$/i.test(packageUrl.pathname)) throw new Error("Invalid catalog package URL");
+      packageUrl.searchParams.set("v", entry.version);
       return { id: entry.id, label: entry.label, version: entry.version, packageUrl: packageUrl.href };
     });
   }
@@ -339,6 +340,11 @@
     document.documentElement.removeAttribute("style");
     delete document.documentElement.dataset.personaRequested;
     delete document.documentElement.dataset.personaPending;
+    const url = new URL(location.href);
+    if (url.searchParams.has("_persona_refresh")) {
+      url.searchParams.delete("_persona_refresh");
+      history.replaceState(history.state, "", url.href);
+    }
   }
 
   async function loadPersona(id) {
@@ -352,7 +358,7 @@
     let validated = null;
     if (!item || (builtin && item.source === "builtin" && item.version !== builtin.version)) {
       if (!builtin) return null;
-      const response = await fetch(builtin.packageUrl, { credentials: "same-origin", cache: "no-cache" });
+      const response = await fetch(builtin.packageUrl, { credentials: "same-origin", cache: "no-store" });
       if (!response.ok) throw new Error("Built-in persona download failed");
       archive = await response.arrayBuffer();
       if (archive.byteLength > MAX_ARCHIVE_SIZE) throw new Error("Built-in persona archive too large");
@@ -376,6 +382,7 @@
     const url = new URL(location.href);
     if (!id || id === "narrator") url.searchParams.delete("persona");
     else url.searchParams.set("persona", id);
+    url.searchParams.set("_persona_refresh", `${Date.now()}-${Math.random().toString(36).slice(2)}`);
     location.assign(url.href);
   }
 

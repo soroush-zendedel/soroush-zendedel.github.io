@@ -56,7 +56,7 @@ $env:PORT=8083; pnpm dev
 
 با دکمهٔ شناور «پرسونا» می‌توانید فایل ZIP بارگذاری کنید. بسته‌های نسخهٔ ۱ داده و آواتار می‌گیرند؛ نسخهٔ ۲ علاوه بر آن CSS و دارایی‌های تصویری و فونت محلی می‌پذیرد. در حالت `isolated`، CSS پرسونا جایگزین همهٔ استایل‌های سایت می‌شود و باید ظاهر کامل صفحه را تعریف کند. ZIP فقط در همان مرورگر ذخیره می‌شود. قالب در [راهنمای بستهٔ پرسونا](PERSONA-PACKAGE.md) آمده است.
 
-فهرست پرسوناهای آماده برای همه در `personas/catalog.json` تعریف می‌شود. «مهندس شب» از ابتدا در این فهرست است؛ بسته‌اش هنگام انتخاب از سایت دریافت و در همان مرورگر ذخیره می‌شود.
+فهرست پرسوناهای آماده برای همه در `personas/catalog.json` تعریف می‌شود. «مهندس شب» از ابتدا در این فهرست است؛ بسته‌اش هنگام انتخاب از سایت دریافت و در همان مرورگر ذخیره می‌شود. ساخت سایت، نسخهٔ بسته را از محتوای ZIP و نسخهٔ فایل‌های CSS/JavaScript را از محتوای خودشان می‌سازد تا تغییرها با کش قبلی اشتباه نشوند.
 
 ## ویرایش محتوا در سایت
 
@@ -97,7 +97,7 @@ $env:PORT=8083; pnpm dev
 pnpm run build:site
 ```
 
-این فرمان داده‌ها را اعتبارسنجی می‌کند و فهرست پروژه‌ها و محتوای قابل‌ویرایش را در شش صفحهٔ HTML بالا بازسازی می‌کند.
+این فرمان داده‌ها را اعتبارسنجی می‌کند، فهرست پروژه‌ها و محتوای قابل‌ویرایش را در شش صفحهٔ HTML بالا بازسازی می‌کند، نسخهٔ بسته‌های پرسونا را از ZIPها می‌سازد و فایل‌های CSS/JavaScript محلی را با شناسهٔ محتوایی در صفحه‌ها ثبت می‌کند. بعد از تغییر CSS، JavaScript یا ZIP پرسونا هم این فرمان را اجرا کنید تا مرورگر نسخهٔ تازه را دریافت کند.
 
 اگر فایل‌های CSS، کلاس‌های Tailwind یا `tailwind.input.css` را تغییر دادید، وابستگی‌ها را نصب و CSS را دوباره بسازید:
 
@@ -234,7 +234,7 @@ After editing JSON files by hand, regenerate the HTML pages:
 pnpm run build:site
 ```
 
-The script validates the data and rebuilds the editable content and project lists in the six HTML pages above.
+The script validates the data, rebuilds the editable content and project lists in the six HTML pages above, derives built-in persona package versions from their ZIP contents, and stamps local CSS/JavaScript URLs with content hashes. Run it after changing CSS, JavaScript, or a persona ZIP so browsers request the current assets.
 
 After changing CSS, Tailwind classes, or `tailwind.input.css`, install dependencies and rebuild the stylesheet:
 
