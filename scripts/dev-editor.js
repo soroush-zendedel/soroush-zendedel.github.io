@@ -16,6 +16,7 @@
     body.dev-editor-on .dev-editor-publish{pointer-events:auto}
     .dev-editor-toggle:disabled,.dev-editor-undo:disabled,.dev-editor-add:disabled,.dev-editor-publish:disabled{opacity:.55;cursor:wait}
     .dev-editor-add[hidden],.dev-editor-publish[hidden],.dev-editor-undo[hidden],.dev-profile-image-button[hidden],.dev-link-settings-button[hidden],.dev-social-settings-button[hidden],.dev-blog-settings-button[hidden],.dev-person-settings-button[hidden],.dev-editor-modal-layer[hidden]{display:none!important}
+    body.dev-editor-session-checking [data-edit-field],body.dev-editor-session-checking .dev-editor-handle,body.dev-editor-session-checking .dev-editor-settings-button,body.dev-editor-session-checking .dev-profile-image-button,body.dev-editor-session-checking .dev-link-settings-button,body.dev-editor-session-checking .dev-social-settings-button,body.dev-editor-session-checking .dev-blog-settings-button,body.dev-editor-session-checking .dev-person-settings-button{pointer-events:none!important}
     body.dev-editor-on a,body.dev-editor-on button,body.dev-editor-on [role="button"],body.dev-editor-on input,body.dev-editor-on select,body.dev-editor-on summary{pointer-events:none}
     body.dev-editor-on [data-edit-field],body.dev-editor-on .dev-editor-toggle,body.dev-editor-on .dev-editor-handle,body.dev-editor-on .dev-editor-settings-button,body.dev-editor-on .dev-profile-image-button,body.dev-editor-on .dev-link-settings-button,body.dev-editor-on .dev-social-settings-button,body.dev-editor-on .dev-blog-settings-button,body.dev-editor-on .dev-person-settings-button,body.dev-editor-on .dev-editor-settings,body.dev-editor-on .dev-editor-settings *,body.dev-editor-on .dev-editor-tools button{pointer-events:auto}
     body.dev-editor-on [data-edit-field]{outline:1px dashed #b91c1c;outline-offset:3px;cursor:text;border-radius:3px}
@@ -201,6 +202,61 @@
   let toastTimer;
   let sessionBase = sessionStorage.getItem("dev-editor-session-base") || "";
   let sessionCommitCount = 0;
+  let operationBusy = "";
+
+  function progressLabel(operation) {
+    const labels = {
+      checking: isEnglish ? "Checking Git…" : "در حال بررسی گیت…",
+      preparing: isEnglish ? "Preparing editor…" : "در حال آماده‌سازی ویرایش…",
+      saving: isEnglish ? "Saving commit…" : "در حال ثبت تغییر…",
+      publishing: isEnglish ? "Pushing changes…" : "در حال ارسال تغییرها…",
+      undoing: isEnglish ? "Undoing edits…" : "در حال بازگردانی…",
+      reloading: isEnglish ? "Saved · Reloading…" : "ذخیره شد · در حال بازخوانی…",
+    };
+    return labels[operation] || "";
+  }
+
+  function updateActionButtons() {
+    toggle.setAttribute("aria-pressed", String(enabled));
+    toggle.textContent = operationBusy ? progressLabel(operationBusy) : enabled
+      ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
+      : (isEnglish ? "✎ Edit" : "✎ ویرایش");
+    undoButton.hidden = sessionCommitCount === 0;
+    publishButton.hidden = enabled || sessionCommitCount === 0;
+    addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
+  }
+
+  function setOperationBusy(operation) {
+    operationBusy = operation;
+    toggle.disabled = true;
+    publishButton.disabled = true;
+    updateActionButtons();
+  }
+
+  function clearOperationBusy() {
+    operationBusy = "";
+    toggle.disabled = false;
+    publishButton.disabled = false;
+    updateActionButtons();
+  }
+
+  async function postEditorSave(payload) {
+    setOperationBusy("saving");
+    try {
+      return await fetch("/__dev/save", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-editor-token": token },
+        body: JSON.stringify(payload),
+      });
+    } finally {
+      clearOperationBusy();
+    }
+  }
+
+  function reloadAfterSave(delay = 700) {
+    setOperationBusy("reloading");
+    setTimeout(() => location.reload(), delay);
+  }
 
   function toast(message, error = false) {
     document.querySelector(".dev-editor-toast")?.remove();
@@ -729,17 +785,13 @@
       blog.fields[key] = { fa: translations.fa.value, en: translations.en.value };
     }
     try {
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify({ type: "saveBlog", blog }),
-      });
+      const response = await postEditorSave({ type: "saveBlog", blog });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || (isEnglish ? "Blog card could not be saved." : "ذخیرهٔ کارت بلاگ انجام نشد."));
       closeAddProjectModal();
       if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
       toast(isEnglish ? `Blog card saved · commit ${result.commit}` : `کارت بلاگ ذخیره شد · کامیت ${result.commit}`);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       button.disabled = false;
       toast(error.message, true);
@@ -998,17 +1050,13 @@
         imageUpload = { mime: mimeByExtension[sourceExtension], extension: sourceExtension.slice(1), data: String(dataUrl).split(",")[1] };
       }
       save.disabled = true;
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify({ type: "savePerson", person: updated, imageUpload }),
-      });
+      const response = await postEditorSave({ type: "savePerson", person: updated, imageUpload });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || (isEnglish ? "About page could not be saved." : "ذخیرهٔ صفحهٔ درباره انجام نشد."));
       closeAddProjectModal();
       if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
       toast(isEnglish ? "About page saved · commit " + result.commit : "صفحهٔ درباره ذخیره شد · کامیت " + result.commit);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       save.disabled = false;
       toast(error.message, true);
@@ -1144,17 +1192,13 @@
     button.disabled = true;
     const socials = captureSocialRows();
     try {
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify({ type: "saveSocials", socials }),
-      });
+      const response = await postEditorSave({ type: "saveSocials", socials });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || (isEnglish ? "Social links could not be saved." : "ذخیرهٔ پیوندها انجام نشد."));
       closeAddProjectModal();
       if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
       toast(isEnglish ? `Social links saved · commit ${result.commit}` : `پیوندها ذخیره شدند · کامیت ${result.commit}`);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       button.disabled = false;
       toast(error.message, true);
@@ -1164,17 +1208,13 @@
   async function saveProjectSetting(payload, button) {
     button.disabled = true;
     try {
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify(payload),
-      });
+      const response = await postEditorSave(payload);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || (isEnglish ? "Could not save." : "ذخیره انجام نشد."));
       document.querySelectorAll(".dev-editor-settings").forEach((panel) => panel.remove());
       if (result.unchanged) return toast(isEnglish ? "No change to save." : "تغییری برای ذخیره وجود نداشت.");
       toast(isEnglish ? `Saved · commit ${result.commit}` : `ذخیره شد · کامیت ${result.commit}`);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       button.disabled = false;
       toast(error.message, true);
@@ -1186,13 +1226,7 @@
     if (enabled) sessionStorage.setItem("dev-editor-session-active", "1");
     else sessionStorage.removeItem("dev-editor-session-active");
     document.body.classList.toggle("dev-editor-on", enabled);
-    toggle.setAttribute("aria-pressed", String(enabled));
-    toggle.textContent = enabled
-      ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
-      : (isEnglish ? "✎ Edit" : "✎ ویرایش");
-    undoButton.hidden = sessionCommitCount === 0;
-    publishButton.hidden = sessionCommitCount === 0;
-    addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
+    updateActionButtons();
     if (profileImageButton) profileImageButton.hidden = !enabled;
     profileLinkButtons.forEach((button) => { button.hidden = !enabled; });
     updateProfileLinkButtons();
@@ -1325,10 +1359,7 @@
         reader.onerror = () => reject(new Error(isEnglish ? "Could not read this image." : "خواندن تصویر ممکن نشد."));
         reader.readAsDataURL(file);
       });
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify({
+      const response = await postEditorSave({
           type: "addProject",
           id: fields.id.value.trim(),
           faName: fields.faName.value,
@@ -1339,13 +1370,12 @@
           alt: fields.alt.value,
           mime: file.type,
           data: String(dataUrl).split(",")[1],
-        }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || (isEnglish ? "Project could not be added." : "افزودن پروژه انجام نشد."));
       closeAddProjectModal();
       toast(isEnglish ? `Project added · commit ${result.commit}` : `پروژه اضافه شد · کامیت ${result.commit}`);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       submit.disabled = false;
       toast(error.message, true);
@@ -1365,8 +1395,7 @@
 
   async function publishEditSession() {
     if (!sessionBase || !sessionCommitCount) return;
-    publishButton.disabled = true;
-    toggle.disabled = true;
+    setOperationBusy("publishing");
     try {
       const response = await fetch("/__dev/publish", {
         method: "POST",
@@ -1378,20 +1407,19 @@
       sessionBase = result.base;
       sessionCommitCount = 0;
       sessionStorage.setItem("dev-editor-session-base", sessionBase);
-      setEnabled(true);
+      setEnabled(false);
       toast(isEnglish
         ? `Edits pushed to ${result.branch}.`
         : `تغییرها به شاخهٔ ${result.branch} ارسال شد.`);
     } catch (error) {
       toast(error.message, true);
     } finally {
-      publishButton.disabled = false;
-      toggle.disabled = false;
+      clearOperationBusy();
     }
   }
 
   async function enterEditMode() {
-    toggle.disabled = true;
+    setOperationBusy("preparing");
     try {
       let result;
       if (sessionBase) {
@@ -1431,7 +1459,7 @@
     } catch (error) {
       toast(error.message, true);
     } finally {
-      toggle.disabled = false;
+      clearOperationBusy();
     }
   }
 
@@ -1448,7 +1476,7 @@
       : `همهٔ ${sessionCommitCount} کامیت این نوبت ویرایش برگردد؟ فایل‌ها به وضعیت پیش از شروع ویرایش بازمی‌گردند.`;
     if (!window.confirm(message)) return;
     undoButton.disabled = true;
-    toggle.disabled = true;
+    setOperationBusy("undoing");
     try {
       const result = await requestEditSession("undo", sessionBase);
       sessionStorage.removeItem("dev-editor-session-base");
@@ -1460,8 +1488,9 @@
       setTimeout(() => location.reload(), 700);
     } catch (error) {
       undoButton.disabled = false;
-      toggle.disabled = false;
       toast(error.message, true);
+    } finally {
+      clearOperationBusy();
     }
   }
 
@@ -1493,11 +1522,7 @@
     const saveButton = editing.tools.querySelector("[data-save]");
     saveButton.disabled = true;
     try {
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify(payload),
-      });
+      const response = await postEditorSave(payload);
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "ذخیره انجام نشد.");
       target.contentEditable = "false";
@@ -1510,7 +1535,7 @@
       }
       clearTextSelection();
       toast(isEnglish ? `Saved · commit ${result.commit}` : `ذخیره شد · کامیت ${result.commit}`);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       saveButton.disabled = false;
       toast(error.message, true);
@@ -1552,16 +1577,12 @@
 
   async function saveOrder(ids) {
     try {
-      const response = await fetch("/__dev/save", {
-        method: "POST",
-        headers: { "content-type": "application/json", "x-editor-token": token },
-        body: JSON.stringify({ type: "reorder", projectIds: ids }),
-      });
+      const response = await postEditorSave({ type: "reorder", projectIds: ids });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "ترتیب ذخیره نشد.");
       if (result.unchanged) return;
       toast(isEnglish ? `Order saved · commit ${result.commit}` : `ترتیب ذخیره شد · کامیت ${result.commit}`);
-      setTimeout(() => location.reload(), 700);
+      reloadAfterSave();
     } catch (error) {
       toast(error.message, true);
       setTimeout(() => location.reload(), 1200);
@@ -1580,7 +1601,7 @@
   document.addEventListener("pointerdown", (event) => {
     const panel = document.querySelector(".dev-editor-settings");
     if (panel && !event.target.closest(".dev-editor-settings,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button")) closeProjectSettings();
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-publish,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const field = event.target.closest("[data-edit-field]");
     if (!field) return;
     const project = field.closest("[data-project-id]");
@@ -1599,7 +1620,7 @@
       closeProjectSettings();
       return;
     }
-    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
+    if (enabled && !event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-publish,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings,[contenteditable=\"true\"]")) {
       const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
       if (control && (event.key === "Enter" || event.key === " " || event.key === "Spacebar")) {
         event.preventDefault();
@@ -1613,7 +1634,7 @@
   }, true);
 
   document.addEventListener("click", (event) => {
-    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
+    if (!enabled || event.target.closest(".dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-publish,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-modal-layer,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-editor-settings")) return;
     const control = event.target.closest("a,button,[role=\"button\"],input,select,summary");
     if (!control) return;
     event.preventDefault();
@@ -1680,6 +1701,9 @@
     window.setTimeout(enterEditMode, 0);
   } else if (sessionBase) {
     const wasEnabled = sessionStorage.getItem("dev-editor-session-active") === "1";
+    if (wasEnabled) setEnabled(true);
+    document.body.classList.add("dev-editor-session-checking");
+    setOperationBusy("checking");
     requestEditSession("status", sessionBase).then((result) => {
       if (result.updated) {
         reloadAfterEditorSync();
@@ -1696,6 +1720,7 @@
       sessionCommitCount = 0;
       setEnabled(false);
       try {
+        setOperationBusy("preparing");
         const freshSession = await requestEditSession("start");
         sessionBase = freshSession.base;
         sessionCommitCount = freshSession.count || 0;
@@ -1707,6 +1732,9 @@
       } catch (restartError) {
         toast(restartError.message || error.message, true);
       }
+    }).finally(() => {
+      document.body.classList.remove("dev-editor-session-checking");
+      clearOperationBusy();
     });
   }
 })();
