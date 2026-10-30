@@ -12,8 +12,8 @@
   const assetBase = new URL("./", currentScript.src);
   const isEnglish = document.documentElement.lang === "en";
   const copy = isEnglish
-    ? { title: "Persona", narrator: "Narrator (default)", upload: "Upload persona ZIP", choose: "Choose a persona", close: "Close", localNote: "Uploaded personas stay in this browser. Built-in personas download from this site when selected.", badZip: "This ZIP is invalid or does not match the persona package format.", saved: "Persona saved in this browser.", unavailable: "This persona is not available right now. Try again or upload its ZIP.", replace: "A persona with this ID is already stored in this browser. Replace it? The current version will be overwritten.", unsupportedZip: "This browser cannot unpack this ZIP format. Try a standard ZIP using Deflate compression.", remove: "Remove this persona from this browser" }
-    : { title: "پرسونا", narrator: "راوی (پیش‌فرض)", upload: "بارگذاری فایل ZIP پرسونا", choose: "یک پرسونا انتخاب کنید", close: "بستن", localNote: "پرسوناهای بارگذاری‌شده در همین مرورگر می‌مانند؛ پرسوناهای آماده هنگام انتخاب از همین سایت دریافت می‌شوند.", badZip: "ساختار فایل ZIP معتبر نیست یا با قالب بستهٔ پرسونا سازگار نیست.", saved: "پرسونا در همین مرورگر ذخیره شد.", unavailable: "این پرسونا در حال حاضر در دسترس نیست. دوباره تلاش کنید یا ZIP آن را بارگذاری کنید.", replace: "پرسونایی با این شناسه در این مرورگر ذخیره شده است. جایگزین شود؟ نسخهٔ فعلی بازنویسی می‌شود.", unsupportedZip: "مرورگر نتوانست این نوع ZIP را باز کند. از ZIP معمولی با فشرده‌سازی Deflate استفاده کنید.", remove: "حذف این پرسونا از همین مرورگر" };
+    ? { title: "Persona", narrator: "Narrator (default)", upload: "Upload persona ZIP", choose: "Choose a persona", description: "A persona changes the site's appearance and profile content. Choose one here or upload your own ZIP.", close: "Close", localNote: "Uploaded personas stay in this browser. Built-in personas download from this site when selected.", badZip: "This ZIP is invalid or does not match the persona package format.", saved: "Persona saved in this browser.", unavailable: "This persona is not available right now. Try again or upload its ZIP.", replace: "A persona with this ID is already stored in this browser. Replace it? The current version will be overwritten.", unsupportedZip: "This browser cannot unpack this ZIP format. Try a standard ZIP using Deflate compression.", remove: "Remove this persona from this browser" }
+    : { title: "پرسونا", narrator: "راوی (پیش‌فرض)", upload: "بارگذاری فایل ZIP پرسونا", choose: "یک پرسونا انتخاب کنید", description: "پرسونا ظاهر و محتوای نمایشی سایت را تغییر می‌دهد. از فهرست انتخابش کن یا فایل ZIP خودت را بارگذاری کن.", close: "بستن", localNote: "پرسوناهای بارگذاری‌شده در همین مرورگر می‌مانند؛ پرسوناهای آماده هنگام انتخاب از همین سایت دریافت می‌شوند.", badZip: "ساختار فایل ZIP معتبر نیست یا با قالب بستهٔ پرسونا سازگار نیست.", saved: "پرسونا در همین مرورگر ذخیره شد.", unavailable: "این پرسونا در حال حاضر در دسترس نیست. دوباره تلاش کنید یا ZIP آن را بارگذاری کنید.", replace: "پرسونایی با این شناسه در این مرورگر ذخیره شده است. جایگزین شود؟ نسخهٔ فعلی بازنویسی می‌شود.", unsupportedZip: "مرورگر نتوانست این نوع ZIP را باز کند. از ZIP معمولی با فشرده‌سازی Deflate استفاده کنید.", remove: "حذف این پرسونا از همین مرورگر" };
   let builtInPersonas = [];
 
   function openDatabase() {
@@ -240,9 +240,36 @@
   }
 
   function validateStylesheet(cssText, files, rewrite) {
-    const inspectableCss = cssText.replace(/\/\*[\s\S]*?\*\//g, "");
-    if (/@import\b|expression\s*\(|-moz-binding|(?:^|[;{}])\s*behavior\s*:|javascript\s*:/i.test(inspectableCss)) throw new Error("Unsafe CSS feature");
-    return cssText.replace(/url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)/gi, (_match, doubleQuoted, singleQuoted, bare) => {
+    const inspectableCss = cssText.replace(/\/\*[\s\S]*?\*\//g, (comment) => comment.replace(/[^\r\n]/g, " "));
+    const importPattern = /@import\b\s+url\(\s*(?:"[^"]*"|'[^']*')\s*\)\s*;/gi;
+    const importRules = [...inspectableCss.matchAll(importPattern)];
+    const importlessCss = inspectableCss.replace(importPattern, "");
+    if (/@import\b|expression\s*\(|-moz-binding|(?:^|[;{}])\s*behavior\s*:|javascript\s*:/i.test(importlessCss)) throw new Error("Unsafe CSS feature");
+
+    const preservedImports = [];
+    let cssWithoutImports = cssText;
+    for (const [index, rule] of importRules.entries()) {
+      const body = rule[0].replace(/^@import\b/i, "").replace(/;\s*$/, "").trim();
+      const urlMatch = body.match(/^url\(\s*(?:"([^"]*)"|'([^']*)'|([^)'\"\s]+))\s*\)$/i);
+      const stringMatch = body.match(/^(?:"([^"]*)"|'([^']*)')$/);
+      const reference = (urlMatch?.[1] ?? urlMatch?.[2] ?? urlMatch?.[3] ?? stringMatch?.[1] ?? stringMatch?.[2] ?? "").trim();
+      let fontStylesheet;
+      try { fontStylesheet = new URL(reference); } catch { throw new Error("Only Google Fonts CSS imports are allowed"); }
+      const allowedParameters = new Set(["family", "display", "text"]);
+      const parameters = [...fontStylesheet.searchParams.keys()];
+      const validDisplay = !fontStylesheet.searchParams.has("display") || ["auto", "block", "swap", "fallback", "optional"].includes(fontStylesheet.searchParams.get("display"));
+      if (!reference || fontStylesheet.protocol !== "https:" || fontStylesheet.hostname !== "fonts.googleapis.com" || fontStylesheet.pathname !== "/css2" || fontStylesheet.username || fontStylesheet.password || fontStylesheet.port || fontStylesheet.hash || !fontStylesheet.searchParams.getAll("family").some(Boolean) || parameters.some((parameter) => !allowedParameters.has(parameter)) || !validDisplay) {
+        throw new Error("Only Google Fonts CSS imports from the /css2 endpoint are allowed");
+      }
+      const token = `__PERSONA_GOOGLE_FONT_IMPORT_${index}__`;
+      if (cssWithoutImports.includes(token)) throw new Error("Invalid CSS import token");
+      const start = rule.index;
+      const end = start + rule[0].length;
+      preservedImports.push({ token, original: cssText.slice(start, end) });
+      cssWithoutImports = cssWithoutImports.slice(0, start) + token + cssWithoutImports.slice(end);
+    }
+
+    let rewritten = cssWithoutImports.replace(/url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)/gi, (_match, doubleQuoted, singleQuoted, bare) => {
       const reference = (doubleQuoted ?? singleQuoted ?? bare ?? "").trim();
       if (reference.startsWith("#")) return `url("${reference}")`;
       let path;
@@ -255,6 +282,8 @@
       const url = rewrite ? URL.createObjectURL(new Blob([bytes], { type: mime })) : path;
       return `url("${url}")`;
     });
+    for (const { token, original } of preservedImports) rewritten = rewritten.replace(token, original);
+    return rewritten;
   }
 
   function applyPersonaStyles(manifest, files) {
@@ -381,6 +410,11 @@
     close.addEventListener("click", () => dialog.close());
     header.append(heading, close);
     panel.append(header);
+
+    const description = document.createElement("p");
+    description.className = "persona-dialog-description";
+    description.textContent = copy.description;
+    panel.append(description);
 
     const select = document.createElement("select");
     select.className = "persona-select";

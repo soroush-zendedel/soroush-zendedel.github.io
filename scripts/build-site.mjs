@@ -82,25 +82,69 @@ function renderHomeImage(project, language) {
   return `<img src="${prefix}${escapeHtml(project.image)}" ${alt} width="80" height="80" loading="lazy" decoding="async" class="w-20 h-20 object-contain rounded-md border border-ink/5 mix-blend-multiply group-hover:scale-105 transition-transform">`;
 }
 
+function getProjectLinks(project) {
+  const projectUrl = new URL(project.href);
+  const host = projectUrl.hostname.toLowerCase();
+  let owner = "";
+  let repository = "";
+  let webHref = projectUrl.href;
+
+  if (host === "github.com") {
+    [owner, repository] = projectUrl.pathname.split("/").filter(Boolean);
+    if (owner && repository) webHref = `https://${owner}.github.io/${repository}/`;
+  } else if (host.endsWith(".github.io")) {
+    const labels = host.split(".");
+    if (labels.length >= 4) [repository, owner] = labels;
+    else {
+      owner = labels[0];
+      repository = projectUrl.pathname.split("/").filter(Boolean)[0] || "";
+    }
+  }
+
+  const safeSegment = /^[a-z0-9][a-z0-9-]*$/i;
+  const sourceHref = safeSegment.test(owner) && safeSegment.test(repository)
+    ? `https://github.com/${owner}/${repository}`
+    : "";
+  return { webHref, sourceHref };
+}
+
+function renderProjectActions(project, language, name = project.home[language].name) {
+  const { webHref, sourceHref } = getProjectLinks(project);
+  const webLabel = language === "en" ? "Web version ↗" : "نسخهٔ وب ↗";
+  const sourceLabel = language === "en" ? "Source code ↗" : "کد منبع ↗";
+  const webAction = webHref
+    ? `<a class="project-action" data-project-action="web" href="${escapeHtml(webHref)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(`${webLabel} ${name}`)}">${webLabel}</a>`
+    : "";
+  const sourceAction = sourceHref
+    ? `<a class="project-action" data-project-action="source" href="${escapeHtml(sourceHref)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(`${sourceLabel} ${name}`)}">${sourceLabel}</a>`
+    : "";
+  return `<span class="project-actions">${webAction}${sourceAction}</span>`;
+}
+
 function renderHomeProject(project, language) {
   const fa = project.home.fa;
   const en = project.home.en;
+  const actions = renderProjectActions(project, language);
   return `                    <!-- ${escapeHtml(project.id)} -->
-                    <a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson text-start">
+                    <article data-project-id="${escapeHtml(project.id)}" class="project-card flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
                         ${renderHomeImage(project, language)}
                         <div class="flex-1 px-5">
-                            <h4 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
-                                <span class="lang-fa flex items-center gap-2"><span data-edit-field="home.fa.name">${escapeHtml(fa.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| <span data-edit-field="home.en.name">${escapeHtml(en.name)}</span></span></span>
-                                <span class="lang-en font-en" data-edit-field="home.en.name">${escapeHtml(en.name)}</span>
+                            <div class="project-heading">
+                            <h4 class="project-title text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">
+                                <span class="lang-fa project-title flex items-center gap-2"><span data-edit-field="home.fa.name">${escapeHtml(fa.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| <span data-edit-field="home.en.name">${escapeHtml(en.name)}</span></span></span>
+                                <span class="lang-en project-title font-en" data-edit-field="home.en.name">${escapeHtml(en.name)}</span>
                             </h4>
+                            </div>
                             <p class="text-sm text-ink/70 leading-relaxed dynamic-align"><span class="lang-fa" data-edit-field="home.fa.description">${escapeHtml(fa.description)}</span><span class="lang-en font-en" data-edit-field="home.en.description">${escapeHtml(en.description)}</span></p>
+                            ${actions}
                         </div>
-                    </a>`;
+                    </article>`;
 }
 
 function renderAboutProject(project, language) {
   const copy = project.about[language];
-  return `          <li><a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong><span data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span></a></li>`;
+  const actions = renderProjectActions(project, language, copy.name);
+  return `          <li class="project-card project-about" data-project-id="${escapeHtml(project.id)}"><div class="project-heading"><strong data-edit-field="about.${language}.name">${escapeHtml(copy.name)}</strong></div><span class="project-about-description" data-edit-field="about.${language}.description">${escapeHtml(copy.description)}</span>${actions}</li>`;
 }
 
 function renderSiteFooter(language) {
@@ -139,6 +183,7 @@ function renderSiteNav(language, currentPage) {
 
 function renderDirectoryProject(project, language) {
   const copy = project.home[language];
+  const actions = renderProjectActions(project, language);
   const prefix = language === "en" ? "../img/" : "./img/";
   const alt = project.home.alt ? `alt="${escapeHtml(project.home.alt)}"` : 'alt="" aria-hidden="true"';
   const fallback = encodeURIComponent(project.imageFallback);
@@ -146,13 +191,14 @@ function renderDirectoryProject(project, language) {
   const name = language === "fa"
     ? `<span data-edit-field="home.fa.name">${escapeHtml(copy.name)}</span> <span class="text-sm font-en text-ink/50 font-normal">| ${escapeHtml(project.home.en.name)}</span>`
     : `<span data-edit-field="home.en.name">${escapeHtml(copy.name)}</span>`;
-  return `          <a data-project-id="${escapeHtml(project.id)}" href="${escapeHtml(project.href)}" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-crimson text-start">
+  return `          <article data-project-id="${escapeHtml(project.id)}" class="project-card flex items-center p-4 bg-white/50 hover:bg-white border border-ink/5 hover:border-crimson/30 rounded-lg transition-all group shadow-sm hover:shadow-md text-start">
             ${image}
             <div class="project-list-copy">
-              <h2 class="text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">${name}</h2>
+              <div class="project-heading"><h2 class="project-title text-xl font-bold text-ink mb-1 group-hover:text-crimson transition-colors">${name}</h2></div>
               <p data-edit-field="home.${language}.description" class="text-sm text-ink/70 leading-relaxed">${escapeHtml(copy.description)}</p>
+              ${actions}
             </div>
-          </a>`;
+          </article>`;
 }
 
 function renderSocialLinks(items, language) {

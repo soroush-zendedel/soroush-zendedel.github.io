@@ -189,12 +189,12 @@ body > footer {
     text-align: center;
   }
 
-  .document-wrapper [data-project-grid] > a {
+  .document-wrapper [data-project-grid] > .project-card {
     gap: 0.9rem;
     padding: 0.75rem;
   }
 
-  .document-wrapper [data-project-grid] > a > div {
+  .document-wrapper [data-project-grid] > .project-card > div {
     padding-inline: 0.25rem;
   }
 }
