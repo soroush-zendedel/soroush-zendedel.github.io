@@ -9,7 +9,7 @@
 - **Node.js نسخهٔ ۲۰ یا جدیدتر** برای اجرای پیش‌نمایش و اسکریپت‌های ساخت.
 - **pnpm نسخهٔ ۹ یا جدیدتر** برای نصب Tailwind CSS و ساخت دوبارهٔ CSS.
 - **Git** برای دریافت پروژه و ثبت تغییرات.
-- دسترسی GitHub به مخزن برای push کردن تغییرات. ساده‌ترین راه برای شروع، GitHub Desktop یا Git Credential Manager است. اگر آدرس SSH مخزن را استفاده می‌کنید، باید کلید SSH خود را در GitHub ثبت کرده باشید.
+- دسترسی GitHub به مخزنی که کلون می‌کنید برای push کردن تغییرات. اگر پروژه را فورک می‌کنید، آدرس Clone را از فورک خودتان بردارید؛ ساده‌ترین راه شروع GitHub Desktop یا Git Credential Manager است.
 
 برای استفادهٔ معمول از ویرایشگر محتوا، لازم نیست CSS را دوباره بسازید. برای تغییر استایل و ساخت CSS، `pnpm install` لازم است.
 
@@ -17,14 +17,16 @@
 
 ### ۱. دریافت پروژه
 
-با HTTPS:
+اگر می‌خواهید نسخهٔ خودتان را بسازید، ابتدا در GitHub از پروژه Fork بگیرید و سپس آدرس Clone همان فورک را استفاده کنید. Clone مستقیم مخزن اصلی فقط برای کسانی مناسب است که اجازهٔ push به آن را دارند.
+
+با HTTPS، نام کاربری خود را در آدرس جایگزین کنید:
 
 ```bash
-git clone https://github.com/soroush-zendedel/soroush-zendedel.github.io.git
+git clone https://github.com/YOUR-USERNAME/soroush-zendedel.github.io.git
 cd soroush-zendedel.github.io
 ```
 
-یا پروژه را با GitHub Desktop از همین مخزن Clone کنید.
+یا آدرس فورک خودتان را در GitHub Desktop وارد و Clone کنید.
 
 ### ۲. نصب وابستگی‌ها
 
@@ -64,26 +66,11 @@ $env:PORT=8083; pnpm dev
 
 ۲. در پیش‌نمایش، «ویرایش» را روشن کنید و روی بخش موردنظر یا دکمهٔ تنظیمات آن بزنید. متن‌های فارسی و انگلیسی، لینک‌ها، تصویرها، پروژه‌ها، ترتیب و نمایش پروژه‌ها، شبکه‌های اجتماعی، اطلاعات تماس، کارت بلاگ و اطلاعات صفحهٔ درباره از همین رابط قابل تغییرند.
 
-۳. هر بار که یک تغییر را تأیید می‌کنید، ویرایشگر داده و صفحه‌های HTML تولیدشده را ذخیره می‌کند و یک commit جداگانه روی شاخهٔ `edit-content` می‌سازد. این commit هنوز سایت زنده را تغییر نمی‌دهد.
+۳. هر بار که یک تغییر را تأیید می‌کنید، ویرایشگر داده و صفحه‌های HTML تولیدشده را ذخیره می‌کند و یک commit جداگانه روی شاخهٔ پیش‌فرض مخزن محلی می‌سازد.
 
-۴. پس از آماده‌شدن تغییرها، «ارسال برای بررسی» را بزنید. ویرایشگر شاخهٔ `edit-content` را به GitHub می‌فرستد و صفحهٔ مقایسه با `main` را باز می‌کند.
+۴. پس از آماده‌شدن تغییرها، «ارسال تغییرها» را بزنید. ویرایشگر commitها را به شاخهٔ پیش‌فرض مخزنی که کلون کرده‌اید می‌فرستد. اگر فورک خودتان را کلون کرده باشید، تغییرها به همان فورک ارسال می‌شوند.
 
-۵. در GitHub، درخواست ادغام (Pull request) با **Base: `main`** و **Compare: `edit-content`** بسازید. بخش **Files changed** را بررسی کنید و سپس PR را Merge کنید. اگر GitHub صفحهٔ Compare را باز کرد، دکمهٔ **Create pull request** شما را به همین مرحله می‌برد.
-
-۶. پس از ادغام در `main`، GitHub Pages سایت زنده را از فایل‌های جدید منتشر می‌کند. انتشار معمولاً کمی زمان می‌برد؛ وضعیت آن را در بخش **Deployments** مخزن ببینید.
-
-### همگام‌کردن شاخهٔ محتوا پس از ادغام
-
-بعد از Merge، برای اینکه شمارندهٔ جلو/عقب `edit-content` نسبت به `main` دوباره صفر شود، در مخزن محلی و در حالی که تغییر ذخیره‌نشده‌ای ندارید اجرا کنید:
-
-```bash
-git switch edit-content
-git fetch origin
-git merge --ff-only origin/main
-git push origin edit-content
-```
-
-این دستورها فقط شاخهٔ محتوا را به commit ادغام‌شدهٔ `main` جلو می‌آورند؛ تاریخچه را بازنویسی نمی‌کنند. ویرایشگر نیز پیش از ذخیره یا ارسال بعدی، شاخه را با تغییرهای تازهٔ GitHub بررسی و همگام می‌کند.
+۵. در مخزن اصلی، push به `main` نسخهٔ زنده را به‌روز می‌کند. در فورک، push فقط مخزن خودتان را به‌روز می‌کند؛ برای نمایش نسخهٔ فورک‌شده در وب، GitHub Pages را در تنظیمات همان فورک فعال کنید.
 
 ## فایل‌های داده و صفحه‌ها
 
@@ -138,7 +125,7 @@ git commit -m "Describe the change"
 git push origin main
 ```
 
-Push مستقیم به `main`، پس از انتشار خودکار GitHub Pages، سایت زنده را تغییر می‌دهد. برای محتوایی که باید پیش از انتشار بررسی شود، از ویرایشگر و شاخهٔ `edit-content` و روند Pull request بالا استفاده کنید. همکارانی که اجازهٔ push مستقیم به مخزن ندارند، باید از مخزن Fork‌شدهٔ خود PR به `main` بفرستند.
+در این پروژه، تغییر روی `main` و push مستقیم به `origin/main` سایت زنده را به‌روز می‌کند. اگر از فورک خودتان استفاده می‌کنید، `origin` باید به همان فورک اشاره کند تا pushها فقط مخزن خودتان را تغییر دهند.
 
 ## ساختار پروژه
 
@@ -157,7 +144,7 @@ projects.html           فهرست پروژه‌های فارسی
 
 ## روش انتشار
 
-این مخزن یک وب‌سایت استاتیک است. فایل‌های HTML، CSS، تصویر، فونت و sitemap در خود مخزن آماده‌اند؛ بنابراین برای انتشار، سرور backend یا فرمان deploy جداگانه لازم نیست. GitHub Pages از شاخهٔ `main` و ریشهٔ مخزن فایل‌ها را منتشر می‌کند. تغییر محتوا ابتدا در شاخهٔ `edit-content` آماده و بازبینی می‌شود؛ پس از Merge شدن PR در `main`، نسخهٔ زنده به‌روز می‌شود.
+این مخزن یک وب‌سایت استاتیک است. فایل‌های HTML، CSS، تصویر، فونت و sitemap در خود مخزن آماده‌اند؛ بنابراین برای انتشار، سرور backend یا فرمان deploy جداگانه لازم نیست. مخزن اصلی از شاخهٔ `main` و ریشهٔ مخزن در GitHub Pages منتشر می‌شود. فورک‌ها مخزن‌های مستقل‌اند و مالک فورک برای انتشار نسخهٔ خودش باید Pages را در تنظیمات فورک فعال کند.
 
 ---
 
@@ -218,23 +205,9 @@ The visual editor is available only through the local preview; it is not shown o
 
 1. Start with a clean working tree. Commit or set aside unrelated changes first.
 2. Enable **Edit** in the preview and open the settings for the section you want to change. The editor supports bilingual text, links, images, projects, project order and visibility, social links, contact methods, the blog card, and About-page details.
-3. Each confirmed change updates its data and generated HTML, then creates a separate commit on `edit-content`. It does not publish the live site.
-4. When the edits are ready, click **Push for review**. The editor pushes `edit-content` to GitHub and opens a comparison with `main`.
-5. On GitHub, create a pull request with **Base: `main`** and **Compare: `edit-content`**. Review **Files changed**, then merge the PR. The **Create pull request** button on the comparison page opens this step.
-6. GitHub Pages publishes the updated files from `main`. Check the repository’s **Deployments** section for publication status.
-
-### Sync `edit-content` after merging
-
-After the PR is merged, run these commands in a clean local checkout to bring the content branch back to the same commit as `main`:
-
-```bash
-git switch edit-content
-git fetch origin
-git merge --ff-only origin/main
-git push origin edit-content
-```
-
-This is a fast-forward update; it does not rewrite history. Before the next save or publish, the visual editor also checks GitHub and synchronizes its branch.
+3. Each confirmed change updates its data and generated HTML, then creates a separate commit on the repository's default branch.
+4. When the edits are ready, click **Push changes**. The editor pushes those commits to the default branch of the repository you cloned. If you cloned your fork, only your fork is updated.
+5. Pushing to the original repository's `main` updates its live site. To publish a fork as a website, its owner must enable GitHub Pages in that fork's settings.
 
 ## Content data and pages
 
@@ -291,7 +264,7 @@ git commit -m "Describe the change"
 git push origin main
 ```
 
-A direct push to `main` publishes through GitHub Pages. For content that should be reviewed before it goes live, use the visual editor and `edit-content` pull-request flow above. Contributors without direct push access should work from a fork and submit a pull request to `main`.
+In this project, changes on `main` and a direct push to `origin/main` update the live site. If you are working from your own fork, make sure `origin` points to that fork so pushes update only your repository.
 
 ## Project layout
 
@@ -310,4 +283,4 @@ projects.html           Persian project directory
 
 ## Deployment
 
-This repository is a static website. HTML, CSS, images, fonts, and sitemap files are committed and ready to serve; no backend or separate deploy command is needed. GitHub Pages publishes the repository root from `main`. Content changes are prepared on `edit-content`, reviewed in a pull request, and go live after that PR is merged into `main`.
+This repository is a static website. HTML, CSS, images, fonts, and sitemap files are committed and ready to serve; no backend or separate deploy command is needed. The original repository publishes its root from `main` through GitHub Pages. Forks are independent repositories; their owners can enable Pages in the fork's settings to publish their own version.

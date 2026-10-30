@@ -92,8 +92,8 @@
   publishButton.className = "dev-editor-publish";
   publishButton.type = "button";
   publishButton.hidden = true;
-  publishButton.textContent = isEnglish ? "↑ Push for review" : "↑ ارسال برای بررسی";
-  publishButton.title = isEnglish ? "Push edit-content and open its GitHub comparison" : "ارسال شاخهٔ ویرایش به گیت‌هاب و بازکردن مقایسه با main";
+  publishButton.textContent = isEnglish ? "↑ Push changes" : "↑ ارسال تغییرها";
+  publishButton.title = isEnglish ? "Push your edits to the default branch of the cloned repository" : "ارسال تغییرها به شاخهٔ اصلی مخزنی که کلون کرده‌اید";
   actionDock.append(publishButton);
 
   const undoButton = document.createElement("button");
@@ -1313,15 +1313,14 @@
         body: JSON.stringify({ base: sessionBase }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || (isEnglish ? "Could not push the edit branch." : "ارسال شاخهٔ ویرایش انجام نشد."));
+      if (!response.ok) throw new Error(result.error || (isEnglish ? "Could not push changes to your repository." : "ارسال تغییرها به مخزن انجام نشد."));
       sessionBase = result.base;
       sessionCommitCount = 0;
       sessionStorage.setItem("dev-editor-session-base", sessionBase);
       setEnabled(true);
       toast(isEnglish
-        ? "Edits pushed. Review and merge the pull request to publish the site."
-        : "تغییرات ارسال شد؛ برای انتشار سایت، درخواست ادغام را بررسی و در main ادغام کنید.");
-      window.setTimeout(() => window.location.assign(result.compareUrl), 450);
+        ? `Edits pushed to ${result.branch}.`
+        : `تغییرها به شاخهٔ ${result.branch} ارسال شد.`);
     } catch (error) {
       toast(error.message, true);
     } finally {

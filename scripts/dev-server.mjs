@@ -52,24 +52,39 @@ async function runGit(args) {
   return execFile("git", args, { cwd: root, env, windowsHide: true, maxBuffer: 1024 * 1024 });
 }
 
-async function ensureEditorBranch() {
+async function getOriginDefaultBranch() {
+  try {
+    const { stdout } = await runGit(["symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD"]);
+    const remoteHead = stdout.trim();
+    if (remoteHead.startsWith("origin/")) return remoteHead.slice("origin/".length);
+  } catch {}
+
+  const { stdout } = await runGit(["ls-remote", "--symref", "origin", "HEAD"]);
+  const match = stdout.match(/^ref:\s+refs\/heads\/(.+?)\s+HEAD$/m);
+  if (!match) throw new Error("Could not detect the default branch for origin. Clone your own fork and try again.");
+  await runGit(["remote", "set-head", "origin", match[1]]);
+  return match[1];
+}
+
+async function ensureDefaultBranch(defaultBranch) {
   await requireCleanWorkingTree();
   const { stdout: currentBranch } = await runGit(["branch", "--show-current"]);
-  if (currentBranch.trim() === "edit-content") return;
+  if (currentBranch.trim() === defaultBranch) return;
 
   const { stdout: localBranches } = await runGit(["branch", "--format=%(refname:short)"]);
-  if (localBranches.split(/\r?\n/).includes("edit-content")) {
-    await runGit(["switch", "edit-content"]);
+  if (localBranches.split(/\r?\n/).includes(defaultBranch)) {
+    await runGit(["switch", defaultBranch]);
     return;
   }
 
+  const remoteBranch = `origin/${defaultBranch}`;
   const { stdout: remoteBranches } = await runGit(["branch", "--remotes", "--format=%(refname:short)"]);
-  if (remoteBranches.split(/\r?\n/).includes("origin/edit-content")) {
-    await runGit(["switch", "--track", "origin/edit-content"]);
+  if (remoteBranches.split(/\r?\n/).includes(remoteBranch)) {
+    await runGit(["switch", "--track", remoteBranch]);
     return;
   }
 
-  await runGit(["switch", "-c", "edit-content"]);
+  throw new Error(`Could not find origin's default branch (${defaultBranch}). Fetch the repository and try again.`);
 }
 
 async function requireCleanWorkingTree() {
@@ -79,43 +94,30 @@ async function requireCleanWorkingTree() {
 
 async function syncEditorBranch() {
   const { stdout: initialHead } = await runGit(["rev-parse", "HEAD"]);
-  await ensureEditorBranch();
+  await requireCleanWorkingTree();
+  await runGit(["fetch", "origin"]);
+  const defaultBranch = await getOriginDefaultBranch();
+  await ensureDefaultBranch(defaultBranch);
   await requireCleanWorkingTree();
   const { stdout: branch } = await runGit(["branch", "--show-current"]);
-  if (branch.trim() !== "edit-content") throw new Error("Switch to the edit-content branch before saving or publishing.");
+  if (branch.trim() !== defaultBranch) throw new Error(`Switch to origin's default branch (${defaultBranch}) before editing.`);
 
-  await runGit(["fetch", "origin"]);
-  const { stdout: remoteBranches } = await runGit(["branch", "--remotes", "--format=%(refname:short)"]);
-  const hasRemoteEditBranch = remoteBranches.split(/\r?\n/).includes("origin/edit-content");
-  const { stdout: upstream } = await runGit(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"]).catch(() => ({ stdout: "" }));
-  if (hasRemoteEditBranch && upstream.trim() !== "origin/edit-content") {
-    await runGit(["branch", "--set-upstream-to=origin/edit-content", "edit-content"]);
-  }
-
-  for (const ref of ["refs/remotes/origin/edit-content", "refs/remotes/origin/main"]) {
-    let remoteHead;
-    try {
-      remoteHead = (await runGit(["rev-parse", "--verify", ref])).stdout.trim();
-    } catch {
-      continue;
-    }
-
-    const { stdout: localHead } = await runGit(["rev-parse", "HEAD"]);
-    try {
-      await runGit(["merge-base", "--is-ancestor", remoteHead, localHead.trim()]);
-      continue;
-    } catch {}
+  const ref = `refs/remotes/origin/${defaultBranch}`;
+  const remoteHead = (await runGit(["rev-parse", "--verify", ref])).stdout.trim();
+  const { stdout: localHead } = await runGit(["rev-parse", "HEAD"]);
+  try {
+    await runGit(["merge-base", "--is-ancestor", remoteHead, localHead.trim()]);
+  } catch {
     try {
       await runGit(["merge-base", "--is-ancestor", localHead.trim(), remoteHead]);
       await runGit(["merge", "--ff-only", remoteHead]);
-      continue;
-    } catch {}
-
-    try {
-      await runGit(["rebase", remoteHead]);
     } catch {
-      try { await runGit(["rebase", "--abort"]); } catch {}
-      throw new Error(`GitHub has newer edits on ${ref.replace("refs/remotes/origin/", "origin/")} that overlap local changes. No new commit was made; resolve the overlap, then try again.`);
+      try {
+        await runGit(["rebase", remoteHead]);
+      } catch {
+        try { await runGit(["rebase", "--abort"]); } catch {}
+        throw new Error(`GitHub has newer edits on origin/${defaultBranch} that overlap local changes. No new commit was made; resolve the overlap, then try again.`);
+      }
     }
   }
 
@@ -203,34 +205,19 @@ async function handlePublish(request, response) {
     const payload = await readBody(request);
     await syncEditorBranch();
     const { stdout: branch } = await runGit(["branch", "--show-current"]);
-    if (branch.trim() !== "edit-content") throw new Error("Publish is only available from the edit-content branch.");
+    const defaultBranch = await getOriginDefaultBranch();
+    if (branch.trim() !== defaultBranch) throw new Error(`Push is only available from origin's default branch (${defaultBranch}).`);
     const session = await getEditorSession(payload.base);
     if (!session.commits.length) return send(response, 409, { error: "There are no new edits to publish." });
-    const styleRef = "origin/style/homepage-hybrid-desktop-mobile";
-    let targetBranch = "style/homepage-hybrid-desktop-mobile";
-    try {
-      await runGit(["merge-base", "--is-ancestor", styleRef, "origin/main"]);
-      targetBranch = "main";
-    } catch {
-      try {
-        const [{ stdout: mainTree }, { stdout: styleTree }] = await Promise.all([
-          runGit(["rev-parse", "origin/main^{tree}"]),
-          runGit(["rev-parse", `${styleRef}^{tree}`]),
-        ]);
-        if (mainTree.trim() === styleTree.trim()) targetBranch = "main";
-      } catch {
-        throw new Error("Could not determine the current GitHub review branch. Fetch the latest branches and try again.");
-      }
-    }
-    await runGit(["push", "--set-upstream", "origin", "edit-content"]);
+    await runGit(["push", "origin", `HEAD:refs/heads/${defaultBranch}`]);
     const { stdout: head } = await runGit(["rev-parse", "HEAD"]);
     return send(response, 200, {
       base: head.trim(),
-      compareUrl: `https://github.com/soroush-zendedel/soroush-zendedel.github.io/compare/${targetBranch}...edit-content?expand=1`,
+      branch: defaultBranch,
       count: session.commits.length,
     });
   } catch (error) {
-    return send(response, 409, { error: error.message || "Could not publish the edit branch." });
+    return send(response, 409, { error: error.message || "Could not push changes to origin." });
   } finally {
     saving = false;
   }
