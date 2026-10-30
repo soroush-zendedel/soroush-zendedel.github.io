@@ -74,53 +74,8 @@
     }
   },
   {
-    "id": "tara",
-    "order": 3,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/tara/",
-    "links": [
-      {
-        "label": {
-          "fa": "نسخهٔ وب ↗",
-          "en": "Web version ↗"
-        },
-        "href": "https://soroush-zendedel.github.io/tara/"
-      },
-      {
-        "label": {
-          "fa": "کد منبع ↗",
-          "en": "Source code ↗"
-        },
-        "href": "https://github.com/soroush-zendedel/tara"
-      }
-    ],
-    "image": "tara.webp",
-    "imageFallback": "T",
-    "home": {
-      "fa": {
-        "name": "تارا",
-        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
-      },
-      "en": {
-        "name": "Tara",
-        "description": "A visual tool for learning and practicing music theory."
-      },
-      "alt": "Tara - Music Theory Application"
-    },
-    "about": {
-      "fa": {
-        "name": "تارا",
-        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
-      },
-      "en": {
-        "name": "Tara",
-        "description": "A visual tool for learning and practicing music theory."
-      }
-    }
-  },
-  {
     "id": "khater",
-    "order": 4,
+    "order": 3,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/khater/",
     "links": [
@@ -160,6 +115,51 @@
       "en": {
         "name": "Khater",
         "description": "A tool for practicing Persian letterforms and designing typefaces."
+      }
+    }
+  },
+  {
+    "id": "tara",
+    "order": 4,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/tara/",
+    "links": [
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/tara/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/tara"
+      }
+    ],
+    "image": "tara.webp",
+    "imageFallback": "T",
+    "home": {
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
+      },
+      "alt": "Tara - Music Theory Application"
+    },
+    "about": {
+      "fa": {
+        "name": "تارا",
+        "description": "ابزاری دیداری برای یادگیری و تمرین تئوری موسیقی."
+      },
+      "en": {
+        "name": "Tara",
+        "description": "A visual tool for learning and practicing music theory."
       }
     }
   },
