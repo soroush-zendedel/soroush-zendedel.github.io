@@ -139,9 +139,10 @@ async function getEditorSession(base) {
   const allowedFiles = new Set(["content/projects.json", "content/profile.json", "content/social.json", "content/contact.json", "content/blog.json", "content/person.json", ...generatedFiles]);
   let effectiveBase = base;
   let pendingCommits = [];
+  let undoneCommits = new Set();
   for (const commit of commits) {
-    const [{ stdout: subject }, { stdout: changedFiles }] = await Promise.all([
-      runGit(["show", "-s", "--format=%s", commit]),
+    const [{ stdout: message }, { stdout: changedFiles }] = await Promise.all([
+      runGit(["show", "-s", "--format=%B", commit]),
       runGit(["diff-tree", "--no-commit-id", "--name-only", "-r", commit]),
     ]);
     const { stdout: remoteRefs } = await runGit(["branch", "--remotes", "--contains", commit]);
@@ -149,16 +150,19 @@ async function getEditorSession(base) {
     if (remoteRefs.trim()) {
       effectiveBase = commit;
       pendingCommits = [];
+      undoneCommits = new Set();
       continue;
     }
-    if (!subject.startsWith("content:") || !files.length || files.some((file) =>
-      !allowedFiles.has(file) && !/^img\/[a-z0-9-]+(?:-v\d+)?\.(?:webp|jpg|jpeg|png)$/i.test(file)
-    )) {
-      throw new Error("This session includes commits outside the project editor; nothing was undone.");
+    for (const match of message.matchAll(/^Project-Editor-Undo:\s*([0-9a-f, ]+)\s*$/gim)) {
+      for (const hash of match[1].split(/[ ,]+/).filter(Boolean)) undoneCommits.add(hash.toLowerCase());
     }
-    pendingCommits.push(commit);
+    const subject = message.split(/\r?\n/, 1)[0];
+    const editorCommit = subject.startsWith("content:") && !subject.startsWith("content: undo project editor changes") && files.length && files.every((file) =>
+      allowedFiles.has(file) || /^img\/[a-z0-9-]+(?:-v\d+)?\.(?:webp|jpg|jpeg|png)$/i.test(file)
+    );
+    if (editorCommit) pendingCommits.push(commit);
   }
-  return { base: effectiveBase, commits: pendingCommits };
+  return { base: effectiveBase, commits: pendingCommits.filter((commit) => !undoneCommits.has(commit.toLowerCase())) };
 }
 
 async function handleEditSession(request, response) {
@@ -188,7 +192,15 @@ async function handleEditSession(request, response) {
     if (payload.action !== "undo") return send(response, 400, { error: "Unsupported session action." });
     await requireCleanWorkingTree();
     if (!session.commits.length) return send(response, 200, { unchanged: true, count: 0 });
-    await runGit(["reset", "--hard", session.base]);
+    const commitsToUndo = [...session.commits].reverse();
+    try {
+      for (const commit of commitsToUndo) await runGit(["revert", "--no-commit", commit]);
+      const undoTrailer = commitsToUndo.join(",");
+      await runGit(["commit", "-m", `content: undo project editor changes\n\nProject-Editor-Undo: ${undoTrailer}`]);
+    } catch (error) {
+      try { await runGit(["revert", "--abort"]); } catch {}
+      throw new Error(`Could not safely undo the project editor changes. Resolve any Git conflict and try again. ${error.message}`);
+    }
     return send(response, 200, { undone: session.commits.length });
   } catch (error) {
     return send(response, 409, { error: error.message || "Could not update the edit session." });
