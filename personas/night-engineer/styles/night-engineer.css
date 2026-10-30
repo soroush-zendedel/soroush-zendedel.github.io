@@ -203,7 +203,7 @@ main.document-wrapper,main.sheet{background:linear-gradient(155deg,rgba(18,31,48
 /* Final mobile refinements from the Night Engineer preview. */
 .document-wrapper a[data-profile-link=contact]{display:flex;width:fit-content;margin-inline:auto}
 .document-wrapper a[data-profile-link=contact]>span[aria-hidden=true]{display:none}
-.profile-statement,.profile-statement p{text-align:justify}
+.profile-statement,.profile-statement p{text-align:center}
 .profile-statement>.quote-mark{top:.25rem;inset-inline-start:.4rem}
 .profile-statement>.quote-mark-mirror{top:.25rem;bottom:auto;inset-inline-start:auto;inset-inline-end:.4rem}
 .document-wrapper>div>section:first-of-type>div,
