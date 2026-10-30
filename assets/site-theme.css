@@ -1,6 +1,7 @@
 :root {
   --home-canvas: #fdfcfb;
   --home-paper: #f6f2ea;
+  --home-card-surface: color-mix(in srgb, var(--home-paper) 64%, var(--home-canvas));
   --home-line: #e4dfd6;
   --home-muted: #4a463f;
   --home-crimson: #9b1c1c;
@@ -122,24 +123,37 @@ body.font-en { font-family: Lora, serif; }
 .sheet > .top-rule { opacity: 0.45; }
 .sheet > .top-rule { height: 6px; background: linear-gradient(90deg, transparent, var(--home-crimson), transparent); }
 
+.document-wrapper .ornate-frame {
+  background-color: var(--home-card-surface);
+}
+
 .document-wrapper [data-project-grid] > a,
 .sheet .projects a {
   border-color: var(--home-line);
   border-radius: 0.8rem;
-  background: hsla(43, 13%, 90%, 0.3);
-  box-shadow: 0 1px 3px rgb(26 26 26 / 5%);
+  background: var(--home-card-surface);
+  box-shadow: 0 2px 7px rgb(26 26 26 / 5%);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .document-wrapper [data-project-grid] > a:hover,
 .sheet .projects a:hover {
-  border-color: var(--home-crimson);
-  background: rgb(255 255 255 / 60%);
-  box-shadow: 0 8px 20px -16px rgb(26 26 26 / 35%);
+  border-color: rgb(155 28 28 / 32%);
+  background: var(--home-card-surface);
+  box-shadow: 0 10px 20px -18px rgb(26 26 26 / 24%), 0 2px 7px rgb(26 26 26 / 5%);
+  transform: translateY(-1px);
 }
 
 .document-wrapper [data-project-grid] > a > img {
   border-color: var(--home-line);
-  background: var(--home-canvas);
+  background: var(--home-card-surface);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .document-wrapper [data-project-grid] > a,
+  .sheet .projects a { transition: none; }
+  .document-wrapper [data-project-grid] > a:hover,
+  .sheet .projects a:hover { transform: none; }
 }
 
 .sheet .projects strong { color: var(--home-crimson); }
