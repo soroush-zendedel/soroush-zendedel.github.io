@@ -162,9 +162,21 @@ body > footer {
   }
 
   .document-wrapper > div > header [data-social-links] {
-    flex-wrap: wrap;
+    box-sizing: border-box;
+    width: 100%;
+    flex-wrap: nowrap;
     justify-content: center;
-    gap: clamp(0.35rem, 2.25vw, 0.75rem);
+    gap: clamp(0.25rem, 1.6vw, 0.5rem);
+  }
+
+  .document-wrapper > div > header [data-social-links] > .w-8 {
+    flex: 1 1 1rem;
+    min-width: 0.75rem;
+  }
+
+  .document-wrapper > div > header [data-social-links] > a {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .document-wrapper > div > .profile-statement {
