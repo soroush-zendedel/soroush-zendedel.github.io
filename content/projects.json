@@ -90,8 +90,37 @@
     }
   },
   {
-    "id": "khater",
+    "id": "didi",
     "order": 3,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/Didi/",
+    "image": "didi.jpg",
+    "imageFallback": "D",
+    "home": {
+      "fa": {
+        "name": "دیدی",
+        "description": "یک ویدیوی کوتاه‌تر، در چند لحظه! ویدیو بریده نمی‌شود و ویدیوی تو روی دستگاهت می‌ماند."
+      },
+      "en": {
+        "name": "Didi",
+        "description": "Set your video to the length you need. Your video stays on your device."
+      },
+      "alt": "Set your video to the length you need. Choose a target length, right in your browser. Your video stays on your device."
+    },
+    "about": {
+      "fa": {
+        "name": "دیدی",
+        "description": "یک ویدیوی کوتاه‌تر، در چند لحظه! ویدیو بریده نمی‌شود و ویدیوی تو روی دستگاهت می‌ماند."
+      },
+      "en": {
+        "name": "Didi",
+        "description": "Set your video to the length you need. Your video stays on your device."
+      }
+    }
+  },
+  {
+    "id": "khater",
+    "order": 4,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/khater/",
     "links": [
@@ -131,35 +160,6 @@
       "en": {
         "name": "Khater",
         "description": "A tool for practicing Persian letterforms and designing typefaces."
-      }
-    }
-  },
-  {
-    "id": "didi",
-    "order": 4,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/Didi/",
-    "image": "didi.jpg",
-    "imageFallback": "D",
-    "home": {
-      "fa": {
-        "name": "دیدی",
-        "description": "یک ویدیوی کوتاه‌تر، در چند لحظه! ویدیو بریده نمی‌شود و ویدیوی تو روی دستگاهت می‌ماند."
-      },
-      "en": {
-        "name": "Didi",
-        "description": "Set your video to the length you need. Your video stays on your device."
-      },
-      "alt": "Set your video to the length you need. Choose a target length, right in your browser. Your video stays on your device."
-    },
-    "about": {
-      "fa": {
-        "name": "دیدی",
-        "description": "یک ویدیوی کوتاه‌تر، در چند لحظه! ویدیو بریده نمی‌شود و ویدیوی تو روی دستگاهت می‌ماند."
-      },
-      "en": {
-        "name": "Didi",
-        "description": "Set your video to the length you need. Your video stays on your device."
       }
     }
   },
