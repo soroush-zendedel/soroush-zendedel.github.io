@@ -5,8 +5,20 @@
     "visible": true,
     "href": "https://soroush-zendedel.github.io/shenobin/",
     "links": [
-      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/shenobin/" },
-      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/shenobin" }
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/shenobin/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/shenobin"
+      }
     ],
     "image": "shenobin.webp",
     "imageFallback": "S",
@@ -33,46 +45,25 @@
     }
   },
   {
-    "id": "khater",
-    "order": 2,
-    "visible": true,
-    "href": "https://soroush-zendedel.github.io/khater/",
-    "links": [
-      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/khater/" },
-      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/khater" }
-    ],
-    "image": "khater.webp",
-    "imageFallback": "K",
-    "home": {
-      "fa": {
-        "name": "خطِر",
-        "description": "ابزاری برای تمرین حروف فارسی و طراحی فونت."
-      },
-      "en": {
-        "name": "Khater",
-        "description": "A tool for practicing Persian letterforms and designing typefaces."
-      },
-      "alt": "Khater - Font Design Tool"
-    },
-    "about": {
-      "fa": {
-        "name": "خطر (Khater)",
-        "description": "ابزاری برای تمرین حروف و طراحی فونت فارسی."
-      },
-      "en": {
-        "name": "Khater",
-        "description": "A tool for practicing Persian letterforms and designing typefaces."
-      }
-    }
-  },
-  {
     "id": "tara",
-    "order": 3,
+    "order": 2,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/tara/",
     "links": [
-      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/tara/" },
-      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/tara" }
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/tara/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/tara"
+      }
     ],
     "image": "tara.webp",
     "imageFallback": "T",
@@ -99,13 +90,70 @@
     }
   },
   {
+    "id": "khater",
+    "order": 3,
+    "visible": true,
+    "href": "https://soroush-zendedel.github.io/khater/",
+    "links": [
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/khater/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/khater"
+      }
+    ],
+    "image": "khater.webp",
+    "imageFallback": "K",
+    "home": {
+      "fa": {
+        "name": "خطِر",
+        "description": "ابزاری برای تمرین حروف فارسی و طراحی فونت."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing Persian letterforms and designing typefaces."
+      },
+      "alt": "Khater - Font Design Tool"
+    },
+    "about": {
+      "fa": {
+        "name": "خطر (Khater)",
+        "description": "ابزاری برای تمرین حروف و طراحی فونت فارسی."
+      },
+      "en": {
+        "name": "Khater",
+        "description": "A tool for practicing Persian letterforms and designing typefaces."
+      }
+    }
+  },
+  {
     "id": "notella",
     "order": 4,
     "visible": true,
     "href": "https://soroush-zendedel.github.io/notella/",
     "links": [
-      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/notella/" },
-      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/notella" }
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/notella/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/notella"
+      }
     ],
     "image": "notella.webp",
     "imageFallback": "N",
@@ -137,8 +185,20 @@
     "visible": true,
     "href": "https://soroush-zendedel.github.io/countdown/",
     "links": [
-      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/countdown/" },
-      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/countdown" }
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/countdown/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/countdown"
+      }
     ],
     "image": "countdown.webp",
     "imageFallback": "C",
@@ -170,8 +230,20 @@
     "visible": true,
     "href": "https://soroush-zendedel.github.io/silk-road/",
     "links": [
-      { "label": { "fa": "نسخهٔ وب ↗", "en": "Web version ↗" }, "href": "https://soroush-zendedel.github.io/silk-road/" },
-      { "label": { "fa": "کد منبع ↗", "en": "Source code ↗" }, "href": "https://github.com/soroush-zendedel/silk-road" }
+      {
+        "label": {
+          "fa": "نسخهٔ وب ↗",
+          "en": "Web version ↗"
+        },
+        "href": "https://soroush-zendedel.github.io/silk-road/"
+      },
+      {
+        "label": {
+          "fa": "کد منبع ↗",
+          "en": "Source code ↗"
+        },
+        "href": "https://github.com/soroush-zendedel/silk-road"
+      }
     ],
     "image": "silkroad.webp",
     "imageFallback": "SR",
