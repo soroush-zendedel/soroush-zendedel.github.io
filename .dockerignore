@@ -1,0 +1,9 @@
+﻿.env
+.env.*
+!.env.example
+backup/
+*.log
+*.dump
+*.bak
+.git/
+node_modules/
