@@ -2,14 +2,29 @@
   if (document.documentElement.dataset.personaRequested) return;
   const token = "__EDITOR_TOKEN__";
   const isEnglish = document.documentElement.lang === "en";
+  const hasFloatingContact = Boolean(document.querySelector('header a[data-profile-link="contact"]'));
+  if (hasFloatingContact) document.body.classList.add("dev-editor-home-layout");
+  const actionDockBottom = hasFloatingContact
+    ? "calc(var(--floating-action-bottom, 1rem) + var(--floating-contact-height, 44px) + var(--floating-action-gap, 8px))"
+    : "18px";
+  const undoBottom = hasFloatingContact
+    ? "calc(var(--floating-action-bottom, 1rem) + var(--floating-contact-height, 44px) + var(--floating-action-gap, 8px) + var(--floating-editor-dock-height, 44px) + var(--floating-action-gap, 8px))"
+    : "66px";
   const style = document.createElement("style");
   style.textContent = `
     .dev-editor-toggle,.dev-editor-undo,.dev-editor-add,.dev-editor-publish,.dev-editor-tools,.dev-editor-handle,.dev-editor-settings-button,.dev-profile-image-button,.dev-link-settings-button,.dev-social-settings-button,.dev-blog-settings-button,.dev-person-settings-button,.dev-editor-settings,.dev-editor-toast{font:inherit;z-index:2147483000}
-    .dev-editor-action-dock{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:8px;max-width:calc(100vw - 24px);z-index:2147483000;pointer-events:none}
-    .dev-editor-toggle{position:static;transform:none;border:0;border-radius:999px;padding:10px 16px;background:#b91c1c;color:#fff;box-shadow:0 6px 24px #0003;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;pointer-events:auto}
-    .dev-editor-toggle[aria-pressed="true"]{background:#292524}
+    .dev-editor-action-dock{position:fixed;left:50%;bottom:${actionDockBottom};transform:translateX(-50%);display:none;align-items:center;justify-content:center;gap:8px;min-height:var(--floating-editor-dock-height, 44px);box-sizing:border-box;max-width:calc(100vw - 24px);z-index:2147483000;pointer-events:none}
+    body.dev-editor-dock-actions-visible .dev-editor-action-dock{display:flex}
+    .dev-editor-toggle{position:static;display:inline-flex;align-items:center;justify-content:center;gap:.25rem;transform:none;box-sizing:border-box;min-height:44px;border:1px solid var(--home-line,#e4dfd6);border-radius:999px;padding:.35rem 1rem;background:var(--home-canvas,#fdfcfb);color:#1a1a1a;box-shadow:0 1px 3px rgb(26 26 26 / 8%);cursor:pointer;font-size:.875rem;font-weight:600;letter-spacing:.025em;white-space:nowrap;pointer-events:auto;transition:border-color 140ms ease,color 140ms ease,background-color 140ms ease}
+    .dev-editor-toggle-icon{display:inline-block;line-height:1}
+    .dev-editor-toggle-icon--pencil{position:relative;top:1px}
+    .dev-editor-toggle:hover{border-color:var(--home-crimson,#9b1c1c);color:var(--home-crimson,#9b1c1c)}
+    .dev-editor-toggle[aria-pressed="true"]{border-color:var(--home-crimson,#9b1c1c);background:var(--home-crimson,#9b1c1c);color:#fff}
+    .dev-editor-toggle[aria-pressed="true"]:hover{border-color:var(--home-crimson-deep,#7a1515);background:var(--home-crimson-deep,#7a1515);color:#fff}
+    .dev-editor-toggle:focus-visible{outline:2px solid var(--home-crimson,#9b1c1c);outline-offset:2px}
+    @media(max-width:420px){.top-navigation,.top-nav{gap:.3rem}.top-navigation a,.top-nav a{padding-inline:.5rem;font-size:.75rem}.top-navigation .dev-editor-toggle,.top-nav .dev-editor-toggle{padding-inline:.5rem;font-size:.75rem;letter-spacing:0}.top-navigation #langToggle,.top-nav #langToggle{gap:.3rem}}
     .dev-editor-publish{position:static;border:1px solid #29252422;border-radius:999px;padding:10px 14px;background:#fdfcfb;color:#292524;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:auto}
-    .dev-editor-undo{position:fixed;left:50%;inset-inline-start:auto;bottom:66px;transform:translateX(-50%);max-width:calc(100vw - 36px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
+    .dev-editor-undo{position:fixed;left:50%;inset-inline-start:auto;bottom:${undoBottom};transform:translateX(-50%);max-width:calc(100vw - 36px);border:1px solid #7f1d1d55;border-radius:999px;padding:10px 13px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700}
     .dev-editor-add{position:static;border:1px solid #b91c1c55;border-radius:999px;padding:10px 15px;background:#fdfcfb;color:#7f1d1d;box-shadow:0 6px 24px #0002;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap;pointer-events:auto}
     body.dev-editor-on .dev-editor-undo{pointer-events:auto}
     body.dev-editor-on .dev-editor-add{pointer-events:auto}
@@ -89,9 +104,28 @@
   const toggle = document.createElement("button");
   toggle.className = "dev-editor-toggle";
   toggle.type = "button";
-  toggle.textContent = isEnglish ? "✎ Edit" : "✎ ویرایش";
+  toggle.title = isEnglish ? "Toggle editing mode" : "روشن/خاموش کردن ویرایش";
+  const setToggleText = (value) => {
+    toggle.replaceChildren();
+    const iconMatch = value.match(/^(✎|✓)\s/);
+    if (iconMatch) {
+      const icon = document.createElement("span");
+      icon.className = iconMatch[1] === "✎" ? "dev-editor-toggle-icon dev-editor-toggle-icon--pencil" : "dev-editor-toggle-icon";
+      icon.setAttribute("aria-hidden", "true");
+      icon.textContent = iconMatch[1];
+      toggle.append(icon);
+    }
+    const label = document.createElement("span");
+    label.textContent = iconMatch ? value.slice(iconMatch[0].length) : value;
+    toggle.append(label);
+  };
+  setToggleText(isEnglish ? "✎ Edit" : "✎ ویرایش");
   toggle.setAttribute("aria-pressed", "false");
-  actionDock.append(toggle);
+  const navigation = document.querySelector(".top-navigation, .top-nav");
+  const languageItem = navigation?.querySelector(".language-switcher, #langToggle");
+  if (navigation && languageItem) navigation.insertBefore(toggle, languageItem);
+  else if (navigation) navigation.append(toggle);
+  else actionDock.append(toggle);
 
   const publishButton = document.createElement("button");
   publishButton.className = "dev-editor-publish";
@@ -218,12 +252,15 @@
 
   function updateActionButtons() {
     toggle.setAttribute("aria-pressed", String(enabled));
-    toggle.textContent = operationBusy ? progressLabel(operationBusy) : enabled
-      ? (isEnglish ? "✓ Done editing" : "✓ پایان ویرایش")
-      : (isEnglish ? "✎ Edit" : "✎ ویرایش");
+    setToggleText(operationBusy ? progressLabel(operationBusy) : enabled
+      ? (isEnglish ? "✓ Done" : "✓ پایان")
+      : (isEnglish ? "✎ Edit" : "✎ ویرایش"));
     undoButton.hidden = sessionCommitCount === 0;
     publishButton.hidden = enabled || sessionCommitCount === 0;
     addButton.hidden = !enabled || !document.querySelector("[data-project-grid]");
+    const dockActionsVisible = !publishButton.hidden || !addButton.hidden;
+    document.body.classList.toggle("dev-editor-dock-actions-visible", dockActionsVisible);
+    document.body.classList.toggle("dev-editor-actions-visible", dockActionsVisible || !undoButton.hidden);
   }
 
   function setOperationBusy(operation) {

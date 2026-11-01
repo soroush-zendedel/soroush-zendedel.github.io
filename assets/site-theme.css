@@ -1,11 +1,18 @@
 :root {
-  --home-canvas: #fdfcfb;
+  --persona-accent-color: #9b1c1c;
+  --persona-secondary-color: #1a1a1a;
+  --persona-background-color: #fdfcfb;
+  --persona-card-background-color: #fff;
+  --persona-border-color: #e4dfd6;
+  --persona-neutral-color: #a3a3a3;
+  --persona-secondary-foreground: #1a1a1a;
+  --home-canvas: var(--persona-background-color);
   --home-paper: #f6f2ea;
-  --home-card-surface: color-mix(in srgb, var(--home-paper) 64%, var(--home-canvas));
-  --home-line: #e4dfd6;
+  --home-card-surface: var(--persona-card-background-color);
+  --home-line: var(--persona-border-color);
   --home-muted: #4a463f;
-  --home-crimson: #9b1c1c;
-  --home-crimson-deep: #7a1515;
+  --home-crimson: var(--persona-accent-color);
+  --home-crimson-deep: color-mix(in srgb, var(--persona-accent-color) 78%, black);
 }
 
 body.font-fa,
@@ -13,10 +20,10 @@ body.font-en {
   min-height: 100vh;
   margin: 0;
   padding: 1rem;
-  background-color: var(--home-canvas);
+  background-color: var(--persona-background-color, var(--home-canvas));
   background-image: radial-gradient(rgb(26 26 26 / 3.5%) 0.6px, transparent 0.6px);
   background-size: 7px 7px;
-  color: #1a1a1a;
+  color: var(--persona-secondary-color, #1a1a1a);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -38,6 +45,9 @@ body.font-en { font-family: Lora, serif; }
 
 .top-navigation > a:last-child,
 .top-nav > a:last-child { margin-inline-start: auto; }
+.top-navigation > .language-switcher,
+.top-nav > .language-switcher { margin-inline-start: auto; }
+.language-switcher { position: relative; display: inline-flex; flex: 0 0 auto; align-items: center; }
 
 .top-navigation a,
 .top-nav a {
@@ -50,7 +60,7 @@ body.font-en { font-family: Lora, serif; }
   border-radius: 999px;
   background: var(--home-canvas);
   box-shadow: 0 1px 3px rgb(26 26 26 / 8%);
-  color: #1a1a1a;
+  color: var(--persona-secondary-color, #1a1a1a);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.025em;
@@ -65,6 +75,8 @@ body.font-en { font-family: Lora, serif; }
   flex: 0 0 1rem;
   color: var(--home-crimson);
 }
+
+[data-social-links] > a { color: var(--persona-neutral-color, #a3a3a3); }
 
 .top-navigation #langToggle,
 .top-nav #langToggle {
@@ -114,7 +126,7 @@ body.font-en { font-family: Lora, serif; }
 .sheet {
   border-color: var(--home-line) !important;
   border-radius: 1.25rem !important;
-  background-color: color-mix(in srgb, var(--home-canvas) 92%, white) !important;
+  background-color: var(--persona-card-background-color) !important;
   background-image: none !important;
   box-shadow: 0 18px 40px -24px rgb(26 26 26 / 28%) !important;
 }

@@ -1,11 +1,54 @@
 /* Home page layout and CTA refinements; shared colors and surfaces live in site-theme.css. */
+:root {
+  --floating-action-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  --floating-contact-height: 44px;
+  --floating-editor-dock-height: 44px;
+  --floating-action-gap: 8px;
+}
+
 .document-wrapper > .h-1\.5 { opacity: 0.45; }
 
 .document-wrapper a[data-profile-link="contact"] {
+  position: fixed;
+  z-index: 82;
+  left: 50%;
+  bottom: var(--floating-action-bottom);
+  box-sizing: border-box;
+  width: var(--contact-expanded-width, max-content);
   min-height: 44px;
+  max-width: var(--contact-expanded-width, calc(100vw - 2rem));
+  margin: 0;
   padding-block: 0;
   border-radius: 999px;
   background-color: var(--home-crimson);
+  transform: translateX(-50%);
+  overflow: hidden;
+  white-space: nowrap;
+  transition: max-width .42s cubic-bezier(.22, .68, .25, 1), width .42s cubic-bezier(.22, .68, .25, 1), height .42s cubic-bezier(.22, .68, .25, 1), padding .32s ease, border-radius .42s cubic-bezier(.22, .68, .25, 1), gap .32s ease, background-color .2s ease, color .2s ease;
+}
+
+.document-wrapper a[data-profile-link="contact"] > .contact-link-label {
+  max-width: 16rem;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity .24s ease, max-width .36s ease;
+}
+
+.document-wrapper a[data-profile-link="contact"] > .contact-floating-phone {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+.document-wrapper a[data-profile-link="contact"] > .contact-floating-phone svg {
+  display: block;
+  width: 1.3rem;
+  height: 1.3rem;
+  color: #fff;
 }
 
 .document-wrapper a[data-profile-link="contact"] > span[aria-hidden="true"] {
@@ -14,6 +57,28 @@
 
 .document-wrapper a[data-profile-link="contact"]:hover {
   background-color: var(--home-crimson-deep);
+}
+
+.document-wrapper a[data-profile-link="contact"].contact-link--collapsed {
+  width: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  max-width: 44px;
+  padding: 0;
+  gap: 0;
+  border-radius: 50%;
+  background-color: var(--home-crimson);
+  color: #fff;
+}
+
+.document-wrapper a[data-profile-link="contact"].contact-link--collapsed > .contact-link-label {
+  max-width: 0;
+  opacity: 0;
+}
+
+.document-wrapper a[data-profile-link="contact"].contact-link--collapsed > .contact-floating-phone {
+  opacity: 1;
+  transition-delay: .24s;
 }
 
 body > footer {
@@ -49,8 +114,13 @@ body > footer {
 
   .document-wrapper > div > header > .flex-1 > .profile-contact-group > a[data-profile-link="contact"] {
     align-self: center;
-    width: fit-content;
-    max-width: 100%;
+    width: var(--contact-expanded-width, fit-content);
+    max-width: var(--contact-expanded-width, 100%);
+  }
+
+  .document-wrapper > div > header > .flex-1 > .profile-contact-group > a[data-profile-link="contact"].contact-link--collapsed {
+    width: 44px;
+    max-width: 44px;
   }
 
   .document-wrapper > div > .profile-statement {
@@ -141,7 +211,7 @@ body > footer {
   .document-wrapper > div > header > .flex-1 > .profile-contact-group > a[data-profile-link="contact"] {
     grid-area: contact;
     justify-self: center;
-    margin: 0 0 1.75rem;
+    margin: 0;
   }
 
   .document-wrapper > div > header .avatar-frame {
@@ -196,6 +266,14 @@ body > footer {
 
   .document-wrapper [data-project-grid] > .project-card > div {
     padding-inline: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .document-wrapper a[data-profile-link="contact"],
+  .document-wrapper a[data-profile-link="contact"] > .contact-link-label,
+  .document-wrapper a[data-profile-link="contact"] > .contact-floating-phone {
+    transition: none;
   }
 }
 

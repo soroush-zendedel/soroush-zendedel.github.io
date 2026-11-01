@@ -8,13 +8,72 @@
   const MAX_STYLESHEET_SIZE = 300 * 1024;
   const MAX_FILES = 100;
   const ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,39}$/;
+  const PERSONA_UI_STYLESHEET_REVISION = "38";
+  const FLOATING_BUTTON_COLLAPSE_DELAY_MS = 10_000;
+  const pageLoadStartedAt = performance.now();
   const currentScript = document.currentScript;
   const assetBase = new URL("./", currentScript.src);
   const isEnglish = document.documentElement.lang === "en";
   const copy = isEnglish
     ? { title: "Persona", narrator: "Narrator (default)", upload: "Upload persona ZIP", choose: "Choose a persona", description: "A persona changes the site's appearance and profile content. Choose one here or upload your own ZIP.", close: "Close", localNote: "Uploaded personas stay in this browser. Built-in personas download from this site when selected.", badZip: "This ZIP is invalid or does not match the persona package format.", saved: "Persona saved in this browser.", unavailable: "This persona is not available right now. Try again or upload its ZIP.", replace: "A persona with this ID is already stored in this browser. Replace it? The current version will be overwritten.", unsupportedZip: "This browser cannot unpack this ZIP format. Try a standard ZIP using Deflate compression.", remove: "Remove this persona from this browser" }
     : { title: "پرسونا", narrator: "راوی (پیش‌فرض)", upload: "بارگذاری فایل ZIP پرسونا", choose: "یک پرسونا انتخاب کنید", description: "پرسونا ظاهر و محتوای نمایشی سایت را تغییر می‌دهد. از فهرست انتخابش کن یا فایل ZIP خودت را بارگذاری کن.", close: "بستن", localNote: "پرسوناهای بارگذاری‌شده در همین مرورگر می‌مانند؛ پرسوناهای آماده هنگام انتخاب از همین سایت دریافت می‌شوند.", badZip: "ساختار فایل ZIP معتبر نیست یا با قالب بستهٔ پرسونا سازگار نیست.", saved: "پرسونا در همین مرورگر ذخیره شد.", unavailable: "این پرسونا در حال حاضر در دسترس نیست. دوباره تلاش کنید یا ZIP آن را بارگذاری کنید.", replace: "پرسونایی با این شناسه در این مرورگر ذخیره شده است. جایگزین شود؟ نسخهٔ فعلی بازنویسی می‌شود.", unsupportedZip: "مرورگر نتوانست این نوع ZIP را باز کند. از ZIP معمولی با فشرده‌سازی Deflate استفاده کنید.", remove: "حذف این پرسونا از همین مرورگر" };
+  const launcherLabel = isEnglish ? "Persona" : "روایت";
+  const onboardingCopy = isEnglish
+    ? { title: "Try a Different Persona", description: "Choose a persona to see the site’s look and writing from a new perspective.", open: "Explore personas", later: "Later" }
+    : { title: "در روایتی دیگر", description: "با انتخابِ روایتی دیگر، ظاهر و نوشته‌هایِ سایت را از زاویه‌ای تازه ببین.", open: "دیدن روایت‌ها", later: "بعداً" };
+  const ONBOARDING_STORAGE_KEY = "persona-onboarding-seen-v3";
   let builtInPersonas = [];
+
+  function hasSeenPersonaOnboarding() {
+    try {
+      return localStorage.getItem(ONBOARDING_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  }
+
+  function markPersonaOnboardingSeen() {
+    try {
+      localStorage.setItem(ONBOARDING_STORAGE_KEY, "true");
+    } catch {}
+  }
+
+  function createPersonaOnboarding(dialog, dismiss) {
+    const card = document.createElement("section");
+    card.className = "persona-onboarding";
+    card.setAttribute("aria-labelledby", "persona-onboarding-title");
+
+    const heading = document.createElement("h2");
+    heading.id = "persona-onboarding-title";
+    heading.textContent = onboardingCopy.title;
+
+    const description = document.createElement("p");
+    description.textContent = onboardingCopy.description;
+
+    const actions = document.createElement("div");
+    actions.className = "persona-onboarding-actions";
+
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "persona-onboarding-open";
+    open.textContent = onboardingCopy.open;
+    open.setAttribute("aria-haspopup", "dialog");
+    open.setAttribute("aria-controls", "persona-dialog");
+    open.addEventListener("click", () => {
+      dismiss();
+      dialog.showModal();
+    });
+
+    const later = document.createElement("button");
+    later.type = "button";
+    later.className = "persona-onboarding-later";
+    later.textContent = onboardingCopy.later;
+    later.addEventListener("click", dismiss);
+
+    actions.append(open, later);
+    card.append(heading, description, actions);
+    return card;
+  }
 
   function openDatabase() {
     return new Promise((resolve, reject) => {
@@ -391,13 +450,39 @@
     const launcher = document.createElement("button");
     launcher.type = "button";
     launcher.className = "persona-fab";
+    launcher.setAttribute("aria-label", launcherLabel);
     launcher.setAttribute("aria-haspopup", "dialog");
     launcher.setAttribute("aria-controls", "persona-dialog");
-    launcher.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8L12 2Z"/><path d="m19 2 .7 2.3L22 5l-2.3.7L19 8l-.7-2.3L16 5l2.3-.7L19 2Z"/></svg>';
+    const launcherIcon = document.createElement("span");
+    launcherIcon.className = "persona-fab-icon";
+    launcherIcon.setAttribute("aria-hidden", "true");
+    launcherIcon.innerHTML = '<svg viewBox="0 0 24 24"><path d="m12 2 1.8 7.2L21 12l-7.2 1.8L12 21l-1.8-7.2L3 12l7.2-2.8L12 2Z"/><path d="m19 2 .7 2.3L22 5l-2.3.7L19 8l-.7-2.3L16 5l2.3-.7L19 2Z"/></svg>';
     const launcherText = document.createElement("span");
-    launcherText.textContent = copy.title;
-    launcher.append(launcherText);
+    launcherText.className = "persona-fab-label";
+    launcherText.textContent = launcherLabel;
+    const launcherContent = document.createElement("span");
+    launcherContent.className = "persona-fab-content";
+    launcherContent.append(launcherIcon, launcherText);
+    launcher.append(launcherContent);
 
+    const tourLauncher = document.createElement("button");
+    tourLauncher.type = "button";
+    tourLauncher.className = "site-tour-fab";
+    tourLauncher.lang = document.documentElement.lang;
+    tourLauncher.setAttribute("aria-label", isEnglish ? "Show site guide" : "نمایش راهنمای سایت");
+    const tourIcon = document.createElement("span");
+    tourIcon.className = "site-tour-fab-icon";
+    tourIcon.setAttribute("aria-hidden", "true");
+    tourIcon.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.4 2.4 0 1 1 4.2 1.6c-.9.9-1.8 1.3-1.8 2.9"/><path d="M12 17h.01"/></svg>';
+    const tourText = document.createElement("span");
+    tourText.className = "site-tour-fab-label";
+    tourText.lang = document.documentElement.lang;
+    tourText.dir = isEnglish ? "ltr" : "rtl";
+    tourText.textContent = isEnglish ? "Guide" : "راهنما";
+    const tourContent = document.createElement("span");
+    tourContent.className = "site-tour-fab-content";
+    tourContent.append(tourIcon, tourText);
+    tourLauncher.append(tourContent);
     const dialog = document.createElement("dialog");
     dialog.id = "persona-dialog";
     dialog.className = "persona-dialog";
@@ -500,11 +585,46 @@
     note.textContent = copy.localNote;
     panel.append(note);
     dialog.append(panel);
-    launcher.addEventListener("click", () => dialog.showModal());
+    let onboarding = null;
+    const dismissOnboarding = () => {
+      if (!onboarding) return;
+      markPersonaOnboardingSeen();
+      onboarding.remove();
+      onboarding = null;
+    };
+
+    const showPersonaOnboarding = (forced = false) => {
+      if (!forced && (activeId !== "narrator" || hasSeenPersonaOnboarding())) return;
+      if (onboarding?.isConnected) return;
+      onboarding = createPersonaOnboarding(dialog, dismissOnboarding);
+      markPersonaOnboardingSeen();
+      document.body.append(onboarding);
+    };
+
+    launcher.addEventListener("click", () => {
+      if (onboarding) dismissOnboarding();
+      dialog.showModal();
+    });
+    tourLauncher.addEventListener("click", () => {
+      document.dispatchEvent(new Event("site-tour"));
+      showPersonaOnboarding(true);
+    });
     dialog.addEventListener("click", (event) => {
       if (event.target === dialog) dialog.close();
     });
-    document.body.append(launcher, dialog);
+    document.body.append(launcher, tourLauncher);
+    window.setTimeout(() => {
+      launcher.classList.add("persona-fab--collapsed");
+      tourLauncher.classList.add("site-tour-fab--collapsed");
+      const contactLauncher = document.querySelector('header a[data-profile-link="contact"]');
+      if (contactLauncher) {
+        contactLauncher.style.setProperty("--contact-expanded-width", `${contactLauncher.getBoundingClientRect().width}px`);
+        contactLauncher.classList.add("contact-link--collapsed");
+        window.setTimeout(() => contactLauncher.style.removeProperty("--contact-expanded-width"), 500);
+      }
+    }, Math.max(0, FLOATING_BUTTON_COLLAPSE_DELAY_MS - (performance.now() - pageLoadStartedAt)));
+    showPersonaOnboarding();
+    document.body.append(dialog);
   }
 
   function preservePersonaOnLinks(id) {
@@ -553,7 +673,10 @@
 
   const style = document.createElement("link");
   style.rel = "stylesheet";
-  style.href = new URL("persona-uploader.css", assetBase).href;
+  const stylesheetUrl = new URL("persona-uploader.css", assetBase);
+  const scriptVersion = new URL(currentScript.src).searchParams.get("v");
+  stylesheetUrl.searchParams.set("v", `${scriptVersion || "0"}-${PERSONA_UI_STYLESHEET_REVISION}`);
+  style.href = stylesheetUrl.href;
   style.dataset.personaUi = "true";
   document.head.append(style);
   init().catch(() => {

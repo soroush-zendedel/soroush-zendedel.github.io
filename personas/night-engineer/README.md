@@ -5,6 +5,10 @@ This is an original, self-contained persona package for a moonlit software works
 - `manifest.json` selects the isolated style mode and defines the persona ID.
 - `profile.json` follows the shared bilingual profile schema.
 - `styles/night-engineer.css` controls the full appearance, responsive layout, typography, and moonlit effects.
+- The six palette tokens are gold accent, white secondary, deep navy background, shared navy card surface (`#111a27`), translucent blue-gray border, and pale blue-gray neutral.
+- Shared animations, page surfaces, bubble backgrounds, project cards, borders, and neutral social links consume these tokens by default; component-specific CSS can override them.
+- Contact-menu text and icon controls use the secondary white for contrast against the dark panel.
+- Floating persona and guide controls share a black background and white content before collapsing; their borders use the fixed border token and their icons use gold in the collapsed state.
 - `images/avatar.jpg` is copied from the site's existing portrait.
 - `assets/fonts/` and `licenses/` contain the fonts and their OFL notices.
 

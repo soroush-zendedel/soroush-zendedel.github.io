@@ -1,13 +1,16 @@
 .contact-popover {
   position: fixed;
-  z-index: 80;
+  z-index: 83;
   inset-block-start: auto;
   inset-inline-start: auto;
+  box-sizing: border-box;
   width: min(19rem, calc(100vw - 2rem));
+  max-height: min(18rem, calc(100dvh - 2rem));
+  overflow-y: auto;
   padding: 0.45rem;
-  border: 1px solid var(--home-line, #e4dfd6);
+  border: 1px solid var(--persona-border-color, var(--home-line, #e4dfd6));
   border-radius: 1rem;
-  background: var(--home-canvas, #fdfcfb);
+  background: var(--persona-card-background-color, var(--persona-background-color, var(--home-canvas, #fdfcfb)));
   box-shadow: 0 16px 36px -18px rgb(26 26 26 / 35%);
   transform: none;
   text-align: start;
@@ -21,7 +24,7 @@
   gap: 0.75rem;
   padding: 0.45rem 0.65rem;
   border-radius: 0.7rem;
-  color: #1a1a1a;
+  color: var(--persona-secondary-color, #1a1a1a);
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -30,16 +33,16 @@
 
 .contact-method:hover,
 .contact-method:focus-visible {
-  background: var(--home-paper, #f6f2ea);
-  color: var(--home-crimson, #9b1c1c);
+  background: color-mix(in srgb, var(--persona-background-color, #f6f2ea) 92%, var(--persona-accent-color, #9b1c1c) 8%);
+  color: var(--persona-accent-color, #9b1c1c);
   outline: none;
 }
 
 .contact-method:hover .contact-method-icon,
 .contact-method:focus-visible .contact-method-icon {
-  border-color: var(--home-crimson, #9b1c1c);
-  background: var(--home-crimson, #9b1c1c);
-  color: #fff;
+  border-color: var(--persona-accent-color, #9b1c1c);
+  background: var(--persona-accent-color, #9b1c1c);
+  color: var(--persona-accent-foreground, #fff);
 }
 
 .contact-method-icon {
@@ -49,10 +52,10 @@
   flex: 0 0 2.25rem;
   place-items: center;
   padding: 0;
-  border: 1px solid var(--home-line, #e4dfd6);
+  border: 1px solid var(--persona-border-color, var(--home-line, #e4dfd6));
   border-radius: 50%;
-  color: var(--home-crimson, #9b1c1c);
-  background: color-mix(in srgb, var(--home-paper, #f6f2ea) 42%, white);
+  color: var(--persona-accent-color, #9b1c1c);
+  background: color-mix(in srgb, var(--persona-background-color, #f6f2ea) 72%, var(--persona-secondary-color, white) 28%);
   line-height: 1;
   transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
 }
