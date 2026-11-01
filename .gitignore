@@ -14,3 +14,13 @@ yarn-error.log*
 # Operating system files
 .DS_Store
 Thumbs.db
+
+
+# .vscode/
+
+litellm.log
+litellm-error.log
+
+.env
+.env.*
+!.env.example
