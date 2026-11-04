@@ -1,0 +1,22 @@
+2026-11-01 08:55:24,931 - litellm_proxy_extras - INFO - Preparing the Prisma CLI toolchain (timeout 600.0s)
+2026-11-01 08:56:06,330 - litellm_proxy_extras - INFO - Prisma CLI toolchain ready
+2026-11-01 08:56:06,330 - litellm_proxy_extras - INFO - Using v2 migration resolver (--use_v2_migration_resolver)
+2026-11-01 08:56:06,494 - litellm_proxy_extras - INFO - Found 213 migrations at C:\Users\Soroush\AppData\Local\Programs\Python\Python314\Lib\site-packages\litellm_proxy_extras
+2026-11-01 08:56:46,296 - litellm_proxy_extras - INFO - prisma migrate deploy stdout: Prisma schema loaded from schema.prisma
+Datasource "client": PostgreSQL database "litellm", schema "public" at "localhost:5432"
+
+213 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+
+2026-11-01 08:56:46,420 - litellm_proxy_extras - INFO - Request-log indexes are all in place
+INFO:     Started server process [23720]
+INFO:     Waiting for application startup.
+08:56:48 - LiteLLM Proxy:WARNING: login_throttle.py:126 - trusted_proxy_ranges is not set or not a valid list of ranges, so failed Admin UI sign-in attempts are limited per source address and username only. Set it to the address ranges of the proxies in front of LiteLLM, or to an empty list when clients connect directly, to also limit each source address across usernames.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:4000 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [23720]

@@ -1,0 +1,48 @@
+LiteLLM Proxy: Postgres connection budget per pod = 1 worker(s) x writer connection_limit 10 = up to 10 connections; keep pods x that figure under max_connections minus superuser_reserved_connections
+
+   ██╗     ██╗████████╗███████╗██╗     ██╗     ███╗   ███╗
+   ██║     ██║╚══██╔══╝██╔════╝██║     ██║     ████╗ ████║
+   ██║     ██║   ██║   █████╗  ██║     ██║     ██╔████╔██║
+   ██║     ██║   ██║   ██╔══╝  ██║     ██║     ██║╚██╔╝██║
+   ███████╗██║   ██║   ███████╗███████╗███████╗██║ ╚═╝ ██║
+   ╚══════╝╚═╝   ╚═╝   ╚══════╝╚══════╝╚══════╝╚═╝     ╚═╝
+
+query-engine 393aa359c9ad4a4bb28630fb5613f9c281cde053
+
+[1;37m#------------------------------------------------------------#[0m
+[1;37m#                                                            #[0m
+[1;37m#         'The worst thing about this product is...'          #[0m
+[1;37m#        https://github.com/BerriAI/litellm/issues/new        #[0m
+[1;37m#                                                            #[0m
+[1;37m#------------------------------------------------------------#[0m
+
+ Thank you for using LiteLLM! - Krrish & Ishaan
+
+
+
+[1;31mGive Feedback / Get Help: https://github.com/BerriAI/litellm/issues/new[0m
+
+
+[32mLiteLLM: Proxy initialized with Config, Set models:[0m
+[32m    gemini-4-argon[0m
+[32m    gemini-3.8-flash[0m
+[32m    gemini-3.6-flash[0m
+[32m    gemini-3.5-flash-lite[0m
+[32m    gemini-3.1-pro[0m
+[32m    gemini-2.5-pro[0m
+[32m    gemini-2.5-flash[0m
+[32m    gemini-2.5-flash-lite[0m
+[32m    gpt-6-astra[0m
+[32m    gpt-6.1-sol[0m
+[32m    gpt-6.1-terra[0m
+[32m    gpt-6-luna[0m
+[32m    claude-fable-5.1[0m
+[32m    claude-opus-5[0m
+[32m    claude-opus-4.8[0m
+[32m    claude-opus-4.7[0m
+[32m    claude-sonnet-5[0m
+[32m    claude-sonnet-4.6[0m
+[32m    claude-haiku-4.5[0m
+INFO:     127.0.0.1:13534 - "GET /ui HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:13534 - "GET /litellm-asset-prefix/_next/static/media/83afe278b6a6bb3c-s.p.2bn3s6zvc0dyp.woff2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:11060 - "GET /litellm-asset-prefix/_next/static/chunks/1bnh8r0-prf7e.css HTTP/1.1" 200 OK

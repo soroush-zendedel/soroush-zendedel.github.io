@@ -18,8 +18,6 @@ Thumbs.db
 
 # .vscode/
 
-litellm.log
-litellm-error.log
 
 .env
 .env.*
