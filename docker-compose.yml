@@ -44,6 +44,7 @@
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/litellm
     volumes:
       - ./config.yaml:/app/config.yaml:ro
+      - ./docker/litellm/transformation.py:/app/.venv/lib/python3.13/site-packages/litellm/llms/cloudflare/chat/transformation.py:ro
     depends_on:
       db:
         condition: service_healthy
